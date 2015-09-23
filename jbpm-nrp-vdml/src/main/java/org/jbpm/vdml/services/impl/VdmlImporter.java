@@ -70,7 +70,7 @@ public class VdmlImporter extends MetaBuilder {
             ec.setCollaborationToUse(find(fromEc.getExchangeMethod(), Collaboration.class));
             ec.setSupplierRole(find(fromEc.getSupplierRole(), Role.class));
             ec.setExchangeMilestone(find(fromEc.getExchangeMilestone(), Milestone.class));
-            ec.setPoolBooking(find(fromEc.getResourceUseFromPool(),ResourceUse.class));
+            ec.setPoolBooking(find(fromEc.getResourceUseFromPool(), ResourceUse.class));
             entityManager.persist(ec);
             entityManager.flush();
         }
@@ -143,20 +143,32 @@ public class VdmlImporter extends MetaBuilder {
         importPortDelegations(result, c.getInternalPortDelegation());
         importContextBasedPortDelegations(deploymentId, c, result);
         importResourceUses(c);
-        setInitiatingRole(result);
+        setInitiatingRole(c, result);
         entityManager.flush();
         return result;
     }
 
-    protected void setInitiatingRole(Collaboration result) {
-        List<Activity> initiatingActivity = new ArrayList<Activity>();
-        for (Activity activity : result.getActivities()) {
-            if (activity.getInputDeliverableFlows().isEmpty() && !activity.getOutputDeliverableFlows().isEmpty()) {
-                initiatingActivity.add(activity);
+    protected void setInitiatingRole(org.omg.vdml.Collaboration source, Collaboration result) {
+        if (source instanceof CapabilityMethod) {
+            CapabilityMethod capabilityMethod = (CapabilityMethod) source;
+            org.omg.vdml.Activity initialActivity = capabilityMethod.getInitialActivity();
+            if (initialActivity != null) {
+                result.setInitiatorRole(result.findRole(initialActivity.getPerformingRole().getName()));
+            }
+            if (capabilityMethod.getPlanningRole() != null) {
+                result.setPlannerRole(result.findRole(capabilityMethod.getPlanningRole().getName()));
             }
         }
-        if (initiatingActivity.size() == 1) {
-            result.setInitiatorRole(initiatingActivity.get(0).getPerformingRole());
+        if (result.getInitiatorRole() == null) {
+            List<Activity> initiatingActivity = new ArrayList<Activity>();
+            for (Activity activity : result.getActivities()) {
+                if (activity.getInputDeliverableFlows().isEmpty() && !activity.getOutputDeliverableFlows().isEmpty()) {
+                    initiatingActivity.add(activity);
+                }
+            }
+            if (initiatingActivity.size() == 1) {
+                result.setInitiatorRole(initiatingActivity.get(0).getPerformingRole());
+            }
         }
     }
 
@@ -343,7 +355,7 @@ public class VdmlImporter extends MetaBuilder {
     }
 
     private <T extends MetaEntity> T find(EObject eObject, Class<T> rt) {
-        if(eObject==null){
+        if (eObject == null) {
             return null;
         }
         return entityManager.find(rt, buildUri(eObject));

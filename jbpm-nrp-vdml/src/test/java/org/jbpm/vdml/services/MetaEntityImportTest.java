@@ -28,15 +28,16 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         }
         assertMeasures(measures);
     }
-    protected <T extends VdmlElement> T findByName(Collection<? extends T> from, String name){
+
+    protected <T extends VdmlElement> T findByName(Collection<? extends T> from, String name) {
         for (T t : from) {
-            if(t.getName().equals(name))
-            {
+            if (t.getName().equals(name)) {
                 return t;
             }
         }
         return null;
     }
+
     protected void assertMeasures(Set<Measure> foundSdMeasures) {
         assertEquals(6, foundSdMeasures.size());
         for (Measure measure : foundSdMeasures) {
@@ -67,7 +68,7 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
                 org.jbpm.vdml.services.impl.model.meta.RescaledMeasure found = (org.jbpm.vdml.services.impl.model.meta.RescaledMeasure) measure;
                 assertNotNull(found.getRescaledMeasure());
                 assertEquals(2d, found.getMultiplier().doubleValue(), 0.0001);
-                assertEquals(100d, found.getOffset().doubleValue(),0.0001);
+                assertEquals(100d, found.getOffset().doubleValue(), 0.0001);
             } else {
                 fail("Unexpected Measure Type: " + measure.getClass().getSimpleName());
             }
@@ -138,11 +139,93 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         collectiveMeasure.setAccumulator(Accumulator.PRODUCT);
         return addToLibrary(l, collectiveMeasure);
     }
+    protected Characteristic buildBinaryMeasure(ValueDeliveryModel l,String name, Characteristic a, Characteristic b, BinaryFunctor functor) {
+        BinaryMeasure binaryMeasure = SMMFactory.eINSTANCE.createBinaryMeasure();
+        binaryMeasure.setName(name);
+        binaryMeasure.setFunctor(functor);
 
-    Characteristic buildDirectMeasure(ValueDeliveryModel l) {
+        Base1MeasureRelationship base1 = SMMFactory.eINSTANCE.createBase1MeasureRelationship();
+        binaryMeasure.setBaseMeasure1To(base1);
+        base1.setToDimensionalMeasure((DirectMeasure) a.getMeasure().get(0));
+
+        Base2MeasureRelationship base2 = SMMFactory.eINSTANCE.createBase2MeasureRelationship();
+        binaryMeasure.setBaseMeasure2To(base2);
+        base2.setToDimensionalMeasure((DirectMeasure) b.getMeasure().get(0));
+        return addToLibrary(l, binaryMeasure);
+    }
+    protected Characteristic buildRescaledMeasure(ValueDeliveryModel l,String name, Characteristic a, double offset, double m) {
+        RescaledMeasure rescaledMeasure= SMMFactory.eINSTANCE.createRescaledMeasure();
+        rescaledMeasure.setName(name);
+        rescaledMeasure.setOffset(offset);
+        rescaledMeasure.setMultiplier(m);
+        RescaledMeasureRelationship rescaledMeasureRelationship = SMMFactory.eINSTANCE.createRescaledMeasureRelationship();
+        DimensionalMeasure value = (DimensionalMeasure) a.getMeasure().get(0);
+        rescaledMeasureRelationship.setFromDimensionalMeasure(value);
+        rescaledMeasure.getRescalesFrom().add(rescaledMeasureRelationship);
+        rescaledMeasure.setName(name);
+        rescaledMeasure.setMultiplier(2d);
+        rescaledMeasure.setOffset(100d);
+        return addToLibrary(l, rescaledMeasure);
+    }
+
+    protected BusinessItemDefinition createBusinessItemDefinition(ValueDeliveryModel vdm, String s) {
+        BusinessItemDefinition money = VDMLFactory.eINSTANCE.createBusinessItemDefinition();
+        vdm.getBusinessItemLibrary().get(0).getBusinessItemLibraryElement().add(money);
+        money.setName(s);
+        return money;
+    }
+
+    protected Activity addActivity(CapabilityDefinition requestDef, CapabilityMethod cp, Role consumer, String s) {
+        Activity requestProduct = VDMLFactory.eINSTANCE.createActivity();
+        requestProduct.setName(s);
+        requestProduct.setCapabilityRequirement(requestDef);
+        cp.getActivity().add(requestProduct);
+        requestProduct.setPerformingRole(consumer);
+        return requestProduct;
+    }
+
+    protected Role createRole(CapabilityMethod cp, String name) {
+        Role consumer = VDMLFactory.eINSTANCE.createPerformer();
+        cp.getCollaborationRole().add(consumer);
+        consumer.setName(name);
+        return consumer;
+    }
+
+    protected CapabilityDefinition createCapabilityDefinition(ValueDeliveryModel vdm, String s) {
+        CapabilityDefinition requestDef = VDMLFactory.eINSTANCE.createCapabilityDefinition();
+        vdm.getCapabilitylibrary().get(0).getCapability().add(requestDef);
+        requestDef.setName(s);
+        return requestDef;
+    }
+
+    protected StoreDefinition createStore(ValueDeliveryModel vdm, BusinessItemDefinition resource, String name) {
+        StoreLibrary sl = vdm.getStoreLibrary().get(0);
+        StoreDefinition sd = VDMLFactory.eINSTANCE.createStoreDefinition();
+        sl.getStoreDefinitions().add(sd);
+        sd.setName(name);
+        sd.setResource(resource);
+        return sd;
+    }
+
+    protected PoolDefinition createPool(ValueDeliveryModel vdm, BusinessItemDefinition reusableResource, String name) {
+        StoreLibrary sl = vdm.getStoreLibrary().get(0);
+        PoolDefinition pd = VDMLFactory.eINSTANCE.createPoolDefinition();
+        sl.getStoreDefinitions().add(pd);
+        pd.setName(name);
+        pd.setResource(reusableResource);
+        return pd;
+    }
+
+    protected Characteristic buildDirectMeasure(ValueDeliveryModel l) {
+        return buildDirectMeasure(l, "DirectMeasure");
+    }
+
+    protected Characteristic buildDirectMeasure(ValueDeliveryModel l, String directMeasure) {
         DirectMeasure directMeasure1 = SMMFactory.eINSTANCE.createDirectMeasure();
-        directMeasure1.setName("DirectMeasure");
-        return addToLibrary(l, directMeasure1);
+        directMeasure1.setName(directMeasure);
+        Characteristic characteristic = addToLibrary(l, directMeasure1);
+        characteristic.setName(directMeasure);
+        return characteristic;
     }
 
     private Characteristic addToLibrary(ValueDeliveryModel l, org.omg.smm.Measure m) {
@@ -151,7 +234,7 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         characteristic.getMeasure().add(m);
         l.getMetricsModel().get(0).getLibraries().get(0).getMeasureElements().add(characteristic);
         l.getMetricsModel().get(0).getLibraries().get(0).getMeasureElements().add(m);
-        ((VDMLResourceImpl)m.eResource()).setID(m, EcoreUtil.generateUUID());
+        ((VDMLResourceImpl) m.eResource()).setID(m, EcoreUtil.generateUUID());
         return characteristic;
     }
 
@@ -184,19 +267,46 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         flow.setRecipient(VDMLFactory.eINSTANCE.createInputPort());
         flow.getRecipient().setName(toPortName);
         to.getContainedPort().add(flow.getRecipient());
-        Characteristic characteristic=null;
-        if(to instanceof SupplyingStore){
-            characteristic=((SupplyingStore)to).getInventoryLevel().getCharacteristicDefinition();
-        }else if(from instanceof  SupplyingStore){
-            characteristic=((SupplyingStore)from).getInventoryLevel().getCharacteristicDefinition();
+        Characteristic characteristic = null;
+        if (to instanceof SupplyingStore) {
+            characteristic = ((SupplyingStore) to).getInventoryLevel().getCharacteristicDefinition();
+        } else if (from instanceof SupplyingStore) {
+            characteristic = ((SupplyingStore) from).getInventoryLevel().getCharacteristicDefinition();
         }
-        if(characteristic!=null){
-             flow.getProvider().setBatchSize(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
+        if (characteristic != null) {
+            flow.getProvider().setBatchSize(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
             flow.getProvider().getBatchSize().setCharacteristicDefinition(characteristic);
             flow.getRecipient().setBatchSize(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
             flow.getRecipient().getBatchSize().setCharacteristicDefinition(characteristic);
         }
         return flow;
+    }
+
+    protected SupplyingStore addSupplyingStore(CapabilityMethod cp, StoreDefinition storeDef, Role storeOwner, String storeName, String inventoryLevelName) {
+        SupplyingStore toAccount = VDMLFactory.eINSTANCE.createSupplyingStore();
+        cp.getSupplyingStore().add(toAccount);
+        toAccount.setName(storeName);
+        toAccount.setStoreRequirement(storeDef);
+        toAccount.setSupplyingRole(storeOwner);
+        toAccount.setInventoryLevel(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
+        toAccount.getInventoryLevel().setName(inventoryLevelName);
+        toAccount.getInventoryLevel().setCharacteristicDefinition(storeDef.getInventoryLevel());
+        return toAccount;
+    }
+
+    protected SupplyingPool addSupplyingPool(CapabilityMethod cp, PoolDefinition storeDef, Role storeOwner, String storeName, String poolSize) {
+        SupplyingPool toAccount = VDMLFactory.eINSTANCE.createSupplyingPool();
+        cp.getSupplyingStore().add(toAccount);
+        toAccount.setName(storeName);
+        toAccount.setStoreRequirement(storeDef);
+        toAccount.setSupplyingRole(storeOwner);
+        toAccount.setInventoryLevel(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
+        toAccount.getInventoryLevel().setName("InventoryLevel");
+        toAccount.getInventoryLevel().setCharacteristicDefinition(storeDef.getInventoryLevel());
+        toAccount.setPoolSize(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
+        toAccount.getPoolSize().setName(poolSize);
+        toAccount.getPoolSize().setCharacteristicDefinition(storeDef.getInventoryLevel());
+        return toAccount;
     }
 
     protected BusinessItem addBusinessItem(BusinessItemDefinition workDefinition, CapabilityMethod cp) {
@@ -205,4 +315,5 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         workBusinessItem.setDefinition(workDefinition);
         workBusinessItem.setName(workDefinition.getName());
         return workBusinessItem;
-    }}
+    }
+}

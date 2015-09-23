@@ -172,7 +172,7 @@ public class ExchangeService extends AbstractRuntimeService {
         }
         pu.setAddress(resourceUse.getAddress());
         pu.setTo(resourceUse.getTo());
-        long commitTime = resourceUse.getFrom().getMillis() - cp.getExchangeConfiguration().getCommitPeriodTimeUnit().toMillis(cp.getExchangeConfiguration().getCommitPeriod());
+        long commitTime = resourceUse.getFrom().getMillis() - cp.getSchedule().getCommitPeriodTimeUnit().toMillis(cp.getSchedule().getCommitPeriod());
         TimerService ts = TimerServiceRegistry.getInstance().get(collaboration1.getDeploymentId());
         ts.scheduleJob(new CommitScheduledResourceUseJob(), new ScheduledResourceUseJobContext("commit", resourceUse), new PointInTimeTrigger(commitTime, null, null));
         ts.scheduleJob(new FulfillScheduledResourceUseJob(), new ScheduledResourceUseJobContext("fulfill", resourceUse), new PointInTimeTrigger(resourceUse.getTo().getMillis(), null, null));

@@ -88,7 +88,7 @@ public class AbstractPoolExchangeTest extends AbstractExchangeTest {
 
         SupplyingStore toAccount = createToAccount(account, cp, storeOwner);
 
-        SupplyingStore productStore = createSupplyingStore(pool, cp, storeOwner, "ResourcePool", "inventoryLevel");
+        SupplyingStore productStore = addSupplyingPool(cp, pool, storeOwner, "ResourcePool", "inventoryLevel");
 
         Activity requestProduct = addActivity(requestDef, cp, consumer, "Request");
 

@@ -98,13 +98,14 @@ public class MeasureBuilder extends MetaBuilder {
                 RescaledMeasure rescaledMeasure = new RescaledMeasure();
                 rescaledMeasure.setMultiplier(((org.omg.smm.RescaledMeasure) measure).getMultiplier());
                 rescaledMeasure.setOffset(((org.omg.smm.RescaledMeasure) measure).getOffset());
-                rescaledMeasure.setRescaledMeasure(buildReference(((org.omg.smm.RescaledMeasure) measure).getRescalesFrom().get(0)));
+                rescaledMeasure.setRescaledMeasure(buildReference(((org.omg.smm.RescaledMeasure) measure).getRescalesFrom().get(0).getFromDimensionalMeasure()));
                 result = rescaledMeasure;
             } else {
                 throw new IllegalArgumentException(measure.eClass().getName() + " not supported");
             }
             result.setName(measure.getName());
             result.setUri(buildUri(measure));
+            System.out.println("Measure [" + measure.eClass().getName() +"]:"+measure.getName() +" (" + result.getUri()+")");
             entityManager.persist(result);
         }
         return result;

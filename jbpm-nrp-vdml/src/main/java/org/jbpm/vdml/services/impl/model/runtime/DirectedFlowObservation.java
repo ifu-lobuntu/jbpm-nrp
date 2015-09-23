@@ -2,12 +2,15 @@ package org.jbpm.vdml.services.impl.model.runtime;
 
 
 import org.jbpm.vdml.services.impl.model.meta.DirectedFlow;
+import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
 public class DirectedFlowObservation implements RuntimeEntity{
@@ -119,12 +122,7 @@ public class DirectedFlowObservation implements RuntimeEntity{
     }
 
     public DirectedFlowMeasurement getQuantity() {
-        for (DirectedFlowMeasurement measurement : measurements) {
-            if(measurement.getMeasure().equals(directedFlow.getQuantity())){
-                return measurement;
-            }
-        }
-        return null;
+        return findMatchingRuntimeEntity(getMeasurements(), getDirectedFlow().getQuantity());
     }
 
     public Date getPlannedDate() {
@@ -141,5 +139,9 @@ public class DirectedFlowObservation implements RuntimeEntity{
 
     public void setActualDate(Date actualDate) {
         this.actualDate = actualDate;
+    }
+
+    public DirectedFlowMeasurement findMeasurement(Measure measure) {
+        return findMatchingRuntimeEntity(getMeasurements(), measure);
     }
 }

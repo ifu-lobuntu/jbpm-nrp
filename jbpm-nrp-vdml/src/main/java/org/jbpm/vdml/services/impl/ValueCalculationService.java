@@ -11,10 +11,18 @@ import java.util.*;
 public class ValueCalculationService {
     private EntityManager entityManager;
 
+    public ValueCalculationService(EntityManager entityManager) {
+        this.entityManager=entityManager;
+    }
+
+    public ValueCalculationService() {
+    }
+
     public void calculateProvidedValueProposition(ProvidedValuePropositionPerformance vpf) {
         //similar to calculateValueProposition without the receiver as criterion
     }
-    public void doCollaborationObservations(CollaborationObservation collaboration) {
+    public void doCollaborationObservations(Long collaborationObservationId) {
+        CollaborationObservation collaboration=entityManager.find(CollaborationObservation.class, collaborationObservationId);
         //First business items
         for (BusinessItemObservation businessItem: collaboration.getBusinessItems()) {
             Set<? extends Measurement> measurements = businessItem.getMeasurements();
@@ -27,6 +35,12 @@ public class ValueCalculationService {
         for (DirectedFlowObservation flow : collaboration.getOwnedDirectedFlows()) {
             Map<String,Measurement> context=new HashMap<String, Measurement>();
             addFlowToContext(flow, context);
+            if(flow.getTargetPortContainer() instanceof ActivityObservation){
+                for (DirectedFlowObservation peerFlows : flow.getTargetPortContainer().getConcludedFlow()) {
+                    addFlowToContext(peerFlows, context);
+                }
+            }
+            resolveMeasurements(context, flow.getMeasurements());
             resolveMeasurements(context, flow.getValueAddMeasurements());
         }
         //Then the activities?
@@ -41,6 +55,7 @@ public class ValueCalculationService {
             }
             resolveMeasurements(context, a.getMeasurements());
         }
+        entityManager.flush();
     }
 
     private void addFlowToContext(DirectedFlowObservation flow, Map<String, Measurement> context) {
@@ -190,6 +205,9 @@ public class ValueCalculationService {
 
     private Measurement resolveMeasurement(Map<String, Measurement> context, EmfReference measureA) {
         Measurement measurement = context.get(measureA.getUri());
+        if(measurement==null){
+            throw new IllegalArgumentException("Measure " + measureA.getUri() + " not found!");
+        }
         if (measurement.getValue() == null) {
             resolveMeasurement(context, measurement);
         }

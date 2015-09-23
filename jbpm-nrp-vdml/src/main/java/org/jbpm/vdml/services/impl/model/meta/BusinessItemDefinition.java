@@ -6,6 +6,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import java.util.*;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 public class BusinessItemDefinition implements MetaEntity{
     @Id
@@ -86,10 +88,10 @@ public class BusinessItemDefinition implements MetaEntity{
                 Measure measure = iterator2.next();
                 if (measure instanceof BinaryMeasure) {
                     BinaryMeasure bm = (BinaryMeasure) measure;
-                    if (singleInstanceMap.containsKey(bm.getMeasureA().getUri()) && singleInstanceMap.containsKey(bm.getMeasureB())) {
+                    if (singleInstanceMap.containsKey(bm.getMeasureA().getUri()) && singleInstanceMap.containsKey(bm.getMeasureB().getUri())) {
                         singleInstanceMap.put(bm.getUri(), bm);
                         iterator2.remove();
-                    } else if (multipleInstanceMap.containsKey(bm.getMeasureA().getUri()) && multipleInstanceMap.containsKey(bm.getMeasureB())) {
+                    } else if (multipleInstanceMap.containsKey(bm.getMeasureA().getUri()) && multipleInstanceMap.containsKey(bm.getMeasureB().getUri())) {
                         multipleInstanceMap.put(bm.getUri(), bm);
                         iterator2.remove();
                     } else {
@@ -130,5 +132,9 @@ public class BusinessItemDefinition implements MetaEntity{
 
     public Set<Collaboration> getCollaborations() {
         return collaborations;
+    }
+
+    public Measure findMeasurement(String name) {
+        return findByName(getMeasures(),name);
     }
 }

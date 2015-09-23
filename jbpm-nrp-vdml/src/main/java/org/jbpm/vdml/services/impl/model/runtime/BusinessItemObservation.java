@@ -1,8 +1,9 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 import org.jbpm.vdml.services.impl.model.meta.BusinessItemDefinition;
+import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
-
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.*;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -53,6 +54,9 @@ public class BusinessItemObservation implements RuntimeEntity {
 
     public void setInstanceReference(ExternalObjectReference instanceReference) {
         this.instanceReference = instanceReference;
+    }
+    public BusinessItemMeasurement findMeasurement(Measure m){
+        return findMatchingRuntimeEntity(getMeasurements(),m);
     }
 
     public Set<BusinessItemMeasurement> getMeasurements() {

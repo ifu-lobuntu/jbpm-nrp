@@ -117,4 +117,16 @@ public class Collaboration extends PortContainer {
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
+
+    public BusinessItemDefinition findBusinessItem(String name) {
+        return findByName(getBusinessItemDefinitions(),name);
+    }
+
+    public DeliverableFlow findDeliverableFlow(String name) {
+        return findByName(getDeliverableFlowsFrom(getOwnedDirectedFlows()),name);
+    }
+
+    public Set<DirectedFlow> getOwnedDirectedFlows() {
+        return ownedDirectedFlows;
+    }
 }

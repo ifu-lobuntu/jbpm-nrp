@@ -158,7 +158,7 @@ public class StoreExchangeTest extends AbstractExchangeTest {
 
         SupplyingStore toAccount = createToAccount(account, cp, storeOwner);
 
-        SupplyingStore productStore= createSupplyingStore(store, cp, storeOwner, "ProductStore", "inventoryLevel");
+        SupplyingStore productStore= addSupplyingStore(cp, store, storeOwner, "ProductStore", "inventoryLevel");
 
         Activity requestProduct = addActivity(requestDef, cp, consumer, "Request");
 

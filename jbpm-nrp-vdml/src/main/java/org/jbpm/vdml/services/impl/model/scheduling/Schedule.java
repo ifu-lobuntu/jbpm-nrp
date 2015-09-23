@@ -20,6 +20,10 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     //TODO This relationship can grow, ensure past unavailability gets deleted. This is just for planning purposes. For performance purposes we will look at the associated ResourceUse
     private Set<PlannedUnavailability> plannedUnavailability=new HashSet<PlannedUnavailability>() ;
+    @Enumerated
+    private TimeUnit commitPeriodTimeUnit=TimeUnit.DAYS;
+
+    private int commitPeriod=1;
 
     public List<DailySchedule> getHoursOfAvailability() {
         return hoursOfAvailability;
@@ -57,5 +61,21 @@ public class Schedule {
 
     public void setScheduleSlotTimeUnit(TimeUnit scheduleSlotTimeUnit) {
         this.scheduleSlotTimeUnit = scheduleSlotTimeUnit;
+    }
+
+    public TimeUnit getCommitPeriodTimeUnit() {
+        return commitPeriodTimeUnit;
+    }
+
+    public void setCommitPeriodTimeUnit(TimeUnit commitPeriodTimeUnit) {
+        this.commitPeriodTimeUnit = commitPeriodTimeUnit;
+    }
+
+    public int getCommitPeriod() {
+        return commitPeriod;
+    }
+
+    public void setCommitPeriod(int commitPeriod) {
+        this.commitPeriod = commitPeriod;
     }
 }

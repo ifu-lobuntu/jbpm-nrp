@@ -22,10 +22,6 @@ public class ExchangeConfiguration {
     @ManyToOne
     private ResourceUse poolBooking;
 
-    @Enumerated
-    private TimeUnit commitPeriodTimeUnit=TimeUnit.DAYS;
-
-    private int commitPeriod=1;
 
     public Long getId() {
         return id;
@@ -63,19 +59,5 @@ public class ExchangeConfiguration {
         this.supplierRole = supplierRole;
     }
 
-    public TimeUnit getCommitPeriodTimeUnit() {
-        return commitPeriodTimeUnit;
-    }
 
-    public void setCommitPeriodTimeUnit(TimeUnit commitPeriodTimeUnit) {
-        this.commitPeriodTimeUnit = commitPeriodTimeUnit;
-    }
-
-    public int getCommitPeriod() {
-        return commitPeriod;
-    }
-
-    public void setCommitPeriod(int commitPeriod) {
-        this.commitPeriod = commitPeriod;
-    }
 }

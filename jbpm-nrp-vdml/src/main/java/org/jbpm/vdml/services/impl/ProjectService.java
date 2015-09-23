@@ -5,7 +5,9 @@ import org.jbpm.vdml.services.impl.model.meta.Collaboration;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ProjectService extends AbstractRuntimeService{
     private CollaborationService collaborationService;
@@ -37,9 +39,12 @@ public class ProjectService extends AbstractRuntimeService{
     public CollaborationObservation initiateProject(Long requestorId, String collaborationUri) {
         Collaboration collaboration=entityManager.find(Collaboration.class, collaborationUri);
         Participant participant = entityManager.find(Participant.class, requestorId);
-        RolePerformance initiator = findOrCreateRole(participant, collaboration.getInitiatorRole());
-        RolePerformance planner= findOrCreateRole(participant, collaboration.getPlannerRole());
-        return collaborationService.startCollaboration(collaboration, Arrays.asList(initiator, planner));
+        List<RolePerformance> roles=new ArrayList<RolePerformance>();
+        roles.add(findOrCreateRole(participant, collaboration.getInitiatorRole()));
+        if(collaboration.getPlannerRole()!=null && !collaboration.getInitiatorRole().equals(collaboration.getPlannerRole())){
+            roles.add(findOrCreateRole(participant, collaboration.getPlannerRole()));
+        }
+        return collaborationService.startCollaboration(collaboration, roles);
     }
     public CollaborationObservation initiateProjectUnderCustodyOf(Long requestorId, Long custodian, String collaborationUri) {
         Collaboration collaboration=entityManager.find(Collaboration.class, collaborationUri);
@@ -56,4 +61,7 @@ public class ProjectService extends AbstractRuntimeService{
         return rp;
     }
 
+    public CollaborationObservation findProject(Long id) {
+        return entityManager.find(CollaborationObservation.class,id);
+    }
 }

@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type")
@@ -135,5 +137,9 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Measure findMeasure(String name) {
+        return findByName(getMeasures(), name);
     }
 }

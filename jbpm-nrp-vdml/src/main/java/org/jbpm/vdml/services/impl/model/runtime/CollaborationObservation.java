@@ -116,4 +116,8 @@ public class CollaborationObservation extends PortContainerObservation {
         }
         return result;
     }
+
+    public DirectedFlowObservation findDeliverableFlow(DeliverableFlow flow) {
+        return findMatchingRuntimeEntity(getOwnedDirectedFlows(),flow);
+    }
 }
