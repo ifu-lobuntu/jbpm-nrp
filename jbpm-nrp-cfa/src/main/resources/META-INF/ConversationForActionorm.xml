@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+	version="2.0">
+	<named-query name="ConversationForActionGetPotentialWork">
+		<query>
+			select distinct
+			new
+			org.pavanecce.cmmn.cfa.impl.ConversationForActionSummaryImpl(
+			t.id,
+			t.name,
+			t.description,
+			t.taskData.status,
+			t.priority,
+			t.taskData.actualOwner.id,
+			t.taskData.createdBy.id,
+			t.taskData.createdOn,
+			t.taskData.activationTime,
+			t.taskData.expirationTime,
+			t.taskData.processId,
+			t.taskData.processInstanceId,
+			t.taskData.parentId,
+			t.taskData.deploymentId )
+			from
+			ConversationForActionImpl t,
+			OrganizationalEntityImpl potentialOwner
+			where
+			t.request.isResponsePending = true and
+			potentialOwner.id = :userId and
+			potentialOwner in elements ( t.peopleAssignments.potentialOwners )
+			order by t.id DESC
+		</query>
+		<!-- hint name="org.hibernate.timeout" value="200"/ -->
+	</named-query>
+	<named-query name="ConversationForActionGetOwnedCommitments">
+		<query><![CDATA[
+			select distinct
+			new
+			org.pavanecce.cmmn.cfa.impl.ConversationForActionSummaryImpl(
+			t.id,
+			t.name,
+			t.description,
+			t.taskData.status,
+			t.priority,
+			t.taskData.actualOwner.id,
+			t.taskData.createdBy.id,
+			t.taskData.createdOn,
+			t.taskData.activationTime,
+			t.taskData.expirationTime,
+			t.taskData.processId,
+			t.taskData.processInstanceId,
+			t.taskData.parentId,
+			t.taskData.deploymentId )
+			from
+			ConversationForActionImpl t
+			where
+			t.commitment.owner.id = :userId  and
+			t.conversationState <> 'CONSUMMATED'
+			order by t.id DESC
+			]]>
+		</query>
+		<!-- hint name="org.hibernate.timeout" value="200"/ -->
+	</named-query>
+	<named-query name="ConversationForActionGetInitiatedCommitments">
+		<query><![CDATA[
+			select distinct
+			new
+			org.pavanecce.cmmn.cfa.impl.ConversationForActionSummaryImpl(
+			t.id,
+			t.name,
+			t.description,
+			t.taskData.status,
+			t.priority,
+			t.taskData.actualOwner.id,
+			t.taskData.createdBy.id,
+			t.taskData.createdOn,
+			t.taskData.activationTime,
+			t.taskData.expirationTime,
+			t.taskData.processId,
+			t.taskData.processInstanceId,
+			t.taskData.parentId,
+			t.taskData.deploymentId )
+			from
+			ConversationForActionImpl t
+			where
+			t.commitment.isCommitted = true and
+			t.peopleAssignments.taskInitiator.id = :userId and
+			t.conversationState  <> 'CONSUMMATED'
+			order by t.id DESC
+		]]>
+		</query>
+		<!-- hint name="org.hibernate.timeout" value="200"/ -->
+	</named-query>
+	<named-query name="ConversationForActionGetPendingRequests">
+		<query>
+			select distinct
+			new
+			org.pavanecce.cmmn.cfa.impl.ConversationActSummaryImpl(
+			t.conversationForAction.id,
+			t.conversationForAction.name,
+			t.conversationForAction.description,
+			t.conversationForAction.taskData.status,
+			t.conversationForAction.priority,
+			t.owner,
+			t.conversationForAction.peopleAssignments.taskInitiator,
+			t.conversationForAction.taskData.createdOn,
+			t.conversationForAction.taskData.activationTime,
+			t.conversationForAction.taskData.expirationTime,
+			t.conversationForAction.taskData.processId,
+			t.conversationForAction.taskData.processInstanceId,
+			t.conversationForAction.taskData.parentId,
+			t.conversationForAction.taskData.deploymentId,
+			t.inputContentId,
+			t.outputContentId,
+			t.faultContentId,
+			t.kind,
+			t.resultingConversationState,
+			renegotiator,
+			t.id,
+			t.dateOfCommencement,
+			t.dateOfCompletion )
+			from
+			ConversationActImpl t left outer join
+			t.renegotiator as renegotiator
+			where
+			t.isResponsePending = true and
+			t.addressedTo.id = :userId 
+			order by t.id DESC
+		</query>
+		<!-- hint name="org.hibernate.timeout" value="200"/ -->
+	</named-query>
+
+	<named-query name="ConversationForActionGetDisputes">
+		<query>
+			select distinct
+			new
+			org.pavanecce.cmmn.cfa.impl.ConversationActSummaryImpl(
+			t.conversationForAction.id,
+			t.conversationForAction.name,
+			t.conversationForAction.description,
+			t.conversationForAction.taskData.status,
+			t.conversationForAction.priority,
+			t.owner,
+			t.conversationForAction.peopleAssignments.taskInitiator,
+			t.conversationForAction.taskData.createdOn,
+			t.conversationForAction.taskData.activationTime,
+			t.conversationForAction.taskData.expirationTime,
+			t.conversationForAction.taskData.processId,
+			t.conversationForAction.taskData.processInstanceId,
+			t.conversationForAction.taskData.parentId,
+			t.conversationForAction.taskData.deploymentId,
+			t.inputContentId,
+			t.outputContentId,
+			t.faultContentId,
+			t.kind,
+			t.resultingConversationState,
+			renegotiator,
+			t.id,
+			t.dateOfCommencement,
+			t.dateOfCompletion )
+			from
+			ConversationActImpl t left outer join
+			t.renegotiator as renegotiator
+			where
+			t.isDispute = true and
+			(t.addressedTo.id = :userId or t.actor.id = :userId) 
+			order by t.id DESC
+		</query>
+		<!-- hint name="org.hibernate.timeout" value="200"/ -->
+	</named-query>
+</entity-mappings>

@@ -1,0 +1,21 @@
+package org.jbpm.vdml.services.impl.scheduling;
+    dialect "java"
+
+import org.jbpm.vdml.services.impl.scheduling.Booking;
+import org.jbpm.vdml.services.impl.scheduling.BookableObject;
+import org.jbpm.vdml.services.impl.scheduling.ScheduleSlot;
+import org.optaplanner.core.api.score.buildin.simple.SimpleScoreHolder;
+global SimpleScoreHolder scoreHolder;
+
+// ############################################################################
+// Hard constraints
+// ############################################################################
+
+rule "requiredDate"
+    when
+        $booking:Booking($bo:bookableObject)
+        $bo.score%$booking.score<1
+    then
+        System.out.println("failed");
+        scoreHolder.addConstraintMatch(kcontext,-1);
+end

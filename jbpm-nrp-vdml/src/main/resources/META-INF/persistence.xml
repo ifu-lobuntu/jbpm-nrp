@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence
+        version="2.0"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd
+                      http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+        xmlns="http://java.sun.com/xml/ns/persistence"
+        xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <persistence-unit name="org.jbpm.vdml.jpa" transaction-type="JTA">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source >jdbc/jbpm-ds</jta-data-source>
+        <!--<mapping-file>META-INF/TaskAuditorm.xml</mapping-file>-->
+        <class>org.jbpm.vdml.services.impl.model.meta.Activity</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.BinaryMeasure</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.BusinessItemDefinition</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.Capability</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.Collaboration</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.CollectiveMeasure</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.CountingMeasure</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.DeliverableFlow</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.DirectMeasure</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.DirectedFlow</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.EnumeratedMeasure</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.InputDelegation</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.Measure</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.Milestone</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.OutputDelegation</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.RescaledMeasure</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.ResourceUse</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.PoolDefinition</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.PortContainer</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.Role</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.StoreDefinition</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.SupplyingStore</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.ValueProposition</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.ValuePropositionComponent</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ActivityMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ActivityObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.Address</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.BusinessItemMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.BusinessItemObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ReusableBusinessItemPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ReusableBusinessItemMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.CapabilityMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.CapabilityPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.CollaborationObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.DirectedFlowMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.DirectedFlowObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ExchangeConfiguration</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.IndividualParticipant</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.Measurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.MilestoneObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.Participant</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.PoolPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ProvidedValuePropositionComponentMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ProvidedValuePropositionComponentPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ProvidedValuePropositionPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ResourceUseMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ResourceUseObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.PortContainerObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.RolePerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.StoreMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.StorePerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.SupplyingStoreMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.SupplyingStoreObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.TestLocation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValueAddMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.scheduling.DailySchedule</class>
+        <class>org.jbpm.vdml.services.impl.model.scheduling.PeriodInDay</class>
+        <class>org.jbpm.vdml.services.impl.model.scheduling.PlannedUnavailability</class>
+        <class>org.jbpm.vdml.services.impl.model.scheduling.Schedule</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <properties>
+            <property name="hibernate.max_fetch_depth" value="3"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+            <property name="hibernate.show_sql" value="false" />
+
+            <property name="hibernate.dialect" value="org.hibernate.spatial.dialect.postgis.PostgisDialect"/>
+
+            <!-- BZ 841786: AS7/EAP 6/Hib 4 uses new (sequence) generators which seem to cause problems -->
+            <property name="hibernate.id.new_generator_mappings" value="false" />
+            <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.BitronixJtaPlatform" />
+        </properties>
+    </persistence-unit>
+</persistence>

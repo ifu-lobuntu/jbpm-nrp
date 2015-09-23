@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+    <!-- Domain model configuration -->
+    <solutionClass>org.jbpm.vdml.services.impl.scheduling.BookingSolution</solutionClass>
+    <entityClass>org.jbpm.vdml.services.impl.scheduling.Booking</entityClass>
+
+    <!-- Score configuration -->
+    <scoreDirectorFactory>
+        <scoreDefinitionType>SIMPLE</scoreDefinitionType>
+        <!--<scoreDrl>org/jbpm/vdml/services/impl/scheduling/Booking.drl</scoreDrl>-->
+        <easyScoreCalculatorClass>org.jbpm.vdml.services.impl.scheduling.BookingSolutionCalculator</easyScoreCalculatorClass>
+        <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+    </scoreDirectorFactory>
+
+    <!-- Optimization algorithms configuration -->
+
+    <termination>
+        <termination>
+            <unimprovedMillisecondsSpentLimit>500</unimprovedMillisecondsSpentLimit>
+        </termination>
+    </termination>
+    <constructionHeuristic>
+        <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
+    </constructionHeuristic>
+    <localSearch>
+        <changeMoveSelector>
+            <selectionOrder>ORIGINAL</selectionOrder>
+        </changeMoveSelector>
+        <!-- changeMoveSelector is the generic form of RowChangeMoveFactory: -->
+        <!--<moveListFactory>-->
+        <!--<moveListFactoryClass>org.optaplanner.examples.nqueens.solver.move.factory.RowChangeMoveFactory</moveListFactoryClass>-->
+        <!--</moveListFactory>-->
+        <acceptor>
+            <entityTabuSize>5</entityTabuSize>
+        </acceptor>
+        <forager>
+            <!-- Real world problems require to use of <acceptedCountLimit> -->
+        </forager>
+    </localSearch>
+</solver>
