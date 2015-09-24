@@ -23,4 +23,9 @@ public class ValueAddMeasurement extends Measurement{
     public DirectedFlowObservation getDeliverableFlow() {
         return deliverableFlow;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getDeliverableFlow();
+    }
 }

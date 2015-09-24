@@ -23,4 +23,9 @@ public class DirectedFlowMeasurement extends Measurement{
     public DirectedFlowObservation getDirectedFlow() {
         return directedFlow;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getDirectedFlow();
+    }
 }

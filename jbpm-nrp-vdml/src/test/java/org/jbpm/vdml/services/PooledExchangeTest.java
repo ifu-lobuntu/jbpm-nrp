@@ -158,7 +158,7 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
         for (DirectedFlowObservation flow : exchange.getOwnedDirectedFlows()) {
             if(flow.getDeliverable().getBusinessItemDefinition().getName().equals("Money")){
-                flow.getQuantity().setValue(100d);
+                flow.getQuantity().setActualValue(100d);
             }
         }
         exchangeService.flush();

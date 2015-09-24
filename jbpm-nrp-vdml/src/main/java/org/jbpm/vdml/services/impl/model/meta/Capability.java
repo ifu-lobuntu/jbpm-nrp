@@ -13,7 +13,7 @@ public class Capability implements MetaEntity, MeasurableElement {
     private String name;
     @ManyToOne(cascade = CascadeType.ALL)
     private ExchangeConfiguration exchangeConfiguration;
-
+    private String deploymentId;
     @ManyToOne
     private Capability extendedCapability;
     @ManyToMany
@@ -56,5 +56,13 @@ public class Capability implements MetaEntity, MeasurableElement {
 
     public Set<Measure> getMeasures() {
         return measures;
+    }
+
+    public String getDeploymentId() {
+        return deploymentId;
+    }
+
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
     }
 }

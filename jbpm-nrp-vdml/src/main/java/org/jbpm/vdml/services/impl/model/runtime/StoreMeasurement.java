@@ -22,4 +22,9 @@ public class StoreMeasurement extends Measurement{
     public StorePerformance getStore() {
         return store;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getStore();
+    }
 }

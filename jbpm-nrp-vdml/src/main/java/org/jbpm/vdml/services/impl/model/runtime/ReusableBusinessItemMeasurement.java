@@ -22,4 +22,9 @@ public class ReusableBusinessItemMeasurement extends Measurement{
     public ReusableBusinessItemPerformance getReusableBusinessItemPerformance() {
         return reusableBusinessItemPerformance;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getReusableBusinessItemPerformance();
+    }
 }

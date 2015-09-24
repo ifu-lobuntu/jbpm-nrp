@@ -22,4 +22,9 @@ public class ActivityMeasurement extends Measurement{
     public ActivityObservation getActivity() {
         return activity;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getActivity();
+    }
 }

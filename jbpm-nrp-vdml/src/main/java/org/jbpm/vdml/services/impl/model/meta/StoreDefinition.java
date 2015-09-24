@@ -21,6 +21,7 @@ public class StoreDefinition implements MetaEntity,MeasurableElement {
     private Set<Measure> measures = new HashSet<Measure>();
     @ManyToOne
     private ExchangeConfiguration exchangeConfiguration;
+    private String deploymentId;
 
     public StoreDefinition() {
 
@@ -68,5 +69,9 @@ public class StoreDefinition implements MetaEntity,MeasurableElement {
 
     public void setExchangeConfiguration(ExchangeConfiguration exchangeConfiguration) {
         this.exchangeConfiguration = exchangeConfiguration;
+    }
+
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
     }
 }

@@ -22,4 +22,9 @@ public class ResourceUseMeasurement extends Measurement{
     public ResourceUseObservation getResourceUse() {
         return resourceUse;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getResourceUse();
+    }
 }

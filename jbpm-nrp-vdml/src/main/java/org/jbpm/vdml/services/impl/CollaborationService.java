@@ -43,6 +43,7 @@ public class CollaborationService extends AbstractRuntimeService {
                 measures.add(dfo.getDirectedFlow().getDuration());
             }
             syncRuntimeEntities(dfo.getMeasurements(), measures, DirectedFlowMeasurement.class, dfo);
+            syncRuntimeEntities(dfo.getValueAddMeasurements(), dfo.getDirectedFlow().getValueAdds(), ValueAddMeasurement.class, dfo);
             if(dfo.getDirectedFlow() instanceof DeliverableFlow){
                 Milestone milestone = ((DeliverableFlow) dfo.getDirectedFlow()).getMilestone();
                 if(milestone!=null){
@@ -51,6 +52,7 @@ public class CollaborationService extends AbstractRuntimeService {
             }
         }
         for (ActivityObservation ao : observation.getActivities()) {
+            syncRuntimeEntities(ao.getMeasurements(), ao.getActivity().getMeasures(), ActivityMeasurement.class, ao);
             Collection<ResourceUseObservation> ruos = syncRuntimeEntities(ao.getResourceUseObservation(), ao.getActivity().getResourceUses(), ResourceUseObservation.class, ao);
             for (ResourceUseObservation ruo : ruos) {
                 syncRuntimeEntities(ruo.getMeasurements(), asCollection(ruo.getResourceUse().getDuration(), ruo.getResourceUse().getQuantity()),ResourceUseMeasurement.class, ruo);
@@ -119,8 +121,8 @@ public class CollaborationService extends AbstractRuntimeService {
                     if (flow.getQuantity() != null) {
                         flow.setStatus(ValueFlowStatus.COMMITTED);
                         Measurement q = flow.getQuantity();
-                        if (q.getValue() != null) {
-                            rsp.getStore().setProjectedInventoryLevel(rsp.getStore().getProjectedInventoryLevel() - q.getValue());
+                        if (q.getActualValue() != null) {
+                            rsp.getStore().setProjectedInventoryLevel(rsp.getStore().getProjectedInventoryLevel() - q.getActualValue());
                         }
                     }
                 }
@@ -129,8 +131,8 @@ public class CollaborationService extends AbstractRuntimeService {
                     if (flow.getQuantity() != null) {
                         Measurement q = flow.getQuantity();
                         flow.setStatus(ValueFlowStatus.COMMITTED);
-                        if (q.getValue() != null) {
-                            rsp.getStore().setProjectedInventoryLevel(rsp.getStore().getProjectedInventoryLevel() + q.getValue());
+                        if (q.getActualValue() != null) {
+                            rsp.getStore().setProjectedInventoryLevel(rsp.getStore().getProjectedInventoryLevel() + q.getActualValue());
                         }
                     }
                 }
@@ -148,8 +150,8 @@ public class CollaborationService extends AbstractRuntimeService {
                         flow.setStatus(ValueFlowStatus.FULFILLED);
                         flow.setActualDate(new Date());
                         Measurement q = flow.getQuantity();
-                        if (q.getValue() != null) {
-                            rsp.getStore().setInventoryLevel(rsp.getStore().getInventoryLevel() - q.getValue());
+                        if (q.getActualValue() != null) {
+                            rsp.getStore().setInventoryLevel(rsp.getStore().getInventoryLevel() - q.getActualValue());
                         }
                     }
                 }
@@ -159,8 +161,8 @@ public class CollaborationService extends AbstractRuntimeService {
                         Measurement q = flow.getQuantity();
                         flow.setStatus(ValueFlowStatus.FULFILLED);
                         flow.setActualDate(new Date());
-                        if (q.getValue() != null) {
-                            rsp.getStore().setInventoryLevel(rsp.getStore().getInventoryLevel() + q.getValue());
+                        if (q.getActualValue() != null) {
+                            rsp.getStore().setInventoryLevel(rsp.getStore().getInventoryLevel() + q.getActualValue());
                         }
                     }
                 }

@@ -72,18 +72,22 @@ public class FindPooledResourceTest extends AbstractPoolExchangeTest {
 
     protected IndividualParticipant createSupplier2(ParticipantService participantService, List<String> storeDefIds, String tukTukDefinitionId) {
         IndividualParticipant supplier2 = participantService.createIndividualParticipant("AlmostMatch");
-        participantService.setAddress(supplier2.getId(), new Address(geometryFactory.createPoint(new Coordinate(LocationUtil.meterToEstimatedDegrees(3000),LocationUtil.meterToEstimatedDegrees(3000)))));
+        participantService.setAddress(supplier2.getId(), new Address(geometryFactory.createPoint(new Coordinate(LocationUtil.meterToEstimatedDegrees(3000), LocationUtil.meterToEstimatedDegrees(3000)))));
         participantService.setStores(supplier2.getId(), storeDefIds);
-        Long bipId=participantService.addResourceToStore(participantService.findParticipant(supplier2.getId()).getOfferedStores().iterator().next().getId(), new LinkedExternalObject(tukTukDefinitionId,"TukTuk","AlmostMatch"));
-        participantService.setResourceSchedule(bipId,SchedulingUtilTest.buildSchedule());
+        Long poolId = participantService.findParticipant(supplier2.getId()).getOfferedStores().iterator().next().getId();
+        Long bipId=participantService.addResourceToStore(poolId, new LinkedExternalObject(tukTukDefinitionId,"TukTuk","AlmostMatch"));
+        participantService.setResourceSchedule(bipId, SchedulingUtilTest.buildSchedule());
+        participantService.setPoolSchedule(poolId, SchedulingUtilTest.buildSchedule());
         return supplier2;
     }
     protected IndividualParticipant createSupplier3(ParticipantService participantService, List<String> storeDefIds, String tukTukDefinitionId) {
         IndividualParticipant supplier3 = participantService.createIndividualParticipant("TooFar");
-        participantService.setAddress(supplier3.getId(), new Address(geometryFactory.createPoint(new Coordinate(LocationUtil.meterToEstimatedDegrees(20000),LocationUtil.meterToEstimatedDegrees(20000)))));
+        participantService.setAddress(supplier3.getId(), new Address(geometryFactory.createPoint(new Coordinate(LocationUtil.meterToEstimatedDegrees(20000), LocationUtil.meterToEstimatedDegrees(20000)))));
         participantService.setStores(supplier3.getId(), storeDefIds);
-        Long bipId=participantService.addResourceToStore(participantService.findParticipant(supplier3.getId()).getOfferedStores().iterator().next().getId(), new LinkedExternalObject(tukTukDefinitionId,"TukTuk","TooFar"));
+        Long poolId = participantService.findParticipant(supplier3.getId()).getOfferedStores().iterator().next().getId();
+        Long bipId=participantService.addResourceToStore(poolId, new LinkedExternalObject(tukTukDefinitionId,"TukTuk","TooFar"));
         participantService.setResourceSchedule(bipId,SchedulingUtilTest.buildSchedule());
+        participantService.setPoolSchedule(poolId, SchedulingUtilTest.buildSchedule());
         return supplier3;
     }
 

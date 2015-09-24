@@ -22,4 +22,9 @@ public class CapabilityMeasurement extends Measurement{
     public CapabilityPerformance getCapabilityPerformance() {
         return capabilityPerformance;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getCapabilityPerformance();
+    }
 }

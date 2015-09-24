@@ -3,6 +3,7 @@ package org.jbpm.vdml.services.impl;
 import org.eclipse.emf.common.util.EList;
 import org.jbpm.designer.vdml.VdmlHelper;
 import org.jbpm.vdml.services.impl.model.meta.*;
+import org.jbpm.vdml.services.impl.model.meta.NamedMeasure;
 import org.jbpm.vdml.services.impl.model.meta.Accumulator;
 import org.jbpm.vdml.services.impl.model.meta.BinaryFunctor;
 import org.jbpm.vdml.services.impl.model.meta.BinaryMeasure;
@@ -99,6 +100,9 @@ public class MeasureBuilder extends MetaBuilder {
                 rescaledMeasure.setMultiplier(((org.omg.smm.RescaledMeasure) measure).getMultiplier());
                 rescaledMeasure.setOffset(((org.omg.smm.RescaledMeasure) measure).getOffset());
                 rescaledMeasure.setRescaledMeasure(buildReference(((org.omg.smm.RescaledMeasure) measure).getRescalesFrom().get(0).getFromDimensionalMeasure()));
+                result = rescaledMeasure;
+            } else if (measure instanceof org.omg.smm.NamedMeasure) {
+                NamedMeasure rescaledMeasure = new NamedMeasure();
                 result = rescaledMeasure;
             } else {
                 throw new IllegalArgumentException(measure.eClass().getName() + " not supported");

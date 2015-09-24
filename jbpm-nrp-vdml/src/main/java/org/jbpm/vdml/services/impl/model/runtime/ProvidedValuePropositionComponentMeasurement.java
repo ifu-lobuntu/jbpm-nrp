@@ -22,4 +22,9 @@ public class ProvidedValuePropositionComponentMeasurement extends Measurement{
     public ProvidedValuePropositionComponentPerformance getComponent() {
         return component;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getComponent();
+    }
 }

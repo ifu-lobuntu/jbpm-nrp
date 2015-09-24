@@ -29,8 +29,10 @@ public class AbstractPoolExchangeTest extends AbstractExchangeTest {
         IndividualParticipant supplier1 = participantService.createIndividualParticipant("BestMach");
         participantService.setAddress(supplier1.getId(), new Address(geometryFactory.createPoint(new Coordinate(0d, 0d))));
         participantService.setStores(supplier1.getId(), storeDefIds);
-        Long bipId=participantService.addResourceToStore(participantService.findParticipant(supplier1.getId()).getOfferedStores().iterator().next().getId(), new LinkedExternalObject(tukTukDefinitionId,"TukTuk","BestMach"));
+        Long poolId = participantService.findParticipant(supplier1.getId()).getOfferedStores().iterator().next().getId();
+        Long bipId=participantService.addResourceToStore(poolId, new LinkedExternalObject(tukTukDefinitionId,"TukTuk","BestMach"));
         participantService.setResourceSchedule(bipId, SchedulingUtilTest.buildSchedule());
+        participantService.setPoolSchedule(poolId, SchedulingUtilTest.buildSchedule());
         return supplier1;
     }
 

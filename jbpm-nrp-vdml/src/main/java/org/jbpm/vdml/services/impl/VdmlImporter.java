@@ -42,9 +42,9 @@ public class VdmlImporter extends MetaBuilder {
 
     public void buildModel(String deploymentId, org.omg.vdml.ValueDeliveryModel vdm) {
 
-        importCapabilities(vdm);
-        importStoreDefinitions(vdm);
-        importBusinessItemDefinitions(vdm);
+        importCapabilities(deploymentId, vdm);
+        importStoreDefinitions(deploymentId,vdm);
+        importBusinessItemDefinitions(deploymentId,vdm);
         for (org.omg.vdml.Collaboration collaboration : vdm.getCollaboration()) {
             buildCollaboration(deploymentId, collaboration);
         }
@@ -87,31 +87,35 @@ public class VdmlImporter extends MetaBuilder {
         }
     }
 
-    private void importStoreDefinitions(ValueDeliveryModel vdm) {
+    private void importStoreDefinitions(String deploymentId, ValueDeliveryModel vdm) {
         for (StoreLibrary library : vdm.getStoreLibrary()) {
             for (org.omg.vdml.StoreDefinition from : library.getStoreDefinitions()) {
                 StoreDefinition to = findOrCreate(from, from instanceof org.omg.vdml.PoolDefinition ? PoolDefinition.class : StoreDefinition.class);
+                to.setDeploymentId(deploymentId);
+
                 to.setName(from.getName());
                 measureBuilder.fromCharacteristics(to.getMeasures(), from.getCharacteristicDefinition());
             }
         }
     }
 
-    private void importCapabilities(ValueDeliveryModel vdm) {
+    private void importCapabilities(String deploymentId, ValueDeliveryModel vdm) {
         for (CapabilityLibrary l : vdm.getCapabilitylibrary()) {
             for (org.omg.vdml.Capability from : l.getCapability()) {
                 Capability to = findOrCreate(from, Capability.class);
                 to.setName(from.getName());
+                to.setDeploymentId(deploymentId);
                 measureBuilder.fromCharacteristics(to.getMeasures(), from.getCharacteristicDefinition());
             }
         }
     }
 
-    private void importBusinessItemDefinitions(ValueDeliveryModel vdm) {
+    private void importBusinessItemDefinitions(String deploymentId, ValueDeliveryModel vdm) {
         for (BusinessItemLibrary library : vdm.getBusinessItemLibrary()) {
             for (BusinessItemLibraryElement from : library.getBusinessItemLibraryElement()) {
                 BusinessItemDefinition to = findOrCreate(from, BusinessItemDefinition.class);
                 to.setName(from.getName());
+                to.setDeploymentId(deploymentId);
                 if (from instanceof org.omg.vdml.BusinessItemDefinition) {
                     org.omg.vdml.BusinessItemDefinition fromDef = (org.omg.vdml.BusinessItemDefinition) from;
                     to.setFungible(fromDef.getIsFungible());

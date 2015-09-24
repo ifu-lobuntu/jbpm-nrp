@@ -108,7 +108,7 @@ public class CapabilityExchangeTest extends AbstractExchangeTest {
         //WHEN
         for (DirectedFlowObservation flow : exchange.getOwnedDirectedFlows()) {
             if (flow.getDeliverable().getBusinessItemDefinition().getName().equals("Money")) {
-                flow.getQuantity().setValue(100d);
+                flow.getQuantity().setActualValue(100d);
             }
         }
         exchangeService.flush();

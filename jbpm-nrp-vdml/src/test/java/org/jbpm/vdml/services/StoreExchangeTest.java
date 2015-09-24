@@ -113,9 +113,9 @@ public class StoreExchangeTest extends AbstractExchangeTest {
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setInventoryLevel(100d);
         for (DirectedFlowObservation flow : exchange.getOwnedDirectedFlows()) {
             if(flow.getDeliverable().getBusinessItemDefinition().getName().equals("Money")){
-                flow.getQuantity().setValue(100d);
+                flow.getQuantity().setActualValue(100d);
             }else if(flow.getDeliverable().getBusinessItemDefinition().getName().equals("ProductDefinition")){
-                flow.getQuantity().setValue(5d);
+                flow.getQuantity().setActualValue(5d);
             }
         }
         exchangeService.flush();

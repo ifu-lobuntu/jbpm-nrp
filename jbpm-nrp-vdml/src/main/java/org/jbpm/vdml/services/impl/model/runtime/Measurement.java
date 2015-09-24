@@ -11,8 +11,10 @@ public abstract class Measurement implements ActivatableRuntimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Double value;
-    private String rating;
+    private Double actualValue;//need a double for aggregate operations
+    private String actualRating;
+    private Double plannedValue;//need a double for aggregate operations
+    private String plannedRating;
     private boolean active;
     @ManyToOne
     private Measure measure;
@@ -28,24 +30,42 @@ public abstract class Measurement implements ActivatableRuntimeEntity {
         return measure;
     }
 
-    public Double getValue() {
-        return value;
+    public Double getActualValue() {
+        return actualValue;
     }
 
-    public void setValue(Double value) {
-        this.value = value;
+    public void setActualValue(Double actualValue) {
+        this.actualValue = actualValue;
     }
 
-    public Enum<?> getRating() {
+    public Double getPlannedValue() {
+        return plannedValue;
+    }
+
+    public void setPlannedValue(Double plannedValue) {
+        this.plannedValue = plannedValue;
+    }
+
+    public Enum<?> getActualRating() {
+        return resolveRating(this.actualRating);
+    }
+    public Enum<?> getPlannedRating() {
+        return resolveRating(this.plannedRating);
+    }
+
+    private Enum<?> resolveRating(String actualRating) {
         if (getMeasure() instanceof EnumeratedMeasure) {
             Class enumClass = ((EnumeratedMeasure) getMeasure()).getEnumClass();
-           return Enum.valueOf(enumClass, rating);
+            return Enum.valueOf(enumClass, actualRating);
         }
         return null;
     }
 
-    public void setRating(Enum<?> rating) {
-        this.rating = rating.name();
+    public void setActualRating(Enum<?> rating) {
+        this.actualRating = rating.name();
+    }
+    public void setPlannedRating(Enum<?> rating) {
+        this.plannedRating = rating.name();
     }
 
     public Long getId() {
@@ -64,4 +84,8 @@ public abstract class Measurement implements ActivatableRuntimeEntity {
     public MetaEntity getMetaEntity() {
         return getMeasure();
     }
+
+    public abstract RuntimeEntity getMeasurand();
+
+
 }

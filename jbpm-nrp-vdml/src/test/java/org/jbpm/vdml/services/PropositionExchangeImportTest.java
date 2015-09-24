@@ -64,7 +64,7 @@ public class PropositionExchangeImportTest extends MetaEntityImportTest {
         vpc.getAggregatedFrom().add(myValueAdd);
         MeasuredCharacteristic measuredCharacteristic = VDMLFactory.eINSTANCE.createMeasuredCharacteristic();
         vpc.getMeasuredCharacteristic().add(measuredCharacteristic);
-        measuredCharacteristic.setCharacteristicDefinition(super.buildCollectiveMeasure(vdm, myValueAdd.getValueMeasurement().getCharacteristicDefinition()));
+        measuredCharacteristic.setCharacteristicDefinition(buildCollectiveMeasure(vdm, myValueAdd.getValueMeasurement().getCharacteristicDefinition(), "CollectiveMeasure"));
 
 
 

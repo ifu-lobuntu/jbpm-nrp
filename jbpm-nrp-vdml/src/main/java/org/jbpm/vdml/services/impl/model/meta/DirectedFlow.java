@@ -142,4 +142,8 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
     public Measure findMeasure(String name) {
         return findByName(getMeasures(), name);
     }
+
+    public Measure findValueAdd(String name) {
+        return findByName(getValueAdds(), name);
+    }
 }

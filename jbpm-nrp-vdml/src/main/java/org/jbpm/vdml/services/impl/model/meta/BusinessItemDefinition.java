@@ -21,6 +21,7 @@ public class BusinessItemDefinition implements MetaEntity{
     private Set<Measure> measures=new HashSet<Measure>();
     private boolean fungible;
     private Boolean shareable;
+    private String deploymentId;
 
     public BusinessItemDefinition() {
     }
@@ -136,5 +137,13 @@ public class BusinessItemDefinition implements MetaEntity{
 
     public Measure findMeasurement(String name) {
         return findByName(getMeasures(),name);
+    }
+
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
+
+    public String getDeploymentId() {
+        return deploymentId;
     }
 }

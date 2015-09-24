@@ -126,9 +126,16 @@ public class ParticipantService extends AbstractRuntimeService {
 
     //TODO figure out what to do here
     public void setResourceSchedule(Long id, Schedule schedule) {
-        ReusableBusinessItemPerformance participant = entityManager.find(ReusableBusinessItemPerformance.class, id);
+        ReusableBusinessItemPerformance resource = entityManager.find(ReusableBusinessItemPerformance.class, id);
         entityManager.persist(schedule);
-        participant.setSchedule(schedule);
+        resource.setSchedule(schedule);
+        entityManager.flush();
+    }
+    //TODO figure out what to do here
+    public void setPoolSchedule(Long id, Schedule schedule) {
+        PoolPerformance pool = entityManager.find(PoolPerformance.class, id);
+        entityManager.persist(schedule);
+        pool.setSchedule(schedule);
         entityManager.flush();
     }
 }

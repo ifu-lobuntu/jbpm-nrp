@@ -144,4 +144,9 @@ public class DirectedFlowObservation implements RuntimeEntity{
     public DirectedFlowMeasurement findMeasurement(Measure measure) {
         return findMatchingRuntimeEntity(getMeasurements(), measure);
     }
+
+    public ValueAddMeasurement findValueAdd(Measure measure) {
+        return findMatchingRuntimeEntity(getValueAddMeasurements(), measure);
+
+    }
 }

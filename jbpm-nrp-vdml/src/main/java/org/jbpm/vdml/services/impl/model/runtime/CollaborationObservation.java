@@ -7,6 +7,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -60,6 +61,10 @@ public class CollaborationObservation extends PortContainerObservation {
         return findMatchingRuntimeEntity(this.getBusinessItems(), deliverable);
     }
 
+    @Override
+    public Collection<? extends Measurement> getMeasurements() {
+        return Collections.emptySet();
+    }
 
     @Override
     public MetaEntity getMetaEntity() {

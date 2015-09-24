@@ -1,16 +1,13 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
-import com.vividsolutions.jts.geom.Point;
 import org.hibernate.annotations.Type;
 import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.meta.ResourceUse;
 import org.jbpm.vdml.services.impl.model.scheduling.PlannedUnavailability;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,13 +32,15 @@ public class ResourceUseObservation implements RuntimeEntity {
     @ManyToOne
     private ReusableBusinessItemPerformance reusableResource;
 
-    @Column(name = "`from`")
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    private DateTime from;
+    private DateTime plannedFromDateTime;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime actualFromDateTime;
 
-    @Column(name = "`to`")
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    private DateTime to;
+    private DateTime actualToDateTime;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime plannedToDateTime;
     @ManyToOne
     private PlannedUnavailability plannedUnavailability;
 
@@ -104,20 +103,36 @@ public class ResourceUseObservation implements RuntimeEntity {
         return null;
     }
 
-    public DateTime getFrom() {
-        return from;
+    public DateTime getPlannedFromDateTime() {
+        return plannedFromDateTime;
     }
 
-    public void setFrom(DateTime from) {
-        this.from = from;
+    public void setPlannedFromDateTime(DateTime plannedFromDateTime) {
+        this.plannedFromDateTime = plannedFromDateTime;
     }
 
-    public DateTime getTo() {
-        return to;
+    public DateTime getActualFromDateTime() {
+        return actualFromDateTime;
     }
 
-    public void setTo(DateTime to) {
-        this.to = to;
+    public void setActualFromDateTime(DateTime actualFromDateTime) {
+        this.actualFromDateTime = actualFromDateTime;
+    }
+
+    public DateTime getActualToDateTime() {
+        return actualToDateTime;
+    }
+
+    public void setActualToDateTime(DateTime actualToDateTime) {
+        this.actualToDateTime = actualToDateTime;
+    }
+
+    public DateTime getPlannedToDateTime() {
+        return plannedToDateTime;
+    }
+
+    public void setPlannedToDateTime(DateTime plannedToDateTime) {
+        this.plannedToDateTime = plannedToDateTime;
     }
 
     public PoolPerformance getPool() {

@@ -22,4 +22,9 @@ public class SupplyingStoreMeasurement extends Measurement{
     public SupplyingStoreObservation getStore() {
         return store;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getStore();
+    }
 }

@@ -22,4 +22,9 @@ public class BusinessItemMeasurement extends Measurement{
     public BusinessItemObservation getBusinessItem(){
         return this.businessItem;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getBusinessItem();
+    }
 }

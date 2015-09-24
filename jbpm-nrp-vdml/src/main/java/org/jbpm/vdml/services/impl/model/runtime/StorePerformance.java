@@ -27,6 +27,7 @@ public class StorePerformance implements ActivatableRuntimeEntity, DirectlyExcha
     private Set<StoreMeasurement> measurements = new HashSet<StoreMeasurement>();//Aggregated from SupplyingStoreObservation
     @ManyToOne
     private Address address;
+    private String deploymentId;
 
     public StorePerformance() {
     }
@@ -109,6 +110,14 @@ public class StorePerformance implements ActivatableRuntimeEntity, DirectlyExcha
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public String getDeploymentId() {
+        return deploymentId;
+    }
+
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
     }
 }
 

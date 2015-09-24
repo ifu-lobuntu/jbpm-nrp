@@ -25,6 +25,7 @@
         <class>org.jbpm.vdml.services.impl.model.meta.InputDelegation</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Measure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Milestone</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.NamedMeasure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.OutputDelegation</class>
         <class>org.jbpm.vdml.services.impl.model.meta.RescaledMeasure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.ResourceUse</class>

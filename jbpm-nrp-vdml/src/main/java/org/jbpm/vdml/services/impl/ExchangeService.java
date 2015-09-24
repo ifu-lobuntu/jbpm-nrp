@@ -146,13 +146,13 @@ public class ExchangeService extends AbstractRuntimeService {
         ActivityObservation ao = observation.findActivity(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking().getActivity());
         final ResourceUseObservation resourceUse = ao.findResourceUse(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking());
         //TODO check for availability AGAIN here.
-        resourceUse.setFrom(requiredAvailability.getFrom());
-        resourceUse.setTo(requiredAvailability.getTo());
+        resourceUse.setPlannedFromDateTime(requiredAvailability.getFrom());
+        resourceUse.setPlannedToDateTime(requiredAvailability.getTo());
         resourceUse.setQuantity(1);
         resourceUse.setReusableResource(reusableResource);
         resourceUse.setPool(cp);
         PlannedUnavailability pu = new PlannedUnavailability(reusableResource.getSchedule());
-        pu.setFrom(resourceUse.getFrom());
+        pu.setFrom(resourceUse.getPlannedFromDateTime());
         resourceUse.setPlannedUnavailability(pu);
         switch (resourceUse.getResourceUse().getResourceUseLocation()) {
             case COLLABORATION:
@@ -171,11 +171,11 @@ public class ExchangeService extends AbstractRuntimeService {
                 break;
         }
         pu.setAddress(resourceUse.getAddress());
-        pu.setTo(resourceUse.getTo());
-        long commitTime = resourceUse.getFrom().getMillis() - cp.getSchedule().getCommitPeriodTimeUnit().toMillis(cp.getSchedule().getCommitPeriod());
+        pu.setTo(resourceUse.getPlannedToDateTime());
+        long commitTime = resourceUse.getPlannedFromDateTime().getMillis() - cp.getSchedule().getCommitPeriodTimeUnit().toMillis(cp.getSchedule().getCommitPeriod());
         TimerService ts = TimerServiceRegistry.getInstance().get(collaboration1.getDeploymentId());
         ts.scheduleJob(new CommitScheduledResourceUseJob(), new ScheduledResourceUseJobContext("commit", resourceUse), new PointInTimeTrigger(commitTime, null, null));
-        ts.scheduleJob(new FulfillScheduledResourceUseJob(), new ScheduledResourceUseJobContext("fulfill", resourceUse), new PointInTimeTrigger(resourceUse.getTo().getMillis(), null, null));
+        ts.scheduleJob(new FulfillScheduledResourceUseJob(), new ScheduledResourceUseJobContext("fulfill", resourceUse), new PointInTimeTrigger(resourceUse.getPlannedToDateTime().getMillis(), null, null));
         entityManager.flush();
         return observation;
     }
@@ -209,8 +209,6 @@ public class ExchangeService extends AbstractRuntimeService {
                         }
                         entityManager.remove(plannedUnavailability);
                         resourceUseObservation.setPlannedUnavailability(null);
-                        resourceUseObservation.setFrom(null);
-                        resourceUseObservation.setTo(null);
                         resourceUseObservation.setQuantity(0);
                         resourceUseObservation.setStatus(ValueFlowStatus.CANCELLED);
                         TimerService ts = TimerServiceRegistry.getInstance().get(collaborationObservation.getCollaboration().getDeploymentId());

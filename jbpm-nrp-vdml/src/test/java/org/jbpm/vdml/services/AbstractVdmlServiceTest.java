@@ -44,6 +44,7 @@ public abstract class AbstractVdmlServiceTest {
     @BeforeClass
     public static void setup() throws Exception {
         if (emf == null) {
+
             if (usePostgres) {
                 DriverManager.registerDriver(new Driver());
                 Connection c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "itest", "itest");

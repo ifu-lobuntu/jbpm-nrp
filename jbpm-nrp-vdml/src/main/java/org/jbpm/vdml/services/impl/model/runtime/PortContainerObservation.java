@@ -3,6 +3,7 @@ package org.jbpm.vdml.services.impl.model.runtime;
 import org.jbpm.vdml.services.impl.model.meta.DeliverableFlow;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,7 +41,7 @@ public abstract class PortContainerObservation implements RuntimeEntity{
         }
         return result;
     }
-
+    public abstract Collection<? extends Measurement> getMeasurements();
 
     public Set<DirectedFlowObservation> getCommencedFlow() {
         return commencedFlow;

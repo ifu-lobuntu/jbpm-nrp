@@ -7,6 +7,8 @@ import javax.persistence.OneToMany;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 public class Activity extends PortContainer {
 
@@ -64,5 +66,14 @@ public class Activity extends PortContainer {
 
     public Set<ResourceUse> getResourceUses() {
         return resourceUses;
+    }
+
+    public Measure findMeasure(String name) {
+        return findByName(getMeasures(),name);
+    }
+
+
+    public ResourceUse findResourceUse(String name) {
+        return findByName(getResourceUses(),name);
     }
 }

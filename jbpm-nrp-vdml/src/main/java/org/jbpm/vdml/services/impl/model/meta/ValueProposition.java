@@ -15,6 +15,8 @@ public class ValueProposition implements  MetaEntity{
     private Role toRole;
     @OneToMany(mappedBy = "valueProposition", cascade = CascadeType.ALL)
     private Set<ValuePropositionComponent> components=new HashSet<ValuePropositionComponent>();
+    @ManyToOne
+    private Collaboration collaboration;
 
     public ValueProposition() {
     }
@@ -52,5 +54,9 @@ public class ValueProposition implements  MetaEntity{
 
     public Set<ValuePropositionComponent> getComponents() {
         return components;
+    }
+
+    public Collaboration getCollaboration() {
+        return collaboration;
     }
 }

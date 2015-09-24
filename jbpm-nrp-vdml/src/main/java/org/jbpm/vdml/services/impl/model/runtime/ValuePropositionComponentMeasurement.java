@@ -23,4 +23,9 @@ public class ValuePropositionComponentMeasurement extends Measurement{
     public ValuePropositionComponentPerformance getComponent() {
         return component;
     }
+
+    @Override
+    public RuntimeEntity getMeasurand() {
+        return getComponent();
+    }
 }

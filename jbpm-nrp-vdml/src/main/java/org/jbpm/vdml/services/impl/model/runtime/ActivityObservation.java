@@ -1,11 +1,13 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
+import org.hibernate.annotations.Type;
 import org.jbpm.vdml.services.impl.model.meta.Activity;
+import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.meta.ResourceUse;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,13 +22,16 @@ public class ActivityObservation extends PortContainerObservation {
     @ManyToOne
     private RolePerformance performingRole;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date plannedStartDate;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime plannedStartDate;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date plannedDateOfCompletion;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime plannedDateOfCompletion;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime actualStartDate;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date actualStartDate;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualDateOfCompletion;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime actualDateOfCompletion;
     @ManyToOne
     private CollaborationObservation collaboration;
     @OneToMany(mappedBy = "activity")
@@ -85,35 +90,39 @@ public class ActivityObservation extends PortContainerObservation {
         return activity;
     }
 
-    public Date getPlannedStartDate() {
+    public DateTime getPlannedStartDate() {
         return plannedStartDate;
     }
 
-    public void setPlannedStartDate(Date plannedStartDate) {
+    public void setPlannedStartDate(DateTime plannedStartDate) {
         this.plannedStartDate = plannedStartDate;
     }
 
-    public Date getPlannedDateOfCompletion() {
+    public DateTime getPlannedDateOfCompletion() {
         return plannedDateOfCompletion;
     }
 
-    public void setPlannedDateOfCompletion(Date plannedDateOfCompletion) {
+    public void setPlannedDateOfCompletion(DateTime plannedDateOfCompletion) {
         this.plannedDateOfCompletion = plannedDateOfCompletion;
     }
 
-    public Date getActualStartDate() {
+    public DateTime getActualStartDate() {
         return actualStartDate;
     }
 
-    public void setActualStartDate(Date actualStartDate) {
+    public void setActualStartDate(DateTime actualStartDate) {
         this.actualStartDate = actualStartDate;
     }
 
-    public Date getActualDateOfCompletion() {
+    public DateTime getActualDateOfCompletion() {
         return actualDateOfCompletion;
     }
 
-    public void setActualDateOfCompletion(Date actualDateOfCompletion) {
+    public void setActualDateOfCompletion(DateTime actualDateOfCompletion) {
         this.actualDateOfCompletion = actualDateOfCompletion;
+    }
+
+    public ActivityMeasurement findMeasurement(Measure measure) {
+        return findMatchingRuntimeEntity(getMeasurements(),measure);
     }
 }
