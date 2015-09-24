@@ -3,6 +3,7 @@ package org.jbpm.vdml.services;
 import bitronix.tm.resource.ResourceRegistrar;
 import bitronix.tm.resource.common.XAResourceProducer;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
+import geodb.GeoDB;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.junit.After;
 import org.junit.Before;
@@ -18,18 +19,16 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 public abstract class AbstractVdmlServiceTest {
     protected static EntityManagerFactory emf;
     private static Logger logger = LoggerFactory.getLogger(CollaborationImportTest.class);
-    private static boolean usePostgres = true;
+    private static boolean usePostgres = false;
     private static PoolingDataSource ds;
     private Collection<EntityManager> entityManagers = new HashSet<EntityManager>();
     protected  static final String DEFAULT_DEPLOYMENT_ID="test-deployment";
@@ -55,17 +54,21 @@ public abstract class AbstractVdmlServiceTest {
                 c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/itest", "itest", "itest");
                 execute(c, "CREATE EXTENSION postgis;");
                 close(c);
+                Properties properties = new Properties();
+                properties.put("hibernate.dialect","org.hibernate.spatial.dialect.postgis.PostgisDialect");
                 ds = setupDatasource("org.postgresql.Driver", "jdbc:postgresql://localhost:5432:itest", "itest", "itest");
-                emf = Persistence.createEntityManagerFactory("org.jbpm.vdml.jpa");
+                emf = Persistence.createEntityManagerFactory("org.jbpm.vdml.jpa", properties);
                 ds.reset();
-                EntityManagerFactoryManager.get().addEntityManagerFactory("org.jbpm.vdml.jpa",emf);
                 c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "itest", "itest");
                 execute(c, "CREATE DATABASE itest_template TEMPLATE itest;");
                 close(c);
             } else {
-                setupDatasource("org.h2.Driver", "jdbc:h2:mem:jbpm-db;MVCC=true", "sa", "");
-                emf = Persistence.createEntityManagerFactory("org.jbpm.vdml.jpa");
+                ds=setupDatasource("org.h2.Driver", "jdbc:h2:mem:jbpm-db;MVCC=true", "sa", "");
+                Properties properties = new Properties();
+                properties.put("hibernate.dialect", "org.hibernate.spatial.dialect.h2geodb.GeoDBDialect");
+                emf = Persistence.createEntityManagerFactory("org.jbpm.vdml.jpa",properties);
             }
+            EntityManagerFactoryManager.get().addEntityManagerFactory("org.jbpm.vdml.jpa",emf);
 
         }
     }
@@ -78,8 +81,22 @@ public abstract class AbstractVdmlServiceTest {
         }
     }
 
-    private static PoolingDataSource setupDatasource(String driverClass, String url, String username, String pwd) {
-        PoolingDataSource pds = new PoolingDataSource();
+    private static PoolingDataSource setupDatasource(final String driverClass, String url, String username, String pwd) {
+        PoolingDataSource pds = new PoolingDataSource(){
+            @Override
+            public Connection getConnection() throws SQLException {
+                Connection conn = super.getConnection();
+                if(driverClass.startsWith("org.h2")) {
+                    GeoDB.InitGeoDB(conn);
+                }
+                return conn;
+            }
+
+            @Override
+            public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+                throw new SQLFeatureNotSupportedException();
+            }
+        };
         pds.setUniqueName("jdbc/jbpm-ds");
         pds.setClassName("bitronix.tm.resource.jdbc.lrc.LrcXADataSource");
         pds.setMaxPoolSize(5);
@@ -128,14 +145,14 @@ public abstract class AbstractVdmlServiceTest {
             UserTransaction ut = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
             Connection c = null;
             try {
+                ut.commit();
                 if (usePostgres) {
-                    ut.commit();
                     c = truncateDbInPg();
                 } else {
                     c = truncateInH2();
-                    ut.commit();
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 ut.rollback();
             } finally {
                 try {

@@ -17,7 +17,7 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
-public class ValueCalculateTest extends MetaEntityImportTest {
+public class ObservationCalculationTest extends MetaEntityImportTest {
     private CapabilityMethod implementUserStoryMethod;
     private CapabilityDefinition detailUserStory;
     private CapabilityDefinition codeUserStory;
@@ -119,7 +119,7 @@ public class ValueCalculateTest extends MetaEntityImportTest {
         ps.flush();
 
         Long projectId = project.getId();
-        new ValueCalculationService(getEntityManager()).doCollaborationObservations(projectId);
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
         CollaborationObservation collaborationObservationFound = new ProjectService(getEntityManager()).findProject(projectId);
         BusinessItemObservation businessItemFound = collaborationObservationFound.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
         DirectedFlowObservation moneyFlowObservation = collaborationObservationFound.findDeliverableFlow(collaborationObservationFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
@@ -146,7 +146,7 @@ public class ValueCalculateTest extends MetaEntityImportTest {
         ps.flush();
 
         Long projectId = project.getId();
-        new ValueCalculationService(getEntityManager()).doCollaborationObservations(projectId);
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
         CollaborationObservation projecFound = new ProjectService(getEntityManager()).findProject(projectId);
         ActivityObservation codeUserStoryFound = projecFound.findActivity(projecFound.getCollaboration().findActivity("CodeUserStory"));
         ActivityMeasurement overrun= codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("DurationOverrun"));

@@ -66,9 +66,9 @@ public class MeasureBuilder extends MetaBuilder {
                 org.omg.smm.Measure countedMeasure = source.getCountedMeasureTo().getToCountedMeasure();
                 cm.setMeasureToCount(buildReference(countedMeasure));
                 if (countedMeasure instanceof RankingMeasure || countedMeasure instanceof GradeMeasure) {
-                    cm.setValuesToCount(source.getOperation().getBody().replaceAll("\\bvalue\\b", "rating"));
+                    cm.setValuesToCount(source.getOperation().getBody().replaceAll("\\bvalue\\b", "actualRating"));
                 } else {
-                    cm.setValuesToCount(source.getOperation().getBody());
+                    cm.setValuesToCount(source.getOperation().getBody().replaceAll("\\bvalue\\b", "actualValue"));
                 }
                 result = cm;
             } else if (measure instanceof org.omg.smm.DirectMeasure) {

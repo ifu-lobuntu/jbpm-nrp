@@ -1,5 +1,6 @@
 package org.jbpm.vdml.services;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -45,7 +46,7 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
             } else if (measure instanceof org.jbpm.vdml.services.impl.model.meta.CountingMeasure) {
                 assertEquals("CountingMeasure", measure.getName());
                 org.jbpm.vdml.services.impl.model.meta.CountingMeasure found = (org.jbpm.vdml.services.impl.model.meta.CountingMeasure) measure;
-                assertEquals("value > 1000", found.getValuesToCount());
+                assertEquals("actualValue > 1000", found.getValuesToCount());
                 assertNotNull(found.getMeasureToCount());
             } else if (measure instanceof org.jbpm.vdml.services.impl.model.meta.BinaryMeasure) {
                 assertEquals("BinaryMeasure", measure.getName());
@@ -137,12 +138,17 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
     }
 
     protected Characteristic buildCollectiveMeasure(ValueDeliveryModel l, Characteristic e, String name) {
+        Accumulator accumulator = Accumulator.PRODUCT;
+        return buildCollectiveMeasure(l, e, name, accumulator);
+    }
+
+    protected Characteristic buildCollectiveMeasure(ValueDeliveryModel l, Characteristic e, String name, Accumulator accumulator) {
         CollectiveMeasure collectiveMeasure = SMMFactory.eINSTANCE.createCollectiveMeasure();
         collectiveMeasure.setName(name);
         BaseNMeasureRelationship baseN = SMMFactory.eINSTANCE.createBaseNMeasureRelationship();
         collectiveMeasure.getBaseMeasureTo().add(baseN);
-        baseN.setToDimensionalMeasure((DirectMeasure) e.getMeasure().get(0));
-        collectiveMeasure.setAccumulator(Accumulator.PRODUCT);
+        baseN.setToDimensionalMeasure((DimensionalMeasure) e.getMeasure().get(0));
+        collectiveMeasure.setAccumulator(accumulator);
         return addToLibrary(l, collectiveMeasure);
     }
 
@@ -160,6 +166,11 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         base2.setToDimensionalMeasure((DimensionalMeasure) b.getMeasure().get(0));
         return addToLibrary(l, binaryMeasure);
     }
+    protected void addCharacteristics(EList<Characteristic> characteristicDefinition, Characteristic ... source) {
+        for (Characteristic characteristic : source) {
+            characteristicDefinition.add(characteristic);
+        }
+    }
     protected Characteristic buildRescaledMeasure(ValueDeliveryModel l,String name, Characteristic a, double offset, double m) {
         RescaledMeasure rescaledMeasure= SMMFactory.eINSTANCE.createRescaledMeasure();
         rescaledMeasure.setName(name);
@@ -173,6 +184,19 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         rescaledMeasure.setMultiplier(m);
         rescaledMeasure.setOffset(offset);
         return addToLibrary(l, rescaledMeasure);
+    }
+    protected Characteristic buildCountingMeasure(ValueDeliveryModel l,String name, Characteristic a, String matchOperation){
+        CountingMeasure countingMeasure = SMMFactory.eINSTANCE.createCountingMeasure();
+        countingMeasure.setName(name);
+        Operation operation = SMMFactory.eINSTANCE.createOperation();
+        countingMeasure.setOperation(operation);
+        countingMeasure.getOperation().setBody(matchOperation);
+        l.getMetricsModel().get(0).getLibraries().get(0).getMeasureElements().add(operation);
+        CountingMeasureRelationship countingMeasureRelationship = SMMFactory.eINSTANCE.createCountingMeasureRelationship();
+        countingMeasure.setCountedMeasureTo(countingMeasureRelationship);
+        countingMeasureRelationship.setToCountedMeasure(a.getMeasure().get(0));
+        return addToLibrary(l, countingMeasure);
+
     }
 
     protected BusinessItemDefinition createBusinessItemDefinition(ValueDeliveryModel vdm, String s) {
@@ -236,6 +260,12 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
     protected Characteristic buildNamedMeasure(ValueDeliveryModel l, String name) {
         NamedMeasure result = SMMFactory.eINSTANCE.createNamedMeasure();
         result.setName(name);
+        Characteristic characteristic = addToLibrary(l, result);
+        return characteristic;
+    }
+    protected Characteristic buildTheGradeMeasure(ValueDeliveryModel l) {
+        GradeMeasure result = SMMFactory.eINSTANCE.createGradeMeasure();
+        result.setName("TestGradeMeasure");
         Characteristic characteristic = addToLibrary(l, result);
         return characteristic;
     }

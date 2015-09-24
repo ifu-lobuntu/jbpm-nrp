@@ -28,6 +28,10 @@
             <name>Java.net repository</name>
             <url>http://download.java.net/maven/2</url>
         </repository>
+        <repository>
+            <id>opengeo.org</id>
+            <url>http://dev.mapfish.org/maven/repository</url>
+        </repository>
     </repositories>
     <dependencyManagement>
         <dependencies>
@@ -35,6 +39,12 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-spatial</artifactId>
                 <version>4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opengeo</groupId>
+                <artifactId>geodb</artifactId>
+                <version>0.6-SNAPSHOT</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.vividsolutions</groupId>
@@ -113,6 +123,10 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opengeo</groupId>
+            <artifactId>geodb</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jadira.usertype</groupId>

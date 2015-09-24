@@ -1,11 +1,14 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 import org.jbpm.vdml.services.impl.model.meta.Capability;
+import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
 public class CapabilityPerformance implements ActivatableRuntimeEntity,DirectlyExchangable {
@@ -76,5 +79,9 @@ public class CapabilityPerformance implements ActivatableRuntimeEntity,DirectlyE
     @Override
     public ExchangeConfiguration getExchangeConfiguration() {
         return capability.getExchangeConfiguration();
+    }
+
+    public CapabilityMeasurement findMeasurement(Measure measure) {
+        return findMatchingRuntimeEntity(getMeasurements(), measure);
     }
 }

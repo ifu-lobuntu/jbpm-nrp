@@ -69,6 +69,7 @@ public class AssignmentService extends AbstractRuntimeService {
                 //TODO signal event to commence ConversationForAction
             }
         }
+        entityManager.flush();
     }
     public void assignToActivities(ActivityObservation observation, CapabilityPerformance capability) {
         observation.setCapabilityOffer(capability);

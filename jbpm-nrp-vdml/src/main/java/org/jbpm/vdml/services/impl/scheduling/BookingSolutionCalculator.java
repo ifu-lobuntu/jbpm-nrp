@@ -36,11 +36,11 @@ public class BookingSolutionCalculator implements EasyScoreCalculator<BookingSol
             } else {
                 totalScore += Math.max(1, totalIdleMinutes) * Math.max(1, minutesFromPreferredStart);
             }
-            System.out.println("Minutes From Start:" + minutesFromPreferredStart);
-            System.out.println("Idle Minutes:" + totalIdleMinutes);
+//            System.out.println("Minutes From Start:" + minutesFromPreferredStart);
+//            System.out.println("Idle Minutes:" + totalIdleMinutes);
         }
         int finalScore = (int) Math.round(1000000000 / totalScore);
-        System.out.println("Final Score:" + finalScore);
+//        System.out.println("Final Score:" + finalScore);
         return SimpleScore.valueOf(finalScore);
     }
 }

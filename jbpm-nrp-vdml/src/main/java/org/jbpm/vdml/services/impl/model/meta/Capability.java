@@ -6,6 +6,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 public class Capability implements MetaEntity, MeasurableElement {
     @Id
@@ -64,5 +66,9 @@ public class Capability implements MetaEntity, MeasurableElement {
 
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
+    }
+
+    public Measure findMeasure(String name) {
+        return findByName(getMeasures(),name);
     }
 }
