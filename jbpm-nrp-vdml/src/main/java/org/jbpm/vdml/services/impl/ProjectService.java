@@ -2,6 +2,7 @@ package org.jbpm.vdml.services.impl;
 
 
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
+import org.jbpm.vdml.services.impl.model.meta.Role;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 
 import javax.persistence.EntityManager;
@@ -57,6 +58,12 @@ public class ProjectService extends AbstractRuntimeService{
     public RolePerformance selectCustodianForProject(Long custodianId, Long projectId) {
         CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
         RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, custodianId), project.getCollaboration().getPlannerRole());
+        assignmentService.assignToRoles(project, Arrays.asList(rp));
+        return rp;
+    }
+    public RolePerformance assignParticipantToRole(Long participantId, Long projectId, String roleUri) {
+        CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
+        RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, participantId), entityManager.find(Role.class,roleUri));
         assignmentService.assignToRoles(project, Arrays.asList(rp));
         return rp;
     }

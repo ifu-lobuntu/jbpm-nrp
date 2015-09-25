@@ -13,6 +13,8 @@ public abstract class PortContainerObservation implements RuntimeEntity, Measura
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @ManyToOne
+    private RolePerformance responsibleRolePerformance;
 
 
     @OneToMany(mappedBy = "targetPortContainer")
@@ -46,5 +48,11 @@ public abstract class PortContainerObservation implements RuntimeEntity, Measura
         return commencedFlow;
     }
 
+    protected RolePerformance getResponsibleRolePerformance() {
+        return responsibleRolePerformance;
+    }
 
+    protected void setResponsibleRolePerformance(RolePerformance responsibleRolePerformance) {
+        this.responsibleRolePerformance = responsibleRolePerformance;
+    }
 }

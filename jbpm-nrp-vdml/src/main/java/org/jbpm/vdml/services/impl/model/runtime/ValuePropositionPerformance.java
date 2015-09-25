@@ -3,10 +3,13 @@ package org.jbpm.vdml.services.impl.model.runtime;
 
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.meta.ValueProposition;
+import org.jbpm.vdml.services.impl.model.meta.ValuePropositionComponent;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
 public class ValuePropositionPerformance implements ActivatableRuntimeEntity {
@@ -15,17 +18,12 @@ public class ValuePropositionPerformance implements ActivatableRuntimeEntity {
     private Long id;
     private boolean active;
     @ManyToOne
-    private ValuePropositionPerformance extendedValuePropositionPerformance;
-    @ManyToOne
     private ValueProposition valueProposition;
-    @Enumerated
-    private TrustRelationshipStatus status=TrustRelationshipStatus.REQUESTED;
     @ManyToOne
     private RolePerformance provider;
-    @ManyToOne
-    private RolePerformance receiver;
-    @OneToMany(mappedBy = "valueProposition")
-    private Set< ValuePropositionComponentPerformance> components = new HashSet< ValuePropositionComponentPerformance>();
+
+    @OneToMany(mappedBy = "valueProposition", cascade = CascadeType.ALL)
+    private Set<ValuePropositionComponentPerformance> components = new HashSet<ValuePropositionComponentPerformance>();
 
     public ValuePropositionPerformance() {
     }
@@ -36,48 +34,7 @@ public class ValuePropositionPerformance implements ActivatableRuntimeEntity {
         this.provider.getProvidedValuePropositions().add(this);
     }
 
-    public TrustRelationshipStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TrustRelationshipStatus status) {
-        this.status = status;
-    }
-
-    public ValuePropositionPerformance getExtendedValuePropositionPerformance() {
-        return extendedValuePropositionPerformance;
-    }
-
-    public void setExtendedValuePropositionPerformance(ValuePropositionPerformance extendedValuePropositionPerformance) {
-        this.extendedValuePropositionPerformance = extendedValuePropositionPerformance;
-    }
-
-    public RolePerformance getProvider() {
-        return provider;
-    }
-
-    public RolePerformance getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(RolePerformance receiver) {
-        this.receiver = receiver;
-        this.receiver.getReceivedValuePropositions().add(this);
-    }
-
-    public Set< ValuePropositionComponentPerformance> getComponents() {
-        return components;
-    }
-
-    public ValueProposition getValueProposition() {
-        return valueProposition;
-    }
-
     @Override
-    public Long getId() {
-        return id;
-    }
-
     public boolean isActive() {
         return active;
     }
@@ -88,7 +45,28 @@ public class ValuePropositionPerformance implements ActivatableRuntimeEntity {
     }
 
     @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
     public MetaEntity getMetaEntity() {
         return getValueProposition();
+    }
+
+    public RolePerformance getProvider() {
+        return provider;
+    }
+
+    public Set<ValuePropositionComponentPerformance> getComponents() {
+        return components;
+    }
+
+    public ValueProposition getValueProposition() {
+        return valueProposition;
+    }
+
+    public ValuePropositionComponentPerformance findComponent(ValuePropositionComponent component) {
+        return findMatchingRuntimeEntity(getComponents(),component);
     }
 }

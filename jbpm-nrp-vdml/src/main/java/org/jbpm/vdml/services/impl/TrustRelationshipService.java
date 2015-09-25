@@ -2,8 +2,8 @@ package org.jbpm.vdml.services.impl;
 
 import org.jbpm.vdml.services.api.model.LocationCriterion;
 import org.jbpm.vdml.services.api.model.MeasurementCriterion;
-import org.jbpm.vdml.services.impl.model.runtime.ProvidedValuePropositionPerformance;
-import org.jbpm.vdml.services.impl.model.runtime.ValuePropositionPerformance;
+import org.jbpm.vdml.services.impl.model.meta.ValueProposition;
+import org.jbpm.vdml.services.impl.model.runtime.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -24,19 +24,29 @@ public class TrustRelationshipService extends AbstractRuntimeService {
         super(entityManager);
     }
 
-    public List<ProvidedValuePropositionPerformance> findMatchingValueProposition(String valuePropositionRef, LocationCriterion location, Collection<MeasurementCriterion> criteria){
+    public List<ValuePropositionPerformance> findMatchingValueProposition(String valuePropositionRef, LocationCriterion location, Collection<MeasurementCriterion> criteria){
         return null;
     }
-    public List<ValuePropositionPerformance> findMyPreferredSuppliers(String valuePropositionRef, Long participantId){
-        Query q = entityManager.createQuery("select vpp from ValuePropositionPerformance  vpp where vpp.receiver.participant.id =:participantId and vpp.valueProposition.uri=:valuePropositionUri");
+    public List<RelationshipPerformance> findMyPreferredSuppliers(String valuePropositionRef, Long participantId){
+        Query q = entityManager.createQuery("select rp from RelationshipPerformance rp where rp.recipient.participant.id =:participantId and rp.valueProposition.uri=:valuePropositionUri");
         q.setParameter("participantId",participantId);
         q.setParameter("valuePropositionUri", valuePropositionRef);
         return q.getResultList();
     }
-    public void requestTrustRelationship(String valuePropositionRef, ProvidedValuePropositionPerformance supplier){
-
+    public void requestTrustRelationship(String valuePropositionRef, Long requesterId,Long providerId){
+        ValueProposition valueProposition=entityManager.find(ValueProposition.class,valuePropositionRef);
+        RolePerformance from = findOrCreateRole(entityManager.find(Participant.class, providerId), valueProposition.getProvider());
+        RolePerformance to = findOrCreateRole(entityManager.find(Participant.class, requesterId), valueProposition.getRecipient());
+        RelationshipPerformance rp = new RelationshipPerformance(valueProposition, from);
+        rp.setRecipient(to);
+        entityManager.persist(rp);
+        Collection<RelationshipComponentPerformance> components = syncRuntimeEntities(rp.getComponents(), rp.getValueProposition().getComponents(), RelationshipComponentPerformance.class, rp);
+        for (RelationshipComponentPerformance component : components) {
+            syncRuntimeEntities(component.getMeasurements(), component.getValuePropositionComponent().getMeasures(),RelationshipComponentMeasurement.class,component);
+        }
+        entityManager.flush();
     }
-    public void confirmTrustRelationship(ValuePropositionPerformance relationship){
+    public void confirmTrustRelationship(RelationshipPerformance relationship){
 
     }
 }

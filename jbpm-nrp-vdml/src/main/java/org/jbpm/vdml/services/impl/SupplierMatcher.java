@@ -36,7 +36,7 @@ public class SupplierMatcher extends AbstractRuntimeService {
     public List<CapabilityPerformance> findMatchingCapabilityOffer(String capabilityDef, LocationCriterion location, ReusableBusinessItemRequirement a, Collection<MeasurementCriterion> criteria) {
         return null;
     }
-    public List<ProvidedValuePropositionPerformance> findMatchingValueProposition(String capabilityDef, LocationCriterion location, Date from, Date to, Collection<MeasurementCriterion> criteria){
+    public List<ValuePropositionPerformance> findMatchingValueProposition(String capabilityDef, LocationCriterion location, Date from, Date to, Collection<MeasurementCriterion> criteria){
         return null;
     }
 }

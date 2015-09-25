@@ -7,6 +7,8 @@ import javax.persistence.ManyToOne;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 public class ValuePropositionComponent implements MetaEntity,MeasurableElement{
     @Id
@@ -47,5 +49,9 @@ public class ValuePropositionComponent implements MetaEntity,MeasurableElement{
     @Override
     public Set<Measure> getMeasures() {
         return measures;
+    }
+
+    public Measure findMeasure(String name) {
+        return findByName(getMeasures(),name);
     }
 }

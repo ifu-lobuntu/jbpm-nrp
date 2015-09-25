@@ -195,9 +195,11 @@ public class VdmlImporter extends MetaBuilder {
                 ValueProposition toVp = findOrCreate(fromVp, ValueProposition.class, role, findRole(buildUri(fromVp.getRecipient())));
                 toVp.setName(fromVp.getName());
                 for (org.omg.vdml.ValuePropositionComponent fromVpc : fromVp.getComponent()) {
-                    ValuePropositionComponent toVpc = findOrCreate(fromVp, ValuePropositionComponent.class, toVp);
+                    ValuePropositionComponent toVpc = findOrCreate(fromVpc, ValuePropositionComponent.class, toVp);
                     toVpc.setName(fromVpc.getName());
-                    measureBuilder.fromMeasuredCharacteristics(toVpc.getMeasures(), fromVpc.getMeasuredCharacteristic());
+                    List<MeasuredCharacteristic> measuredCharacteristics = new ArrayList<MeasuredCharacteristic>(fromVpc.getMeasuredCharacteristic());
+                    measuredCharacteristics.add(fromVpc.getValueMeasurement());
+                    measureBuilder.fromMeasuredCharacteristics(toVpc.getMeasures(), measuredCharacteristics);
                 }
             }
         }

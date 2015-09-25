@@ -1,12 +1,13 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 
+import org.hibernate.annotations.Type;
 import org.jbpm.vdml.services.impl.model.meta.DirectedFlow;
 import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,10 +28,10 @@ public class DirectedFlowObservation implements RuntimeEntity{
     private PortContainerObservation sourcePortContainer;
     @ManyToOne
     private PortContainerObservation targetPortContainer;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date plannedDate;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualDate;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime plannedDate;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime actualDate;
     @Enumerated
     private ValueFlowStatus status=ValueFlowStatus.PLANNING;
     @ManyToOne
@@ -125,19 +126,19 @@ public class DirectedFlowObservation implements RuntimeEntity{
         return findMatchingRuntimeEntity(getMeasurements(), getDirectedFlow().getQuantity());
     }
 
-    public Date getPlannedDate() {
+    public DateTime getPlannedDate() {
         return plannedDate;
     }
 
-    public void setPlannedDate(Date plannedDate) {
+    public void setPlannedDate(DateTime plannedDate) {
         this.plannedDate = plannedDate;
     }
 
-    public Date getActualDate() {
+    public DateTime getActualDate() {
         return actualDate;
     }
 
-    public void setActualDate(Date actualDate) {
+    public void setActualDate(DateTime actualDate) {
         this.actualDate = actualDate;
     }
 

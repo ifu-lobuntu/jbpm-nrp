@@ -19,10 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by ampie on 2015/09/23.
- */
-public class AbstractPoolExchangeTest extends AbstractExchangeTest {
+public class AbstractPoolExchangeTest extends MetaEntityImportTest {
     GeometryFactory geometryFactory= JTSFactoryFinder.getGeometryFactory(null);
 
     protected IndividualParticipant createSupplier1(ParticipantService participantService, List<String> storeDefIds, String tukTukDefinitionId) {
@@ -49,16 +46,13 @@ public class AbstractPoolExchangeTest extends AbstractExchangeTest {
         return r;
     }
 
-    // Fullfill - could be automated
-    // 1. Increment InventoryLevel
-    // 2. Delete PlannedUnavailability
-    // 3. Effect payments
+
     protected org.jbpm.vdml.services.impl.model.meta.Collaboration buildDefaultStoreExchange(ValueDeliveryModel vdm) throws IOException {
-        BusinessItemDefinition money = createMoney(vdm);
+        BusinessItemDefinition money = createBusinessItemDefinition(vdm, "Money");
 
 
-        StoreDefinition account = createAccount(vdm, money);
-        Characteristic amount = createAmount(vdm);
+        StoreDefinition account = createStore(vdm, money, "Account");
+        Characteristic amount = buildDirectMeasure(vdm, "Amount");
         account.setInventoryLevel(amount);
 
         BusinessItemDefinition productDefinition = createBusinessItemDefinition(vdm, "TukTukDefinition");
@@ -86,9 +80,9 @@ public class AbstractPoolExchangeTest extends AbstractExchangeTest {
 
         Role consumer = createRole(cp, "Consumer");
 
-        SupplyingStore fromAccount = createFromAccount(account, cp, consumer);
+        SupplyingStore fromAccount = addSupplyingStore(cp, account, consumer, "FromAccount", "amount");
 
-        SupplyingStore toAccount = createToAccount(account, cp, storeOwner);
+        SupplyingStore toAccount = addSupplyingStore(cp, account, storeOwner, "ToAccount", "amount");
 
         SupplyingStore productStore = addSupplyingPool(cp, pool, storeOwner, "ResourcePool", "inventoryLevel");
 

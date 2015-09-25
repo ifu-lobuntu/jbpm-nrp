@@ -10,7 +10,6 @@ import org.jbpm.vdml.services.impl.model.runtime.StorePerformance;
 import org.junit.Test;
 import org.omg.vdml.*;
 
-import javax.persistence.EntityManager;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 
@@ -98,8 +97,8 @@ public class PartitipantTest extends MetaEntityImportTest {
         RolePerformance rolePerformance=new ParticipantService(getEntityManager()).findIndividualParticipant("ekke").getRolePerformances().iterator().next();
         assertEquals(ekke.getId(), rolePerformance.getParticipant().getId());
         assertEquals("MyRole", rolePerformance.getRole().getName());
-        assertEquals(1, rolePerformance.getOverallProvidedValuePropositions().size());
-        assertEquals("MyValueToYou", rolePerformance.getOverallProvidedValuePropositions().iterator().next().getValueProposition().getName());
-        super.assertMeasurements(rolePerformance.getOverallProvidedValuePropositions().iterator().next().getComponents().iterator().next().getMeasurements());
+        assertEquals(1, rolePerformance.getProvidedValuePropositions().size());
+        assertEquals("MyValueToYou", rolePerformance.getProvidedValuePropositions().iterator().next().getValueProposition().getName());
+        super.assertMeasurements(rolePerformance.getProvidedValuePropositions().iterator().next().getComponents().iterator().next().getMeasurements());
     }
 }

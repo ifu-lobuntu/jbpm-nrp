@@ -18,11 +18,11 @@ public class RolePerformance implements ActivatableRuntimeEntity {
     @ManyToOne
     private Participant participant;
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL)
-    private Set<ValuePropositionPerformance> providedValuePropositions=new HashSet<ValuePropositionPerformance>();
+    private Set<RelationshipPerformance> providedRelationships =new HashSet<RelationshipPerformance>();
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL)
-    private Set<ProvidedValuePropositionPerformance> overallProvidedValuePropositions=new HashSet<ProvidedValuePropositionPerformance>();
-    @OneToMany(mappedBy = "receiver")
-    private Set<ValuePropositionPerformance> receivedValuePropositions=new HashSet<ValuePropositionPerformance>();
+    private Set<ValuePropositionPerformance> providedValuePropositions =new HashSet<ValuePropositionPerformance>();
+    @OneToMany(mappedBy = "recipient")
+    private Set<RelationshipPerformance> receivedRelationships =new HashSet<RelationshipPerformance>();
 
     public RolePerformance() {
     }
@@ -41,16 +41,16 @@ public class RolePerformance implements ActivatableRuntimeEntity {
         return participant;
     }
 
+    public Set<RelationshipPerformance> getProvidedRelationships() {
+        return providedRelationships;
+    }
+
+    public Set<RelationshipPerformance> getReceivedRelationships() {
+        return receivedRelationships;
+    }
+
     public Set<ValuePropositionPerformance> getProvidedValuePropositions() {
         return providedValuePropositions;
-    }
-
-    public Set<ValuePropositionPerformance> getReceivedValuePropositions() {
-        return receivedValuePropositions;
-    }
-
-    public Set<ProvidedValuePropositionPerformance> getOverallProvidedValuePropositions() {
-        return overallProvidedValuePropositions;
     }
 
     public boolean isActive() {

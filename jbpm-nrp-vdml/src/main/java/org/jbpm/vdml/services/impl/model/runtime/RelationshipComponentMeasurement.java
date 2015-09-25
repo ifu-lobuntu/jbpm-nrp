@@ -1,25 +1,26 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
+
 import org.jbpm.vdml.services.impl.model.meta.Measure;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ProvidedValuePropositionComponentMeasurement extends Measurement{
+public class RelationshipComponentMeasurement extends Measurement{
     @ManyToOne
-    private ProvidedValuePropositionComponentPerformance component;
+    private RelationshipComponentPerformance component;
 
-    public ProvidedValuePropositionComponentMeasurement(Measure measure, ProvidedValuePropositionComponentPerformance component) {
+    public RelationshipComponentMeasurement() {
+    }
+
+    public RelationshipComponentMeasurement(Measure measure, RelationshipComponentPerformance component) {
         super(measure);
         this.component = component;
         this.component.getMeasurements().add(this);
     }
 
-    public ProvidedValuePropositionComponentMeasurement() {
-    }
-
-    public ProvidedValuePropositionComponentPerformance getComponent() {
+    public RelationshipComponentPerformance getComponent() {
         return component;
     }
 

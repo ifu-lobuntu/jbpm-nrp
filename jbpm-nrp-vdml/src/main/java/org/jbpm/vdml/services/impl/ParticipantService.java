@@ -8,7 +8,6 @@ import org.jbpm.vdml.services.impl.model.scheduling.Schedule;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
@@ -52,11 +51,11 @@ public class ParticipantService extends AbstractRuntimeService {
         Participant participant = entityManager.find(Participant.class, participantId);
         syncRuntimeEntities(participant.getRolePerformances(), storeDefinitions, RolePerformance.class, participant);
         for (RolePerformance cp : participant.getRolePerformances()) {
-            Collection<ProvidedValuePropositionPerformance> pvpp = syncRuntimeEntities(cp.getOverallProvidedValuePropositions(), cp.getRole().getProvidedValuePropositions(), ProvidedValuePropositionPerformance.class, cp);
-            for (ProvidedValuePropositionPerformance p : pvpp) {
-                Collection<ProvidedValuePropositionComponentPerformance> cs = syncRuntimeEntities(p.getComponents(), p.getValueProposition().getComponents(), ProvidedValuePropositionComponentPerformance.class, p);
-                for (ProvidedValuePropositionComponentPerformance cc : cs) {
-                    syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ProvidedValuePropositionComponentMeasurement.class, cc);
+            Collection<ValuePropositionPerformance> pvpp = syncRuntimeEntities(cp.getProvidedValuePropositions(), cp.getRole().getProvidedValuePropositions(), ValuePropositionPerformance.class, cp);
+            for (ValuePropositionPerformance p : pvpp) {
+                Collection<ValuePropositionComponentPerformance> cs = syncRuntimeEntities(p.getComponents(), p.getValueProposition().getComponents(), ValuePropositionComponentPerformance.class, p);
+                for (ValuePropositionComponentPerformance cc : cs) {
+                    syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ValuePropositionComponentMeasurement.class, cc);
                 }
             }
         }

@@ -14,9 +14,9 @@ public class Role implements MetaEntity {
 
     @OneToMany(mappedBy = "supplyingRole", cascade = CascadeType.ALL)
     private Set<SupplyingStore> supplyingStores = new HashSet<SupplyingStore>();
-    @OneToMany(mappedBy = "fromRole", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     private Set<ValueProposition> providedValuePropositions = new HashSet<ValueProposition>();
-    @OneToMany(mappedBy = "toRole")
+    @OneToMany(mappedBy = "recipient")
     private Set<ValueProposition> receivedValuePropositions = new HashSet<ValueProposition>();
     @OneToMany(mappedBy = "performingRole", cascade = CascadeType.ALL)
     private Set<Activity> performedActitivities = new HashSet<Activity>();

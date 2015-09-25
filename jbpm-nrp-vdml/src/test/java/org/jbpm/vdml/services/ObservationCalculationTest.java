@@ -26,9 +26,10 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
     private IndividualParticipant developer;
     private DeliverableFlow profitFlow;
     private DeliverableFlow featureFlow;
+    private DeliverableFlow userStoryFromBacklogFlow;
 
     @Before
-    public void setupModel()throws Exception{
+    public void setupModel() throws Exception {
         ValueDeliveryModel vdm = buildModel();
         BusinessItemDefinition userStory = super.createBusinessItemDefinition(vdm, "UserStory");
         Characteristic userStoryEffort = super.buildDirectMeasure(vdm, "UserStoryEffort");
@@ -37,6 +38,8 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         userStory.getCharacteristicDefinition().add(difficulty);
         Characteristic userStorySize = super.buildBinaryMeasure(vdm, "UserStorySize", difficulty, userStoryEffort, BinaryFunctor.MULTIPLY);
         userStory.getCharacteristicDefinition().add(userStorySize);
+
+        StoreDefinition backlog = createStore(vdm, userStory, "Backlog");
 
         implementUserStoryMethod = VDMLFactory.eINSTANCE.createCapabilityMethod();
         vdm.getCollaboration().add(implementUserStoryMethod);
@@ -49,20 +52,21 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         Role developerRole = createRole(implementUserStoryMethod, "Developer");
         Activity codeUserStoryActivity = addActivity(codeUserStory, implementUserStoryMethod, developerRole, "CodeUserStory");
 
-        BusinessItemDefinition executableFeature=createBusinessItemDefinition(vdm, "ExecutableFeature");
-        StoreDefinition executableProduct= super.createStore(vdm, executableFeature, "ExecutableProduct");
+        BusinessItemDefinition executableFeature = createBusinessItemDefinition(vdm, "ExecutableFeature");
+        StoreDefinition executableProduct = super.createStore(vdm, executableFeature, "ExecutableProduct");
 
 
         Characteristic durationOverrun = buildNamedMeasure(vdm, "DurationOverrun");
         Characteristic completionLateness = buildNamedMeasure(vdm, "CompletionLateness");
-        Characteristic startDelay= buildNamedMeasure(vdm, "StartDelay");
-        Characteristic penalty= buildRescaledMeasure(vdm, "Penalty", durationOverrun, 0d, 0.5d);//30 money units per hour
+        Characteristic startDelay = buildNamedMeasure(vdm, "StartDelay");
+        Characteristic penalty = buildRescaledMeasure(vdm, "Penalty", durationOverrun, 0d, 0.5d);//30 money units per hour
 
         BusinessItem userStoryItem = addBusinessItem(userStory, implementUserStoryMethod);
         DeliverableFlow userStoryFlow = addDeliverableFlow(implementUserStoryMethod, userStoryItem, detailUserStoryActivity, codeUserStoryActivity, "userStoryProvided", "userStoryReceived");
         BusinessItemDefinition money = createBusinessItemDefinition(vdm, "Money");
+
         StoreDefinition account = super.createStore(vdm, money, "Account");
-        account.setInventoryLevel(buildDirectMeasure(vdm,"Amount"));
+        account.setInventoryLevel(buildDirectMeasure(vdm, "Amount"));
         SupplyingStore fromAccount = addSupplyingStore(implementUserStoryMethod, account, productOwnerRole, "FromAccount", "Balance");
         SupplyingStore toAccount = addSupplyingStore(implementUserStoryMethod, account, developerRole, "ToAccount", "Balance");
         BusinessItem moneyItem = addBusinessItem(money, implementUserStoryMethod);
@@ -72,7 +76,12 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         incomeFlow.getProvider().getBatchSize().setCharacteristicDefinition(userStoryPrice);
         incomeFlow.getRecipient().setBatchSize(null);
 
-        ResourceUse moneyUse=VDMLFactory.eINSTANCE.createResourceUse();
+        SupplyingStore supplyingBacklog = addSupplyingStore(implementUserStoryMethod, backlog, productOwnerRole, "Backlog", "NoOfStories");
+        this.userStoryFromBacklogFlow = addDeliverableFlow(implementUserStoryMethod, userStoryItem, supplyingBacklog, detailUserStoryActivity, "userStoryOut", "userStoryIn");
+        addMeasuredCharacteristics(userStoryFromBacklogFlow.getMeasuredCharacteristic(), completionLateness);
+        Characteristic latenessDifficultyRatio = buildBinaryMeasure(vdm, "LatenessDifficultyRatio", completionLateness, difficulty, BinaryFunctor.DIVIDE);
+        addMeasuredCharacteristics(supplyingBacklog.getMeasuredCharacteristic(), latenessDifficultyRatio);
+        ResourceUse moneyUse = VDMLFactory.eINSTANCE.createResourceUse();
         moneyUse.setName("MoneyUse");
         moneyUse.getResource().add(incomeFlow.getRecipient());
         moneyUse.setResourceIsConsumed(true);
@@ -80,8 +89,8 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         moneyUse.getQuantity().setCharacteristicDefinition(buildDirectMeasure(vdm, "AmountUsed"));
         codeUserStoryActivity.getResourceUse().add(moneyUse);
 
-        Characteristic totalCost= super.buildBinaryMeasure(vdm, "TotalCost", penalty, moneyUse.getQuantity().getCharacteristicDefinition(), BinaryFunctor.PLUS);
-        addMeasuredCharacteristics(codeUserStoryActivity.getMeasuredCharacteristic(), durationOverrun, completionLateness, startDelay,penalty,totalCost);
+        Characteristic totalCost = super.buildBinaryMeasure(vdm, "TotalCost", penalty, moneyUse.getQuantity().getCharacteristicDefinition(), BinaryFunctor.PLUS);
+        addMeasuredCharacteristics(codeUserStoryActivity.getMeasuredCharacteristic(), durationOverrun, completionLateness, startDelay, penalty, totalCost);
 
         profitFlow = addDeliverableFlow(implementUserStoryMethod, moneyItem, codeUserStoryActivity, toAccount, "profitGenerated", "profitSaved");
         profitFlow.getProvider().setBatchSize(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
@@ -108,6 +117,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         participantService.setCapabilities(productOwner.getId(), Collections.singleton(MetaBuilder.buildUri(detailUserStory)));
 
     }
+
     @Test
     public void testBusinessItemAndInputFlows() throws Exception {
         //WHEN
@@ -129,6 +139,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         assertEquals(316d, userStoryPrice, 0.01d);
 
     }
+
     @Test
     public void testActivityAndResourceUseAndValueAdd() throws Exception {
         //WHEN
@@ -149,23 +160,25 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
         CollaborationObservation projecFound = new ProjectService(getEntityManager()).findProject(projectId);
         ActivityObservation codeUserStoryFound = projecFound.findActivity(projecFound.getCollaboration().findActivity("CodeUserStory"));
-        ActivityMeasurement overrun= codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("DurationOverrun"));
+        ActivityMeasurement overrun = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("DurationOverrun"));
         assertEquals(60d, overrun.getActualValue(), 0.01d);
-        ActivityMeasurement completionLateness= codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("CompletionLateness"));
+        ActivityMeasurement completionLateness = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("CompletionLateness"));
         assertEquals(120d, completionLateness.getActualValue(), 0.01d);
-        ActivityMeasurement startDelay= codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("StartDelay"));
+        ActivityMeasurement startDelay = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("StartDelay"));
         assertEquals(60d, startDelay.getActualValue(), 0.01d);
-        ActivityMeasurement penalty= codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("Penalty"));
+        ActivityMeasurement penalty = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("Penalty"));
         assertEquals(30d, penalty.getActualValue(), 0.01d);
-        DirectedFlowObservation incomeFlowObservation= projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
+        DirectedFlowObservation incomeFlowObservation = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
         assertEquals(316d, incomeFlowObservation.getQuantity().getActualValue(), 0.01d);
-        DirectedFlowObservation profitFlowObservation= projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(profitFlow.getName()));
-        assertEquals(316d-10-30, profitFlowObservation.getQuantity().getActualValue(), 0.01d);
-        DirectedFlowObservation featureFlow=projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(this.featureFlow.getName()));
-        ValueAddMeasurement onTimeDelivery= featureFlow.findValueAdd(featureFlow.getDirectedFlow().findValueAdd("OnTimeDelivery"));
-        assertEquals(-120d,onTimeDelivery.getActualValue(),0.01d);
+        DirectedFlowObservation profitFlowObservation = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(profitFlow.getName()));
+        assertEquals(316d - 10 - 30, profitFlowObservation.getQuantity().getActualValue(), 0.01d);
+        DirectedFlowObservation featureFlow = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(this.featureFlow.getName()));
+        ValueAddMeasurement onTimeDelivery = featureFlow.findValueAdd(featureFlow.getDirectedFlow().findValueAdd("OnTimeDelivery"));
+        assertEquals(-120d, onTimeDelivery.getActualValue(), 0.01d);
     }
-    public void testSupplyingStore() throws Exception{
+
+    @Test
+    public void testSupplyingStore() throws Exception {
         //TODO
         /**
          * Test that we can calculate these metrics from the following contexts:
@@ -173,6 +186,23 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
          * 2. Outgoing Deliverable flows (look at duration, lateness implementations)
          * 3. Resource Use
          */
+        //WHEN
+        ProjectService ps = new ProjectService(getEntityManager());
+        CollaborationObservation project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
+        BusinessItemObservation bio = project.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
+        bio.findMeasurement(bio.getDefinition().findMeasure("UserStoryEffort")).setActualValue(12d);
+        bio.findMeasurement(bio.getDefinition().findMeasure("Difficulty")).setActualValue(9d);
+        DirectedFlowObservation flow = project.findDeliverableFlow(project.getCollaboration().findDeliverableFlow(userStoryFromBacklogFlow.getName()));
+        flow.setPlannedDate(new DateTime(2015, 10, 1, 8, 0, 0, 0));
+        flow.setActualDate(new DateTime(2015, 10, 1, 8, 50, 0, 0));//50 minutes late,
+        ps.flush();
+
+        Long projectId = project.getId();
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
+        CollaborationObservation projectFound = new ProjectService(getEntityManager()).findProject(projectId);
+        SupplyingStoreObservation backlog = projectFound.findSupplyingStore(projectFound.getCollaboration().findSupplyingStore("Backlog"));
+        SupplyingStoreMeasurement latenessDifficultyRatio = backlog.findMeasurement(backlog.getSupplyingStore().findMeasure("LatenessDifficultyRatio"));
+        assertEquals(50 / 9d, latenessDifficultyRatio.getActualValue(), 0.01d);
     }
 
 }

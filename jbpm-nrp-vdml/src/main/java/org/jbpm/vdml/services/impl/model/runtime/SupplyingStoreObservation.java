@@ -21,8 +21,6 @@ public class SupplyingStoreObservation extends PortContainerObservation {
     @ManyToOne
     private StorePerformance store;
     @ManyToOne
-    private RolePerformance supplyingRole;
-    @ManyToOne
     private CollaborationObservation collaboration;
     @ManyToOne
     private SupplyingStore supplyingStore;
@@ -40,7 +38,7 @@ public class SupplyingStoreObservation extends PortContainerObservation {
     }
 
     public void setSupplyingRole(RolePerformance supplyingRole) {
-        this.supplyingRole = supplyingRole;
+        setResponsibleRolePerformance(supplyingRole);
     }
 
     public void setStore(StorePerformance store) {
@@ -48,7 +46,7 @@ public class SupplyingStoreObservation extends PortContainerObservation {
     }
 
     public RolePerformance getSupplyingRole() {
-        return supplyingRole;
+        return getResponsibleRolePerformance();
     }
 
     public CollaborationObservation getCollaboration() {
@@ -80,7 +78,7 @@ public class SupplyingStoreObservation extends PortContainerObservation {
         return supplyingStore;
     }
 
-    public Measurement findMeasurement(Measure measure) {
+    public SupplyingStoreMeasurement findMeasurement(Measure measure) {
         return findMatchingRuntimeEntity(getMeasurements(),measure);
     }
 }

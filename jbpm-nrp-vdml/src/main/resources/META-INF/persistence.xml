@@ -54,9 +54,9 @@
         <class>org.jbpm.vdml.services.impl.model.runtime.MilestoneObservation</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.Participant</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.PoolPerformance</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ProvidedValuePropositionComponentMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ProvidedValuePropositionComponentPerformance</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ProvidedValuePropositionPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionPerformance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ResourceUseMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ResourceUseObservation</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.PortContainerObservation</class>
@@ -67,9 +67,9 @@
         <class>org.jbpm.vdml.services.impl.model.runtime.SupplyingStoreObservation</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.TestLocation</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValueAddMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentPerformance</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.RelationshipComponentMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.RelationshipComponentPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.RelationshipPerformance</class>
         <class>org.jbpm.vdml.services.impl.model.scheduling.DailySchedule</class>
         <class>org.jbpm.vdml.services.impl.model.scheduling.PeriodInDay</class>
         <class>org.jbpm.vdml.services.impl.model.scheduling.PlannedUnavailability</class>

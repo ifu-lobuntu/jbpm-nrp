@@ -82,11 +82,11 @@ public class AbstractRuntimeService extends MetaBuilder {
         } else {
             rp = resultList.get(0);
         }
-        Collection<ProvidedValuePropositionPerformance> pvpp = syncRuntimeEntities(rp.getOverallProvidedValuePropositions(), rp.getRole().getProvidedValuePropositions(), ProvidedValuePropositionPerformance.class, rp);
-        for (ProvidedValuePropositionPerformance p : pvpp) {
-            Collection<ProvidedValuePropositionComponentPerformance> cs = syncRuntimeEntities(p.getComponents(), p.getValueProposition().getComponents(), ProvidedValuePropositionComponentPerformance.class, p);
-            for (ProvidedValuePropositionComponentPerformance cc : cs) {
-                syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ProvidedValuePropositionComponentMeasurement.class, cc);
+        Collection<ValuePropositionPerformance> pvpp = syncRuntimeEntities(rp.getProvidedValuePropositions(), rp.getRole().getProvidedValuePropositions(), ValuePropositionPerformance.class, rp);
+        for (ValuePropositionPerformance p : pvpp) {
+            Collection<ValuePropositionComponentPerformance> cs = syncRuntimeEntities(p.getComponents(), p.getValueProposition().getComponents(), ValuePropositionComponentPerformance.class, p);
+            for (ValuePropositionComponentPerformance cc : cs) {
+                syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ValuePropositionComponentMeasurement.class, cc);
             }
         }
         return rp;

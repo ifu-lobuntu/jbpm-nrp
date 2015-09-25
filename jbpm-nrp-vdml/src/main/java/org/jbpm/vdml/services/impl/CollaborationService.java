@@ -2,6 +2,7 @@ package org.jbpm.vdml.services.impl;
 
 import org.jbpm.vdml.services.impl.model.meta.*;
 import org.jbpm.vdml.services.impl.model.runtime.*;
+import org.joda.time.DateTime;
 
 
 import javax.persistence.EntityManager;
@@ -159,7 +160,7 @@ public class CollaborationService extends AbstractRuntimeService {
                     SupplyingStoreObservation rsp = (SupplyingStoreObservation) flow.getSourcePortContainer();
                     if (flow.getQuantity() != null) {
                         flow.setStatus(ValueFlowStatus.FULFILLED);
-                        flow.setActualDate(new Date());
+                        flow.setActualDate(new DateTime());
                         Measurement q = flow.getQuantity();
                         if (q.getActualValue() != null) {
                             rsp.getStore().setInventoryLevel(rsp.getStore().getInventoryLevel() - q.getActualValue());
@@ -171,7 +172,7 @@ public class CollaborationService extends AbstractRuntimeService {
                     if (flow.getQuantity() != null) {
                         Measurement q = flow.getQuantity();
                         flow.setStatus(ValueFlowStatus.FULFILLED);
-                        flow.setActualDate(new Date());
+                        flow.setActualDate(new DateTime());
                         if (q.getActualValue() != null) {
                             rsp.getStore().setInventoryLevel(rsp.getStore().getInventoryLevel() + q.getActualValue());
                         }

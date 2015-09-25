@@ -19,17 +19,12 @@ public class ActivityObservation extends PortContainerObservation {
     private CapabilityPerformance capabilityOffer;
     @ManyToOne
     private Activity activity;
-    @ManyToOne
-    private RolePerformance performingRole;
-    @Temporal(TemporalType.TIMESTAMP)
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime plannedStartDate;
-    @Temporal(TemporalType.TIMESTAMP)
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime plannedDateOfCompletion;
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime actualStartDate;
-    @Temporal(TemporalType.TIMESTAMP)
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime actualDateOfCompletion;
     @ManyToOne
@@ -62,7 +57,7 @@ public class ActivityObservation extends PortContainerObservation {
     }
 
     public void setPerformingRole(RolePerformance performingRole) {
-        this.performingRole = performingRole;
+        setResponsibleRolePerformance(performingRole);
     }
 
     public Set<ResourceUseObservation> getResourceUseObservation() {
@@ -70,7 +65,7 @@ public class ActivityObservation extends PortContainerObservation {
     }
 
     public RolePerformance getPerformingRole() {
-        return performingRole;
+        return getResponsibleRolePerformance();
     }
 
     public Set<ActivityMeasurement> getMeasurements() {

@@ -358,4 +358,38 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         workBusinessItem.setName(workDefinition.getName());
         return workBusinessItem;
     }
+    protected CapabilityMethod createCapabilityMethod(ValueDeliveryModel vdm, String name) {
+        CapabilityMethod cm= VDMLFactory.eINSTANCE.createCapabilityMethod();
+        cm.setName(name);
+        vdm.getCollaboration().add(cm);
+        return cm;
+    }
+
+    protected ValueAdd addValueAdd(DeliverableFlow flow, Characteristic characteristic) {
+        ValueAdd valueAdd = VDMLFactory.eINSTANCE.createValueAdd();
+        valueAdd.setName(characteristic.getName());
+        valueAdd.setValueMeasurement(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
+        valueAdd.getValueMeasurement().setName(characteristic.getName());
+        valueAdd.getValueMeasurement().setCharacteristicDefinition(characteristic);
+        flow.getProvider().getValueAdd().add(valueAdd);
+        return valueAdd;
+    }
+
+    protected ValuePropositionComponent addComponent(ValueProposition vp, Characteristic characteristic) {
+        ValuePropositionComponent component = VDMLFactory.eINSTANCE.createValuePropositionComponent();
+        component.setName(characteristic.getName());
+        component.setValueMeasurement(VDMLFactory.eINSTANCE.createMeasuredCharacteristic());
+        component.getValueMeasurement().setName(characteristic.getName());
+        component.getValueMeasurement().setCharacteristicDefinition(characteristic);
+        vp.getComponent().add(component);
+        return component;
+    }
+    protected ValueProposition addValueProposition(Role provider, Role recipient, String name) {
+        ValueProposition vp= VDMLFactory.eINSTANCE.createValueProposition();
+        vp.setName(name);
+        provider.getProvidedProposition().add(vp);
+        vp.setRecipient(recipient);
+        return vp;
+    }
+
 }

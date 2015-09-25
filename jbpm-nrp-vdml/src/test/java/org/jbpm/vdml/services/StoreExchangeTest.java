@@ -20,7 +20,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class StoreExchangeTest extends AbstractExchangeTest {
+public class StoreExchangeTest extends MetaEntityImportTest {
     @Test
     public void testExchange() throws Exception{
         ValueDeliveryModel vdm = buildModel();
@@ -123,11 +123,11 @@ public class StoreExchangeTest extends AbstractExchangeTest {
     }
 
     protected org.jbpm.vdml.services.impl.model.meta.Collaboration buildDefaultStoreExchange(ValueDeliveryModel vdm) throws IOException {
-        BusinessItemDefinition money = createMoney(vdm);
+        BusinessItemDefinition money = createBusinessItemDefinition(vdm, "Money");
 
 
-        StoreDefinition account = createAccount(vdm, money);
-        Characteristic amount = createAmount(vdm);
+        StoreDefinition account = createStore(vdm, money, "Account");
+        Characteristic amount = buildDirectMeasure(vdm, "Amount");
         account.setInventoryLevel(amount);
 
         BusinessItemDefinition productDefinition = createBusinessItemDefinition(vdm, "ProductDefinition");
@@ -154,9 +154,9 @@ public class StoreExchangeTest extends AbstractExchangeTest {
 
         Role consumer = createRole(cp, "Consumer");
 
-        SupplyingStore fromAccount = createFromAccount(account, cp, consumer);
+        SupplyingStore fromAccount = addSupplyingStore(cp, account, consumer, "FromAccount", "amount");
 
-        SupplyingStore toAccount = createToAccount(account, cp, storeOwner);
+        SupplyingStore toAccount = addSupplyingStore(cp, account, storeOwner, "ToAccount", "amount");
 
         SupplyingStore productStore= addSupplyingStore(cp, store, storeOwner, "ProductStore", "inventoryLevel");
 

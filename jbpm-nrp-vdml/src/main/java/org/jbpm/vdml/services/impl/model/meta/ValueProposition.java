@@ -4,15 +4,17 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 public class ValueProposition implements  MetaEntity{
     @Id
     private String uri;
     private String name;
     @ManyToOne
-    private Role fromRole;
+    private Role provider;
     @ManyToOne
-    private Role toRole;
+    private Role recipient;
     @OneToMany(mappedBy = "valueProposition", cascade = CascadeType.ALL)
     private Set<ValuePropositionComponent> components=new HashSet<ValuePropositionComponent>();
     @ManyToOne
@@ -21,12 +23,13 @@ public class ValueProposition implements  MetaEntity{
     public ValueProposition() {
     }
 
-    public ValueProposition(String uri, Role fromRole, Role toRole) {
+    public ValueProposition(String uri, Role provider, Role recipient) {
         this.uri = uri;
-        this.fromRole = fromRole;
-        this.fromRole.getProvidedValuePropositions().add(this);
-        this.toRole = toRole;
-        this.toRole.getReceivedValuePropositions().add(this);
+        this.provider = provider;
+        this.provider.getProvidedValuePropositions().add(this);
+        this.recipient = recipient;
+        this.recipient.getReceivedValuePropositions().add(this);
+        this.collaboration=provider.getCollaboration();
     }
 
     @Override
@@ -44,12 +47,12 @@ public class ValueProposition implements  MetaEntity{
         this.name = name;
     }
 
-    public Role getFromRole() {
-        return fromRole;
+    public Role getProvider() {
+        return provider;
     }
 
-    public Role getToRole() {
-        return toRole;
+    public Role getRecipient() {
+        return recipient;
     }
 
     public Set<ValuePropositionComponent> getComponents() {
@@ -59,4 +62,10 @@ public class ValueProposition implements  MetaEntity{
     public Collaboration getCollaboration() {
         return collaboration;
     }
+
+    public ValuePropositionComponent findComponent(String name) {
+        return findByName(getComponents(),name);
+    }
+
+
 }

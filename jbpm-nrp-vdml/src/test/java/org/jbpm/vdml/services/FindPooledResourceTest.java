@@ -27,9 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
-/**
- * Created by ampie on 2015/09/19.
- */
+
 public class FindPooledResourceTest extends AbstractPoolExchangeTest {
     @Test
     public void testFind() throws Exception {
