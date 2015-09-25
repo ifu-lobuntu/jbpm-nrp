@@ -60,7 +60,20 @@ public class ProjectService extends AbstractRuntimeService{
         assignmentService.assignToRoles(project, Arrays.asList(rp));
         return rp;
     }
-
+    public StorePerformance assignStorePerformance(Long projectId, Long spId) {
+        CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
+        StorePerformance storePerformance = entityManager.find(StorePerformance.class, spId);
+        assignmentService.assignToSupplyingStores(project.findSupplyingStore(storePerformance.getStoreDefinition()),storePerformance);
+        entityManager.flush();
+        return storePerformance;
+    }
+    public ReusableBusinessItemPerformance assignReusableBusinessItemPerformance(Long projectId, Long bipId) {
+        CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
+        ReusableBusinessItemPerformance storePerformance = entityManager.find(ReusableBusinessItemPerformance.class, bipId);
+        assignmentService.assignToBusinessItem(project.findBusinessItem(storePerformance.getDefinition()),storePerformance);
+        entityManager.flush();
+        return storePerformance;
+    }
     public CollaborationObservation findProject(Long id) {
         return entityManager.find(CollaborationObservation.class,id);
     }

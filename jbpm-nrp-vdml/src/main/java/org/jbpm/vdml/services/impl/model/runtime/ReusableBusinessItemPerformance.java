@@ -3,6 +3,7 @@ package org.jbpm.vdml.services.impl.model.runtime;
 
 import com.vividsolutions.jts.geom.Point;
 import org.jbpm.vdml.services.impl.model.meta.BusinessItemDefinition;
+import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.scheduling.SchedulableObject;
 import org.jbpm.vdml.services.impl.model.scheduling.Schedule;
@@ -11,8 +12,10 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
+
 @Entity
-public class ReusableBusinessItemPerformance implements ActivatableRuntimeEntity,SchedulableObject {
+public class ReusableBusinessItemPerformance implements ActivatableRuntimeEntity,SchedulableObject,Measurand  {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -129,6 +132,10 @@ public class ReusableBusinessItemPerformance implements ActivatableRuntimeEntity
         if(this.hostingPool!=null) {
             this.hostingPool.getPooledResources().add(this);
         }
+    }
+
+    public ReusableBusinessItemMeasurement findMeasurement(Measure measure) {
+        return findMatchingRuntimeEntity(getMeasurements(),measure);
     }
 }
 

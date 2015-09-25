@@ -107,7 +107,7 @@ public class CapabilityExchangeTest extends AbstractExchangeTest {
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
         //WHEN
         for (DirectedFlowObservation flow : exchange.getOwnedDirectedFlows()) {
-            if (flow.getDeliverable().getBusinessItemDefinition().getName().equals("Money")) {
+            if (flow.getDeliverable().getDefinition().getName().equals("Money")) {
                 flow.getQuantity().setActualValue(100d);
             }
         }

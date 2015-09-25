@@ -114,8 +114,8 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         ProjectService ps = new ProjectService(getEntityManager());
         CollaborationObservation project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
         BusinessItemObservation bio = project.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
-        bio.findMeasurement(bio.getBusinessItemDefinition().findMeasurement("UserStoryEffort")).setActualValue(12d);
-        bio.findMeasurement(bio.getBusinessItemDefinition().findMeasurement("Difficulty")).setActualValue(9d);
+        bio.findMeasurement(bio.getDefinition().findMeasure("UserStoryEffort")).setActualValue(12d);
+        bio.findMeasurement(bio.getDefinition().findMeasure("Difficulty")).setActualValue(9d);
         ps.flush();
 
         Long projectId = project.getId();
@@ -123,7 +123,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         CollaborationObservation collaborationObservationFound = new ProjectService(getEntityManager()).findProject(projectId);
         BusinessItemObservation businessItemFound = collaborationObservationFound.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
         DirectedFlowObservation moneyFlowObservation = collaborationObservationFound.findDeliverableFlow(collaborationObservationFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
-        Double userStorySize1 = businessItemFound.findMeasurement(businessItemFound.getBusinessItemDefinition().findMeasurement("UserStorySize")).getActualValue();
+        Double userStorySize1 = businessItemFound.findMeasurement(businessItemFound.getDefinition().findMeasure("UserStorySize")).getActualValue();
         Double userStoryPrice = moneyFlowObservation.getQuantity().getActualValue();
         assertEquals(108d, userStorySize1, 0.01d);
         assertEquals(316d, userStoryPrice, 0.01d);
@@ -135,8 +135,8 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         ProjectService ps = new ProjectService(getEntityManager());
         CollaborationObservation project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
         BusinessItemObservation bio = project.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
-        bio.findMeasurement(bio.getBusinessItemDefinition().findMeasurement("UserStoryEffort")).setActualValue(12d);
-        bio.findMeasurement(bio.getBusinessItemDefinition().findMeasurement("Difficulty")).setActualValue(9d);
+        bio.findMeasurement(bio.getDefinition().findMeasure("UserStoryEffort")).setActualValue(12d);
+        bio.findMeasurement(bio.getDefinition().findMeasure("Difficulty")).setActualValue(9d);
         ActivityObservation codeUserStory = project.findActivity(project.getCollaboration().findActivity("CodeUserStory"));
         codeUserStory.setPlannedStartDate(new DateTime(2015, 10, 1, 8, 0, 0, 0));
         codeUserStory.setActualStartDate(new DateTime(2015, 10, 1, 9, 0, 0, 0));//one hour late,
@@ -164,6 +164,15 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         DirectedFlowObservation featureFlow=projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(this.featureFlow.getName()));
         ValueAddMeasurement onTimeDelivery= featureFlow.findValueAdd(featureFlow.getDirectedFlow().findValueAdd("OnTimeDelivery"));
         assertEquals(-120d,onTimeDelivery.getActualValue(),0.01d);
+    }
+    public void testSupplyingStore() throws Exception{
+        //TODO
+        /**
+         * Test that we can calculate these metrics from the following contexts:
+         * 1. BusinessItemObservations NB!!
+         * 2. Outgoing Deliverable flows (look at duration, lateness implementations)
+         * 3. Resource Use
+         */
     }
 
 }

@@ -2,6 +2,7 @@ package org.jbpm.vdml.services.impl.model.runtime;
 
 
 import org.hibernate.annotations.Type;
+import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.meta.StoreDefinition;
 
@@ -9,6 +10,9 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import com.vividsolutions.jts.geom.Point;
+
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
+
 @Entity
 public class StorePerformance implements ActivatableRuntimeEntity, DirectlyExchangable{
     @Id
@@ -118,6 +122,10 @@ public class StorePerformance implements ActivatableRuntimeEntity, DirectlyExcha
 
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
+    }
+
+    public StoreMeasurement findMeasurement(Measure measure) {
+        return findMatchingRuntimeEntity(getMeasurements(),measure);
     }
 }
 

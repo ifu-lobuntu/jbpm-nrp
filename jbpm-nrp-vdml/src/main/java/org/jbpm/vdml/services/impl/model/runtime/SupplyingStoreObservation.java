@@ -1,6 +1,7 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 
+import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.meta.SupplyingStore;
 
@@ -10,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
 public class SupplyingStoreObservation extends PortContainerObservation {
@@ -75,6 +78,10 @@ public class SupplyingStoreObservation extends PortContainerObservation {
     @Override
     public MetaEntity getMetaEntity() {
         return supplyingStore;
+    }
+
+    public Measurement findMeasurement(Measure measure) {
+        return findMatchingRuntimeEntity(getMeasurements(),measure);
     }
 }
 

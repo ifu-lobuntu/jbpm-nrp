@@ -82,4 +82,8 @@ public class AssignmentService extends AbstractRuntimeService {
         //TODO signal event to commence ConversationForAction
     }
 
+    public void assignToBusinessItem(BusinessItemObservation observation, ReusableBusinessItemPerformance storePerformance) {
+        observation.setInstanceReference(storePerformance);
+        //uhm yeah well ok?!
+    }
 }

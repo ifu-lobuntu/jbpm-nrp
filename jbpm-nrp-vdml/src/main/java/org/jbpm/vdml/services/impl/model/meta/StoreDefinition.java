@@ -6,6 +6,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class StoreDefinition implements MetaEntity,MeasurableElement {
@@ -73,5 +75,13 @@ public class StoreDefinition implements MetaEntity,MeasurableElement {
 
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
+    }
+
+    public String getDeploymentId() {
+        return deploymentId;
+    }
+
+    public Measure findMeasure(String name) {
+        return findByName(getMeasures(),name);
     }
 }

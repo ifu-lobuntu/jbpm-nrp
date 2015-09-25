@@ -14,19 +14,19 @@ public class BusinessItemObservation implements RuntimeEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @ManyToOne
-    private BusinessItemDefinition businessItemDefinition;
+    private BusinessItemDefinition definition;
     @ManyToOne
     private CollaborationObservation collaboration;
     @OneToMany(cascade = CascadeType.ALL)
     private Set<BusinessItemMeasurement> measurements = new HashSet<BusinessItemMeasurement>();
-    @Embedded
-    private ExternalObjectReference instanceReference=new ExternalObjectReference();
+    @ManyToOne
+    private ReusableBusinessItemPerformance instanceReference;
 
     public BusinessItemObservation() {
     }
 
-    public BusinessItemObservation(BusinessItemDefinition businessItemDefinition, CollaborationObservation collaboration) {
-        this.businessItemDefinition = businessItemDefinition;
+    public BusinessItemObservation(BusinessItemDefinition definition, CollaborationObservation collaboration) {
+        this.definition = definition;
         this.collaboration = collaboration;
         this.collaboration.getBusinessItems().add(this);
     }
@@ -37,22 +37,22 @@ public class BusinessItemObservation implements RuntimeEntity {
 
     @Override
     public MetaEntity getMetaEntity() {
-        return getBusinessItemDefinition();
+        return getDefinition();
     }
 
-    public BusinessItemDefinition getBusinessItemDefinition() {
-        return businessItemDefinition;
+    public BusinessItemDefinition getDefinition() {
+        return definition;
     }
 
     public CollaborationObservation getCollaboration() {
         return collaboration;
     }
 
-    public ExternalObjectReference getInstanceReference() {
+    public ReusableBusinessItemPerformance getInstanceReference() {
         return instanceReference;
     }
 
-    public void setInstanceReference(ExternalObjectReference instanceReference) {
+    public void setInstanceReference(ReusableBusinessItemPerformance instanceReference) {
         this.instanceReference = instanceReference;
     }
     public BusinessItemMeasurement findMeasurement(Measure m){

@@ -112,9 +112,9 @@ public class StoreExchangeTest extends AbstractExchangeTest {
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setProjectedInventoryLevel(100d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setInventoryLevel(100d);
         for (DirectedFlowObservation flow : exchange.getOwnedDirectedFlows()) {
-            if(flow.getDeliverable().getBusinessItemDefinition().getName().equals("Money")){
+            if(flow.getDeliverable().getDefinition().getName().equals("Money")){
                 flow.getQuantity().setActualValue(100d);
-            }else if(flow.getDeliverable().getBusinessItemDefinition().getName().equals("ProductDefinition")){
+            }else if(flow.getDeliverable().getDefinition().getName().equals("ProductDefinition")){
                 flow.getQuantity().setActualValue(5d);
             }
         }

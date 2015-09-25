@@ -65,7 +65,7 @@ public class BusinessItemDefinition implements MetaEntity{
     }
     public Set<Measure> getImmediateMeasures(){
         Set<Measure> result =new HashSet<Measure>();
-        separateMeasures(getMeasures(),new HashSet<Measure>(),result);
+        separateMeasures(getMeasures(), new HashSet<Measure>(), result);
         return result;
     }
     private static void separateMeasures(Collection<Measure> source, Collection<Measure> multipleInstanceMeasures, Collection<Measure> singleInstanceMeasures) {
@@ -83,6 +83,7 @@ public class BusinessItemDefinition implements MetaEntity{
                 multipleInstanceMap.put(measure.getUri(), measure);
             }
         }
+        int lastSize=temp.size();
         while (temp.size() > 0) {
             Iterator<Measure> iterator2 = temp.iterator();
             while (iterator2.hasNext()) {
@@ -110,6 +111,11 @@ public class BusinessItemDefinition implements MetaEntity{
                     }
                 }
             }
+            if(temp.size()==lastSize){
+                throw new IllegalStateException("Could not resolve measure '" + temp.iterator().next().getName());
+            }else{
+                lastSize=temp.size();
+            }
         }
         multipleInstanceMeasures.addAll(multipleInstanceMap.values());
         singleInstanceMeasures.addAll(singleInstanceMap.values());
@@ -135,7 +141,7 @@ public class BusinessItemDefinition implements MetaEntity{
         return collaborations;
     }
 
-    public Measure findMeasurement(String name) {
+    public Measure findMeasure(String name) {
         return findByName(getMeasures(),name);
     }
 
@@ -146,4 +152,5 @@ public class BusinessItemDefinition implements MetaEntity{
     public String getDeploymentId() {
         return deploymentId;
     }
+
 }

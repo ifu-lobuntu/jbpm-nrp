@@ -31,7 +31,7 @@ public class CollaborationService extends AbstractRuntimeService {
         syncRuntimeEntities(observation.getSupplyingStores(), collaboration.getSupplyingStores(), SupplyingStoreObservation.class, observation);
         syncRuntimeEntities(observation.getBusinessItems(), collaboration.getBusinessItemDefinitions(), BusinessItemObservation.class, observation);
         for (BusinessItemObservation bio : observation.getBusinessItems()) {
-            syncRuntimeEntities(bio.getMeasurements(), bio.getBusinessItemDefinition().getImmediateMeasures(), BusinessItemMeasurement.class, bio);
+            syncRuntimeEntities(bio.getMeasurements(), bio.getDefinition().getImmediateMeasures(), BusinessItemMeasurement.class, bio);
         }
         syncRuntimeEntities(observation.getOwnedDirectedFlows(), collaboration.getFlows(), DirectedFlowObservation.class, observation);
         for (DirectedFlowObservation dfo : observation.getOwnedDirectedFlows()) {
@@ -58,6 +58,9 @@ public class CollaborationService extends AbstractRuntimeService {
                 syncRuntimeEntities(ruo.getMeasurements(), asCollection(ruo.getResourceUse().getDuration(), ruo.getResourceUse().getQuantity()),ResourceUseMeasurement.class, ruo);
             }
         }
+        for (SupplyingStoreObservation so : observation.getSupplyingStores()) {
+            syncRuntimeEntities(so.getMeasurements(),so.getSupplyingStore().getMeasures(),SupplyingStoreMeasurement.class,so);
+        }
         assignmentService.assignToRoles(observation, rolePerformances);
         return observation;
     }
@@ -71,6 +74,14 @@ public class CollaborationService extends AbstractRuntimeService {
 
         return result;
     }
+
+    /**
+     * To be used when we support multiple instances of the same activity
+     * @param activityId
+     * @param collaborationObservationId
+     * @param capabilityPerformance
+     * @return
+     */
 
     public ActivityObservation newActivity(String activityId, Long collaborationObservationId, Long capabilityPerformance) {
         CollaborationObservation co = entityManager.find(CollaborationObservation.class, collaborationObservationId);

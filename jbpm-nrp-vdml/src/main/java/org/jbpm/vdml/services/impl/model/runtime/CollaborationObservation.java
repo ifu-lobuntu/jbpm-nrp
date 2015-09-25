@@ -125,4 +125,13 @@ public class CollaborationObservation extends PortContainerObservation {
     public DirectedFlowObservation findDeliverableFlow(DeliverableFlow flow) {
         return findMatchingRuntimeEntity(getOwnedDirectedFlows(),flow);
     }
+
+    public SupplyingStoreObservation findSupplyingStore(StoreDefinition definition) {
+        for (SupplyingStoreObservation so : getSupplyingStores()) {
+            if(so.getSupplyingStore().getStoreRequirement().equals(definition)){
+                return so;
+            }
+        }
+        throw new IllegalArgumentException("This collaboration does not have stores of type '" + definition.getName() +"'");
+    }
 }

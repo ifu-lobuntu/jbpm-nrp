@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class PortContainerObservation implements RuntimeEntity{
+public abstract class PortContainerObservation implements RuntimeEntity, Measurand{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -41,7 +41,6 @@ public abstract class PortContainerObservation implements RuntimeEntity{
         }
         return result;
     }
-    public abstract Collection<? extends Measurement> getMeasurements();
 
     public Set<DirectedFlowObservation> getCommencedFlow() {
         return commencedFlow;

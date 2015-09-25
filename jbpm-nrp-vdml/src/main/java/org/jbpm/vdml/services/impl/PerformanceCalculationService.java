@@ -29,34 +29,39 @@ public class PerformanceCalculationService extends AbstractCalculationService {
         return entityManager.find(CapabilityPerformance.class,cpId);
     }
     public void calculateCapabilityPerformance(Long cpId) {
-        CapabilityPerformance cp=entityManager.find(CapabilityPerformance.class,cpId);
-        Map<String, Measurement> measurements = new HashMap<String, Measurement>();
+        CapabilityPerformance measurand=entityManager.find(CapabilityPerformance.class,cpId);
+        Map<String, Measurement> context = new HashMap<String, Measurement>();
+        addToContext(context,measurand.getMeasurements());
+        Set<Measurement> otherMeasurements = resolveAggregatedMEasurements(measurand, "ActivityMeasurement m where m.activity.capabilityOffer");
+        resolveMeasurements(measurand.getCapability().getDeploymentId(), context, otherMeasurements);
+        entityManager.flush();
+    }
+
+    private Set<Measurement> resolveAggregatedMEasurements(Measurand measurand, String measurandMatcher) {
         Set<Measurement> otherMeasurements = new HashSet<Measurement>();
-        for (CapabilityMeasurement measurement : cp.getMeasurements()) {
-            measurements.put(measurement.getMeasure().getUri(), measurement);
+        for (Measurement measurement : measurand.getMeasurements()) {
             if (measurement.getMeasure() instanceof CollectiveMeasure) {
                 CollectiveMeasure cm = (CollectiveMeasure) measurement.getMeasure();
                 Accumulator accumulator = cm.getAccumulator();
-                Query q = entityManager.createQuery("select "+ constructFormula(accumulator) +" from ActivityMeasurement m where m.activity.capabilityOffer =:capabilityPerformance and m.measure.uri in :measureUris");
+                Query q = entityManager.createQuery("select "+ constructFormula(accumulator) +" from "+ measurandMatcher +" =:measurand and m.measure.uri in :measureUris");
                 Set<String> uris = new HashSet<String>();
                 for (EmfReference emfReference : cm.getAggregatedMeasures()) {
                     uris.add(emfReference.getUri());
                 }
                 q.setParameter("measureUris", uris);
-                q.setParameter("capabilityPerformance", cp);
+                q.setParameter("measurand", measurand);
                 measurement.setActualValue(extractDouble(q));
             } else if (measurement.getMeasure() instanceof CountingMeasure) {
                 CountingMeasure cm = (CountingMeasure) measurement.getMeasure();
-                Query q = entityManager.createQuery("select count(m)  from ActivityMeasurement m where  m.activity.capabilityOffer =:capabilityPerformance and m.measure.uri =:measureUri and " + cm.getValuesToCount());
+                Query q = entityManager.createQuery("select count(m)  from "+ measurandMatcher +" =:measurand and m.measure.uri =:measureUri and " + cm.getValuesToCount());
                 q.setParameter("measureUri", cm.getMeasureToCount().getUri());
-                q.setParameter("capabilityPerformance", cp);
+                q.setParameter("measurand", measurand);
                 measurement.setActualValue(extractDouble(q));
             } else {
                 otherMeasurements.add(measurement);
             }
         }
-        resolveMeasurements(cp.getCapability().getDeploymentId(), measurements, otherMeasurements);
-        entityManager.flush();
+        return otherMeasurements;
     }
 
     private String constructFormula(Accumulator accumulator) {
@@ -77,9 +82,25 @@ public class PerformanceCalculationService extends AbstractCalculationService {
         return "AVG(m.actualValue)";
     }
 
-    public void calculateStorePerformance(StorePerformance sp) {
+    public void calculateStorePerformance(Long spId) {
+        StorePerformance measurand=entityManager.find(StorePerformance.class,spId);
+        Map<String, Measurement> context = new HashMap<String, Measurement>();
+        addToContext(context,measurand.getMeasurements());
+        Set<Measurement> otherMeasurements = resolveAggregatedMEasurements(measurand, "SupplyingStoreMeasurement m where m.store.store");
+        resolveMeasurements( measurand.getStoreDefinition().getDeploymentId(), context, otherMeasurements);
+        entityManager.flush();
     }
-    public void calculateReusableResourcePerformance(ReusableBusinessItemPerformance rp) {
+    public StorePerformance findStorePerformance(Long spId) {
+        return entityManager.find(StorePerformance.class,spId);
+    }
+
+    public void calculateReusableResourcePerformance(Long bipId) {
+        ReusableBusinessItemPerformance measurand=entityManager.find(ReusableBusinessItemPerformance.class,bipId);
+        Map<String, Measurement> context = new HashMap<String, Measurement>();
+        addToContext(context,measurand.getMeasurements());
+        Set<Measurement> otherMeasurements = resolveAggregatedMEasurements(measurand, "BusinessItemMeasurement m where m.businessItem.instanceReference");
+        resolveMeasurements( measurand.getDefinition().getDeploymentId(), context, otherMeasurements);
+        entityManager.flush();
     }
 
     private Double extractDouble(Query q) {
@@ -124,4 +145,7 @@ public class PerformanceCalculationService extends AbstractCalculationService {
         }
     }
 
+    public ReusableBusinessItemPerformance findReusableBusinessItemPerformance(Long bipId) {
+        return entityManager.find(ReusableBusinessItemPerformance.class,bipId);
+    }
 }

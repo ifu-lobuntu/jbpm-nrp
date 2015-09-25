@@ -4,6 +4,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+
 @Entity
 public class SupplyingStore extends PortContainer {
 
@@ -45,5 +47,9 @@ public class SupplyingStore extends PortContainer {
 
     public Set<Measure> getMeasures() {
         return measures;
+    }
+
+    public Measure findMeasure(String name) {
+        return findByName(getMeasures(),name);
     }
 }
