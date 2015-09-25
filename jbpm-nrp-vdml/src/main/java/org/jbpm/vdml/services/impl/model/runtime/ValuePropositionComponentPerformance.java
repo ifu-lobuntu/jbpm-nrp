@@ -68,6 +68,7 @@ public class ValuePropositionComponentPerformance implements ActivatableRuntimeE
     }
 
     public ValuePropositionComponentMeasurement findMeasurement(Measure measure) {
-        return findMatchingRuntimeEntity(getMeasurements(), measure);
+        ValuePropositionComponentMeasurement result = findMatchingRuntimeEntity(getMeasurements(), measure);
+        return result;
     }
 }

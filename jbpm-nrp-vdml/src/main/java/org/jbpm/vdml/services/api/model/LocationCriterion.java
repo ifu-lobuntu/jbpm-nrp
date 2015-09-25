@@ -4,24 +4,24 @@ package org.jbpm.vdml.services.api.model;
 import java.io.Serializable;
 
 public class LocationCriterion implements Serializable {
-    private String longitude;
-    private String lattitude;
+    private double longitude;
+    private double lattitude;
     private double distance;
 
     public LocationCriterion() {
     }
 
-    public LocationCriterion(String longitude, String lattitude, double distance) {
+    public LocationCriterion(double longitude, double lattitude, double distance) {
         this.longitude = longitude;
         this.lattitude = lattitude;
         this.distance = distance;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public String getLattitude() {
+    public double getLattitude() {
         return lattitude;
     }
 

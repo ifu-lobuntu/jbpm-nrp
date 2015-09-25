@@ -9,10 +9,14 @@ public class MeasurementCriterion implements Serializable{
     private Double upper;
     private CriterionOperator operator;
 
-    public MeasurementCriterion(String measureUri,CriterionOperator operator, Double lower) {
+    public MeasurementCriterion(String measureUri,CriterionOperator operator, Double value) {
         this.measureUri=measureUri;
         this.operator = operator;
-        this.lower = lower;
+        if(operator==CriterionOperator.LESS_THAN) {
+            this.upper= value;
+        }else{
+            this.lower = value;
+        }
     }
     public MeasurementCriterion(String measureUri, Double lower, Double upper) {
         this.measureUri=measureUri;
