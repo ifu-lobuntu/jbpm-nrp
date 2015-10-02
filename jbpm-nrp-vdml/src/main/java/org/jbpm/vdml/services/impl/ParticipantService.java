@@ -109,8 +109,8 @@ public class ParticipantService extends AbstractRuntimeService {
     public void setCapabilities(Long participantId, Collection<String> capabilityIds) {
         Collection<Capability> capabilities = entityManager.createQuery("select c from Capability c where c.uri in :capabilityIds").setParameter("capabilityIds", capabilityIds).getResultList();
         Participant participant = entityManager.find(Participant.class, participantId);
-        syncRuntimeEntities(participant.getCapabilityOffers(), capabilities, CapabilityPerformance.class, participant);
-        for (CapabilityPerformance cp : participant.getCapabilityOffers()) {
+        syncRuntimeEntities(participant.getCapabilityOffers(), capabilities, CapabilityOffer.class, participant);
+        for (CapabilityOffer cp : participant.getCapabilityOffers()) {
             syncRuntimeEntities(cp.getMeasurements(), cp.getCapability().getMeasures(), CapabilityMeasurement.class, cp);
         }
     }

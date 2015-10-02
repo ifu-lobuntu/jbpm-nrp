@@ -23,6 +23,8 @@ public class Activity extends PortContainer {
     private Collaboration collaboration;
     @ManyToOne
     private Collaboration delegatingCollaboration;
+    @ManyToOne
+    private Measure duration;
     @ManyToMany
     private Set<Measure> measures=new HashSet<Measure>();
 
@@ -58,6 +60,14 @@ public class Activity extends PortContainer {
 
     public void setDelegatingCollaboration(Collaboration delegatingCollaboration) {
         this.delegatingCollaboration = delegatingCollaboration;
+    }
+
+    public Measure getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Measure duration) {
+        this.duration = duration;
     }
 
     public Set<Measure> getMeasures() {

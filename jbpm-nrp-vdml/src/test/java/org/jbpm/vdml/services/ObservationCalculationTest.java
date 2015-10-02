@@ -122,7 +122,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
     public void testBusinessItemAndInputFlows() throws Exception {
         //WHEN
         ProjectService ps = new ProjectService(getEntityManager());
-        CollaborationObservation project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
+        CollaborationInstance project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
         BusinessItemObservation bio = project.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
         bio.findMeasurement(bio.getDefinition().findMeasure("UserStoryEffort")).setActualValue(12d);
         bio.findMeasurement(bio.getDefinition().findMeasure("Difficulty")).setActualValue(9d);
@@ -130,9 +130,9 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
 
         Long projectId = project.getId();
         new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
-        CollaborationObservation collaborationObservationFound = new ProjectService(getEntityManager()).findProject(projectId);
-        BusinessItemObservation businessItemFound = collaborationObservationFound.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
-        DirectedFlowObservation moneyFlowObservation = collaborationObservationFound.findDeliverableFlow(collaborationObservationFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
+        CollaborationInstance collaborationInstanceFound = new ProjectService(getEntityManager()).findProject(projectId);
+        BusinessItemObservation businessItemFound = collaborationInstanceFound.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
+        DeliverableFlowInstance moneyFlowObservation = collaborationInstanceFound.findDeliverableFlow(collaborationInstanceFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
         Double userStorySize1 = businessItemFound.findMeasurement(businessItemFound.getDefinition().findMeasure("UserStorySize")).getActualValue();
         Double userStoryPrice = moneyFlowObservation.getQuantity().getActualValue();
         assertEquals(108d, userStorySize1, 0.01d);
@@ -144,11 +144,11 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
     public void testActivityAndResourceUseAndValueAdd() throws Exception {
         //WHEN
         ProjectService ps = new ProjectService(getEntityManager());
-        CollaborationObservation project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
+        CollaborationInstance project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
         BusinessItemObservation bio = project.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
         bio.findMeasurement(bio.getDefinition().findMeasure("UserStoryEffort")).setActualValue(12d);
         bio.findMeasurement(bio.getDefinition().findMeasure("Difficulty")).setActualValue(9d);
-        ActivityObservation codeUserStory = project.findActivity(project.getCollaboration().findActivity("CodeUserStory"));
+        ActivityInstance codeUserStory = project.findActivity(project.getCollaboration().findActivity("CodeUserStory"));
         codeUserStory.setPlannedStartDate(new DateTime(2015, 10, 1, 8, 0, 0, 0));
         codeUserStory.setActualStartDate(new DateTime(2015, 10, 1, 9, 0, 0, 0));//one hour late,
         codeUserStory.setPlannedDateOfCompletion(new DateTime(2015, 10, 1, 12, 0, 0, 0));
@@ -158,8 +158,8 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
 
         Long projectId = project.getId();
         new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
-        CollaborationObservation projecFound = new ProjectService(getEntityManager()).findProject(projectId);
-        ActivityObservation codeUserStoryFound = projecFound.findActivity(projecFound.getCollaboration().findActivity("CodeUserStory"));
+        CollaborationInstance projecFound = new ProjectService(getEntityManager()).findProject(projectId);
+        ActivityInstance codeUserStoryFound = projecFound.findActivity(projecFound.getCollaboration().findActivity("CodeUserStory"));
         ActivityMeasurement overrun = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("DurationOverrun"));
         assertEquals(60d, overrun.getActualValue(), 0.01d);
         ActivityMeasurement completionLateness = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("CompletionLateness"));
@@ -168,11 +168,11 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         assertEquals(60d, startDelay.getActualValue(), 0.01d);
         ActivityMeasurement penalty = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("Penalty"));
         assertEquals(30d, penalty.getActualValue(), 0.01d);
-        DirectedFlowObservation incomeFlowObservation = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
+        DeliverableFlowInstance incomeFlowObservation = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
         assertEquals(316d, incomeFlowObservation.getQuantity().getActualValue(), 0.01d);
-        DirectedFlowObservation profitFlowObservation = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(profitFlow.getName()));
+        DeliverableFlowInstance profitFlowObservation = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(profitFlow.getName()));
         assertEquals(316d - 10 - 30, profitFlowObservation.getQuantity().getActualValue(), 0.01d);
-        DirectedFlowObservation featureFlow = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(this.featureFlow.getName()));
+        DeliverableFlowInstance featureFlow = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(this.featureFlow.getName()));
         ValueAddMeasurement onTimeDelivery = featureFlow.findValueAdd(featureFlow.getDirectedFlow().findValueAdd("OnTimeDelivery"));
         assertEquals(-120d, onTimeDelivery.getActualValue(), 0.01d);
     }
@@ -188,19 +188,19 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
          */
         //WHEN
         ProjectService ps = new ProjectService(getEntityManager());
-        CollaborationObservation project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
+        CollaborationInstance project = ps.initiateProject(productOwner.getId(), MetaBuilder.buildUri(implementUserStoryMethod));
         BusinessItemObservation bio = project.findBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
         bio.findMeasurement(bio.getDefinition().findMeasure("UserStoryEffort")).setActualValue(12d);
         bio.findMeasurement(bio.getDefinition().findMeasure("Difficulty")).setActualValue(9d);
-        DirectedFlowObservation flow = project.findDeliverableFlow(project.getCollaboration().findDeliverableFlow(userStoryFromBacklogFlow.getName()));
+        DeliverableFlowInstance flow = project.findDeliverableFlow(project.getCollaboration().findDeliverableFlow(userStoryFromBacklogFlow.getName()));
         flow.setPlannedDate(new DateTime(2015, 10, 1, 8, 0, 0, 0));
         flow.setActualDate(new DateTime(2015, 10, 1, 8, 50, 0, 0));//50 minutes late,
         ps.flush();
 
         Long projectId = project.getId();
         new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
-        CollaborationObservation projectFound = new ProjectService(getEntityManager()).findProject(projectId);
-        SupplyingStoreObservation backlog = projectFound.findSupplyingStore(projectFound.getCollaboration().findSupplyingStore("Backlog"));
+        CollaborationInstance projectFound = new ProjectService(getEntityManager()).findProject(projectId);
+        SupplyingStoreInstance backlog = projectFound.findSupplyingStore(projectFound.getCollaboration().findSupplyingStore("Backlog"));
         SupplyingStoreMeasurement latenessDifficultyRatio = backlog.findMeasurement(backlog.getSupplyingStore().findMeasure("LatenessDifficultyRatio"));
         assertEquals(50 / 9d, latenessDifficultyRatio.getActualValue(), 0.01d);
     }

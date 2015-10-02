@@ -14,34 +14,34 @@ import java.util.Set;
 import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
-public class CollaborationObservation extends PortContainerObservation {
+public class CollaborationInstance extends PortContainerInstance {
 
     @ManyToOne
     private Collaboration collaboration;
 
     @OneToMany(mappedBy = "collaboration")
-    private Set<ActivityObservation> activities = new HashSet<ActivityObservation>();
+    private Set<ActivityInstance> activities = new HashSet<ActivityInstance>();
     @OneToMany(mappedBy = "collaboration")
-    private Set<SupplyingStoreObservation> supplyingStores = new HashSet<SupplyingStoreObservation>();
+    private Set<SupplyingStoreInstance> supplyingStores = new HashSet<SupplyingStoreInstance>();
     @ManyToMany()
     private Set<RolePerformance> collaborationRoles = new HashSet<RolePerformance>();
 
     @OneToMany(mappedBy = "collaboration")
     private Set<BusinessItemObservation> businessItems = new HashSet<BusinessItemObservation>();
     @OneToMany(mappedBy = "collaboration")
-    private Set<DirectedFlowObservation> ownedDirectedFlows = new HashSet<DirectedFlowObservation>();
+    private Set<DeliverableFlowInstance> ownedDirectedFlows = new HashSet<DeliverableFlowInstance>();
 
     @OneToMany(mappedBy = "collaboration")
-    private Set<MilestoneObservation> milestones = new HashSet<MilestoneObservation>();
+    private Set<MilestoneInstance> milestones = new HashSet<MilestoneInstance>();
 
-    public CollaborationObservation(Collaboration collaboration) {
+    public CollaborationInstance(Collaboration collaboration) {
         this.collaboration = collaboration;
     }
 
-    public CollaborationObservation() {
+    public CollaborationInstance() {
     }
 
-    public PortContainerObservation findPortContainer(PortContainer pc) {
+    public PortContainerInstance findPortContainer(PortContainer pc) {
         if (pc instanceof Activity) {
             return findActivity((Activity) pc);
         } else {
@@ -49,11 +49,11 @@ public class CollaborationObservation extends PortContainerObservation {
         }
     }
 
-    public ActivityObservation findActivity(Activity pc) {
+    public ActivityInstance findActivity(Activity pc) {
         return findMatchingRuntimeEntity(this.getActivities(), pc);
     }
 
-    public SupplyingStoreObservation findSupplyingStore(SupplyingStore pc) {
+    public SupplyingStoreInstance findSupplyingStore(SupplyingStore pc) {
         return findMatchingRuntimeEntity(this.getSupplyingStores(), pc);
     }
 
@@ -75,7 +75,7 @@ public class CollaborationObservation extends PortContainerObservation {
         return collaboration;
     }
 
-    public Set<ActivityObservation> getActivities() {
+    public Set<ActivityInstance> getActivities() {
         return activities;
     }
 
@@ -87,11 +87,11 @@ public class CollaborationObservation extends PortContainerObservation {
         return businessItems;
     }
 
-    public Set<DirectedFlowObservation> getOwnedDirectedFlows() {
+    public Set<DeliverableFlowInstance> getOwnedDirectedFlows() {
         return ownedDirectedFlows;
     }
 
-    public Set<SupplyingStoreObservation> getSupplyingStores() {
+    public Set<SupplyingStoreInstance> getSupplyingStores() {
         return supplyingStores;
     }
 
@@ -99,35 +99,35 @@ public class CollaborationObservation extends PortContainerObservation {
         return findMatchingRuntimeEntity(getCollaborationRoles(), role);
     }
 
-    public Set<MilestoneObservation> getMilestones() {
+    public Set<MilestoneInstance> getMilestones() {
         return milestones;
     }
 
-    public MilestoneObservation findMilestone(Milestone milestone) {
+    public MilestoneInstance findMilestone(Milestone milestone) {
         return findMatchingRuntimeEntity(getMilestones(), milestone);
     }
 
-    public Collection<CapabilityPerformance> getCapabilityOffersUsed() {
-        Collection<CapabilityPerformance> result = new HashSet<CapabilityPerformance>();
-        for (ActivityObservation a : this.getActivities()) {
+    public Collection<CapabilityOffer> getCapabilityOffersUsed() {
+        Collection<CapabilityOffer> result = new HashSet<CapabilityOffer>();
+        for (ActivityInstance a : this.getActivities()) {
             result.add(a.getCapabilityOffer());
         }
         return result;
     }
     public Collection<StorePerformance> getStoresUsed() {
         Collection<StorePerformance> result = new HashSet<StorePerformance>();
-        for (SupplyingStoreObservation a : this.getSupplyingStores()) {
+        for (SupplyingStoreInstance a : this.getSupplyingStores()) {
             result.add(a.getStore());
         }
         return result;
     }
 
-    public DirectedFlowObservation findDeliverableFlow(DeliverableFlow flow) {
+    public DeliverableFlowInstance findDeliverableFlow(DeliverableFlow flow) {
         return findMatchingRuntimeEntity(getOwnedDirectedFlows(),flow);
     }
 
-    public SupplyingStoreObservation findSupplyingStore(StoreDefinition definition) {
-        for (SupplyingStoreObservation so : getSupplyingStores()) {
+    public SupplyingStoreInstance findSupplyingStore(StoreDefinition definition) {
+        for (SupplyingStoreInstance so : getSupplyingStores()) {
             if(so.getSupplyingStore().getStoreRequirement().equals(definition)){
                 return so;
             }

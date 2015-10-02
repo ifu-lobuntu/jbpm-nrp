@@ -8,18 +8,18 @@ import javax.persistence.ManyToOne;
 @Entity
 public class ResourceUseMeasurement extends Measurement{
     @ManyToOne
-    private ResourceUseObservation resourceUse;
+    private ResourceUseInstance resourceUse;
 
     public ResourceUseMeasurement() {
     }
 
-    public ResourceUseMeasurement(Measure measure, ResourceUseObservation resourceUse) {
+    public ResourceUseMeasurement(Measure measure, ResourceUseInstance resourceUse) {
         super(measure);
         this.resourceUse = resourceUse;
         this.resourceUse.getMeasurements().add(this);
     }
 
-    public ResourceUseObservation getResourceUse() {
+    public ResourceUseInstance getResourceUse() {
         return resourceUse;
     }
 

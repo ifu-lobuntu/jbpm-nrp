@@ -11,24 +11,24 @@ import java.util.Set;
 import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
-public class CapabilityPerformance implements ActivatableRuntimeEntity,DirectlyExchangable {
+public class CapabilityOffer implements ActivatableRuntimeEntity,DirectlyExchangable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private boolean active;
     @ManyToOne
-    private CapabilityPerformance extendedCapabilityPerformance;
+    private CapabilityOffer extendedCapabilityOffer;
     @ManyToOne
     private Participant participant;
     @ManyToOne
     private Capability capability;
     @OneToMany()
-    private Set<CapabilityMeasurement> measurements=new HashSet<CapabilityMeasurement>();//Aggregated from ActivityObservation.measurements
+    private Set<CapabilityMeasurement> measurements=new HashSet<CapabilityMeasurement>();//Aggregated from ActivityInstance.measurements
 
-    public CapabilityPerformance() {
+    public CapabilityOffer() {
     }
 
-    public CapabilityPerformance(Capability capability,Participant participant) {
+    public CapabilityOffer(Capability capability, Participant participant) {
         this.participant = participant;
         this.participant.getCapabilityOffers().add(this);
         this.capability = capability;
@@ -64,12 +64,12 @@ public class CapabilityPerformance implements ActivatableRuntimeEntity,DirectlyE
         return measurements;
     }
 
-    public CapabilityPerformance getExtendedCapabilityPerformance() {
-        return extendedCapabilityPerformance;
+    public CapabilityOffer getExtendedCapabilityOffer() {
+        return extendedCapabilityOffer;
     }
 
-    public void setExtendedCapabilityPerformance(CapabilityPerformance extendedCapabilityPerformance) {
-        this.extendedCapabilityPerformance = extendedCapabilityPerformance;
+    public void setExtendedCapabilityOffer(CapabilityOffer extendedCapabilityOffer) {
+        this.extendedCapabilityOffer = extendedCapabilityOffer;
     }
     @Override
     public Participant getSupplier() {

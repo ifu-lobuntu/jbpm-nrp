@@ -8,18 +8,18 @@ import javax.persistence.ManyToOne;
 @Entity
 public class SupplyingStoreMeasurement extends Measurement{
     @ManyToOne
-    private SupplyingStoreObservation store;
+    private SupplyingStoreInstance store;
 
     public SupplyingStoreMeasurement() {
     }
 
-    public SupplyingStoreMeasurement(Measure measure, SupplyingStoreObservation store) {
+    public SupplyingStoreMeasurement(Measure measure, SupplyingStoreInstance store) {
         super(measure);
         this.store = store;
         this.store.getMeasurements().add(this);
     }
 
-    public SupplyingStoreObservation getStore() {
+    public SupplyingStoreInstance getStore() {
         return store;
     }
 

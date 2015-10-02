@@ -15,22 +15,22 @@ import java.util.Set;
 import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
-public class SupplyingStoreObservation extends PortContainerObservation {
+public class SupplyingStoreInstance extends PortContainerInstance {
     @ManyToOne
-    private SupplyingStoreObservation extendedSupplyingStoreObservation;
+    private SupplyingStoreInstance extendedSupplyingStoreObservation;
     @ManyToOne
     private StorePerformance store;
     @ManyToOne
-    private CollaborationObservation collaboration;
+    private CollaborationInstance collaboration;
     @ManyToOne
     private SupplyingStore supplyingStore;
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private Set<SupplyingStoreMeasurement> measurements = new HashSet<SupplyingStoreMeasurement>();//Aggregated from BusinessItemObservation
 
-    public SupplyingStoreObservation() {
+    public SupplyingStoreInstance() {
     }
 
-    public SupplyingStoreObservation(SupplyingStore supplyingStore, CollaborationObservation collaboration) {
+    public SupplyingStoreInstance(SupplyingStore supplyingStore, CollaborationInstance collaboration) {
         super();
         this.supplyingStore = supplyingStore;
         this.collaboration=collaboration;
@@ -49,7 +49,7 @@ public class SupplyingStoreObservation extends PortContainerObservation {
         return getResponsibleRolePerformance();
     }
 
-    public CollaborationObservation getCollaboration() {
+    public CollaborationInstance getCollaboration() {
         return collaboration;
     }
 
@@ -61,11 +61,11 @@ public class SupplyingStoreObservation extends PortContainerObservation {
         return measurements;
     }
 
-    public SupplyingStoreObservation getExtendedSupplyingStoreObservation() {
+    public SupplyingStoreInstance getExtendedSupplyingStoreObservation() {
         return extendedSupplyingStoreObservation;
     }
 
-    public void setExtendedSupplyingStoreObservation(SupplyingStoreObservation extendedSupplyingStoreObservation) {
+    public void setExtendedSupplyingStoreObservation(SupplyingStoreInstance extendedSupplyingStoreObservation) {
         this.extendedSupplyingStoreObservation = extendedSupplyingStoreObservation;
     }
 

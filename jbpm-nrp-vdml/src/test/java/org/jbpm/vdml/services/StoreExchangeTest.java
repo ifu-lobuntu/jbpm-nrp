@@ -5,8 +5,8 @@ import org.jbpm.vdml.services.impl.ExchangeService;
 import org.jbpm.vdml.services.impl.MetaBuilder;
 import org.jbpm.vdml.services.impl.ParticipantService;
 import org.jbpm.vdml.services.impl.VdmlImporter;
-import org.jbpm.vdml.services.impl.model.runtime.CollaborationObservation;
-import org.jbpm.vdml.services.impl.model.runtime.DirectedFlowObservation;
+import org.jbpm.vdml.services.impl.model.runtime.CollaborationInstance;
+import org.jbpm.vdml.services.impl.model.runtime.DeliverableFlowInstance;
 import org.jbpm.vdml.services.impl.model.runtime.IndividualParticipant;
 import org.jbpm.vdml.services.impl.model.runtime.StorePerformance;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         ExchangeService exchangeService = new ExchangeService(getEntityManager());
 
         //WHEN
-        CollaborationObservation exchange = exchangeService.startExchangeForProduct(consumerParticipant.getId(), supplierParticipant.getOfferedStores().iterator().next().getId());
+        CollaborationInstance exchange = exchangeService.startExchangeForProduct(consumerParticipant.getId(), supplierParticipant.getOfferedStores().iterator().next().getId());
         //THEN
         assertEquals(3, exchange.getActivities().size());
         assertNotNull(exchange.findActivity(collaboration.findActivity("Request")));
@@ -63,7 +63,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         //WHEN
         new ExchangeService(getEntityManager()).commitToExchange(exchangeId);
         //THEN
-        CollaborationObservation exchange=new ExchangeService(getEntityManager()).findExchange(exchangeId);
+        CollaborationInstance exchange=new ExchangeService(getEntityManager()).findExchange(exchangeId);
         StorePerformance fromAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
         StorePerformance toAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
         StorePerformance fromStore = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ProductStore")).getStore();
@@ -82,7 +82,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         exchangeService.commitToExchange(exchangeId);
         exchangeService.fulfillExchange(exchangeId);
         //THEN
-        CollaborationObservation exchange=new ExchangeService(getEntityManager()).findExchange(exchangeId);
+        CollaborationInstance exchange=new ExchangeService(getEntityManager()).findExchange(exchangeId);
         StorePerformance fromAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
         StorePerformance toAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
         StorePerformance fromStore = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ProductStore")).getStore();
@@ -104,14 +104,14 @@ public class StoreExchangeTest extends MetaEntityImportTest {
 
         participantService.setStores(supplierParticipant.getId(), Arrays.asList(MetaBuilder.buildUri(findByName(storeDefs, "ProductStore"))));
         ExchangeService exchangeService = new ExchangeService(getEntityManager());
-        CollaborationObservation exchange = exchangeService.startExchangeForProduct(consumerParticipant.getId(), supplierParticipant.getOfferedStores().iterator().next().getId());
+        CollaborationInstance exchange = exchangeService.startExchangeForProduct(consumerParticipant.getId(), supplierParticipant.getOfferedStores().iterator().next().getId());
         exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setProjectedInventoryLevel(1000d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setProjectedInventoryLevel(2000d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setInventoryLevel(1000d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setProjectedInventoryLevel(100d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setInventoryLevel(100d);
-        for (DirectedFlowObservation flow : exchange.getOwnedDirectedFlows()) {
+        for (DeliverableFlowInstance flow : exchange.getOwnedDirectedFlows()) {
             if(flow.getDeliverable().getDefinition().getName().equals("Money")){
                 flow.getQuantity().setActualValue(100d);
             }else if(flow.getDeliverable().getDefinition().getName().equals("ProductDefinition")){

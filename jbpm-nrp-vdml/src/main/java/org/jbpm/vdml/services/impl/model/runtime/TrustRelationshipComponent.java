@@ -12,28 +12,28 @@ import java.util.Set;
 import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
-public class RelationshipComponentPerformance implements ActivatableRuntimeEntity,Measurand {
+public class TrustRelationshipComponent implements ActivatableRuntimeEntity,Measurand {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private boolean active;
     @ManyToOne
-    private RelationshipPerformance relationship;
+    private TrustRelationship relationship;
     @ManyToOne
     private ValuePropositionComponent valuePropositionComponent;
     @OneToMany(mappedBy = "component")
-    private Set<RelationshipComponentMeasurement> measurements=new HashSet<RelationshipComponentMeasurement>();//Aggregated from related ValueAddMeasurements
+    private Set<TrustRelationshipComponentMeasurement> measurements=new HashSet<TrustRelationshipComponentMeasurement>();//Aggregated from related ValueAddMeasurements
 
-    public RelationshipComponentPerformance() {
+    public TrustRelationshipComponent() {
     }
 
-    public RelationshipComponentPerformance(ValuePropositionComponent valuePropositionComponent, RelationshipPerformance relationshipPerformance) {
-        this.relationship = relationshipPerformance;
+    public TrustRelationshipComponent(ValuePropositionComponent valuePropositionComponent, TrustRelationship trustRelationship) {
+        this.relationship = trustRelationship;
         this.valuePropositionComponent = valuePropositionComponent;
         this.relationship.getComponents().add(this);
     }
 
-    public RelationshipPerformance getRelationship() {
+    public TrustRelationship getRelationship() {
         return relationship;
     }
 
@@ -41,11 +41,11 @@ public class RelationshipComponentPerformance implements ActivatableRuntimeEntit
     public ValuePropositionComponent getValuePropositionComponent() {
         return valuePropositionComponent;
     }
-    public RelationshipComponentMeasurement findMeasurement(Measure measure){
+    public TrustRelationshipComponentMeasurement findMeasurement(Measure measure){
         return findMatchingRuntimeEntity(getMeasurements(),measure);
     }
 
-    public Set<RelationshipComponentMeasurement> getMeasurements() {
+    public Set<TrustRelationshipComponentMeasurement> getMeasurements() {
         return measurements;
     }
 

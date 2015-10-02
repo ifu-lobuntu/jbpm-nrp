@@ -23,18 +23,18 @@ public class AssignmentService extends AbstractRuntimeService {
     }
 
 
-    public void assignToRoles(CollaborationObservation observation, Collection<RolePerformance> rolePerformances) {
+    public void assignToRoles(CollaborationInstance observation, Collection<RolePerformance> rolePerformances) {
         for (RolePerformance rp : rolePerformances) {
             observation.getCollaborationRoles().add(rp);
             for (Activity activity : rp.getRole().getPerformedActitivities()) {
-                ActivityObservation ao = observation.findActivity(activity);
+                ActivityInstance ao = observation.findActivity(activity);
                 Query q = entityManager.createQuery("select cp from CapabilityPerformance cp where cp.participant= :participant and cp.capability=:capability");
                 q.setParameter("participant", rp.getParticipant());
                 q.setParameter("capability", activity.getCapabilityRequirement());
-                List<CapabilityPerformance> result = q.getResultList();
-                CapabilityPerformance cp;
+                List<CapabilityOffer> result = q.getResultList();
+                CapabilityOffer cp;
                 if (result.isEmpty()) {
-                    cp = new CapabilityPerformance(activity.getCapabilityRequirement(), rp.getParticipant());
+                    cp = new CapabilityOffer(activity.getCapabilityRequirement(), rp.getParticipant());
                     entityManager.persist(cp);
                 } else {
                     cp = result.get(0);
@@ -46,7 +46,7 @@ public class AssignmentService extends AbstractRuntimeService {
                 //TODO signal event to commence ConversationForAction
             }
             for (SupplyingStore ss : rp.getRole().getSupplyingStores()) {
-                SupplyingStoreObservation sso = observation.findSupplyingStore(ss);
+                SupplyingStoreInstance sso = observation.findSupplyingStore(ss);
                 Query q = entityManager.createQuery("select sp from StorePerformance sp where sp.owner= :participant and sp.storeDefinition=:storeDefinition");
                 q.setParameter("participant", rp.getParticipant());
                 q.setParameter("storeDefinition", ss.getStoreRequirement());
@@ -71,12 +71,12 @@ public class AssignmentService extends AbstractRuntimeService {
         }
         entityManager.flush();
     }
-    public void assignToActivities(ActivityObservation observation, CapabilityPerformance capability) {
+    public void assignToActivities(ActivityInstance observation, CapabilityOffer capability) {
         observation.setCapabilityOffer(capability);
         observation.setPerformingRole(findOrCreateRole(capability.getParticipant(), observation.getActivity().getPerformingRole()));
         //TODO signal event to commence ConversationForAction
     }
-    public void assignToSupplyingStores(SupplyingStoreObservation observation, StorePerformance capability) {
+    public void assignToSupplyingStores(SupplyingStoreInstance observation, StorePerformance capability) {
         observation.setStore(capability);
         observation.setSupplyingRole(findOrCreateRole(capability.getOwner(), observation.getSupplyingStore().getSupplyingRole()));
         //TODO signal event to commence ConversationForAction

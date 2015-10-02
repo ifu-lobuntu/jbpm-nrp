@@ -14,9 +14,9 @@ import java.util.Set;
 import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
-public class ActivityObservation extends PortContainerObservation {
+public class ActivityInstance extends PortContainerInstance {
     @ManyToOne
-    private CapabilityPerformance capabilityOffer;
+    private CapabilityOffer capabilityOffer;
     @ManyToOne
     private Activity activity;
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -28,31 +28,31 @@ public class ActivityObservation extends PortContainerObservation {
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime actualDateOfCompletion;
     @ManyToOne
-    private CollaborationObservation collaboration;
+    private CollaborationInstance collaboration;
     @OneToMany(mappedBy = "activity")
-    private Set<ResourceUseObservation> resourceUseObservation = new HashSet<ResourceUseObservation>();
+    private Set<ResourceUseInstance> resourceUseInstance = new HashSet<ResourceUseInstance>();
     @OneToMany(mappedBy = "activity")
     private Set<ActivityMeasurement> measurements = new HashSet<ActivityMeasurement>();
 
-    public ActivityObservation() {
+    public ActivityInstance() {
     }
 
-    public ActivityObservation(Activity activity, CollaborationObservation collaboration) {
+    public ActivityInstance(Activity activity, CollaborationInstance collaboration) {
         super();
         this.activity = activity;
         this.collaboration = collaboration;
         this.collaboration.getActivities().add(this);
     }
-    public ResourceUseObservation findResourceUse(ResourceUse ru){
-        return findMatchingRuntimeEntity(this.getResourceUseObservation(), ru);
+    public ResourceUseInstance findResourceUse(ResourceUse ru){
+        return findMatchingRuntimeEntity(this.getResourceUseInstance(), ru);
 
     }
 
-    public CollaborationObservation getCollaboration() {
+    public CollaborationInstance getCollaboration() {
         return collaboration;
     }
 
-    public void setCapabilityOffer(CapabilityPerformance capabilityOffer) {
+    public void setCapabilityOffer(CapabilityOffer capabilityOffer) {
         this.capabilityOffer = capabilityOffer;
     }
 
@@ -60,19 +60,22 @@ public class ActivityObservation extends PortContainerObservation {
         setResponsibleRolePerformance(performingRole);
     }
 
-    public Set<ResourceUseObservation> getResourceUseObservation() {
-        return resourceUseObservation;
+    public Set<ResourceUseInstance> getResourceUseInstance() {
+        return resourceUseInstance;
     }
 
     public RolePerformance getPerformingRole() {
         return getResponsibleRolePerformance();
+    }
+    public ActivityMeasurement getDuration(){
+        return findMatchingRuntimeEntity(getMeasurements(),getActivity().getDuration());
     }
 
     public Set<ActivityMeasurement> getMeasurements() {
         return measurements;
     }
 
-    public CapabilityPerformance getCapabilityOffer() {
+    public CapabilityOffer getCapabilityOffer() {
         return capabilityOffer;
     }
 

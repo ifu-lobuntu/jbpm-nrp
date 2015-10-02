@@ -64,7 +64,7 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
 
         ReusableBusinessItemAvailability availability1 = exchangeService.findAvailability(buildRequirement(tukTukDefinitionId,0));
         assertEquals(resource1.getId(), availability1.getReusableBusinessItemId());
-        CollaborationObservation c = exchangeService.scheduleReusableProductUse(consumerParticipant.getId(), availability1);
+        CollaborationInstance c = exchangeService.scheduleReusableProductUse(consumerParticipant.getId(), availability1);
         ReusableBusinessItemAvailability availability2 = exchangeService.findAvailability(buildRequirement(tukTukDefinitionId, 0));
         assertNull(availability2);
         //WHEN
@@ -96,14 +96,14 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
         ExchangeService exchangeService = new ExchangeService(getEntityManager());
         ReusableBusinessItemAvailability availability1 = exchangeService.findAvailability(requirement);
         assertEquals(resource1.getId(), availability1.getReusableBusinessItemId());
-        CollaborationObservation exchange = startExchangeAndSetAccountBalances(collaboration, consumerParticipant, exchangeService, availability1);
+        CollaborationInstance exchange = startExchangeAndSetAccountBalances(collaboration, consumerParticipant, exchangeService, availability1);
         ReusableBusinessItemAvailability availability2 = exchangeService.findAvailability(requirement);
         assertNull(availability2);
         //WHEN
         long millisUntilCommitment= availability1.getFrom().minusDays(1).getMillis() - clock.getCurrentTime();
         clock.advanceTime(millisUntilCommitment, TimeUnit.MILLISECONDS);
         //THEN
-        CollaborationObservation foundExchange=new ExchangeService(getEntityManager()).findExchange(exchange.getId());
+        CollaborationInstance foundExchange=new ExchangeService(getEntityManager()).findExchange(exchange.getId());
         StorePerformance fromAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
         StorePerformance toAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
         Assert.assertEquals(1000d, fromAccount.getInventoryLevel(), 0.01);
@@ -133,14 +133,14 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
         ExchangeService exchangeService = new ExchangeService(getEntityManager());
         ReusableBusinessItemAvailability availability1 = exchangeService.findAvailability(requirement);
         assertEquals(resource1.getId(), availability1.getReusableBusinessItemId());
-        CollaborationObservation exchange = startExchangeAndSetAccountBalances(collaboration, consumerParticipant, exchangeService, availability1);
+        CollaborationInstance exchange = startExchangeAndSetAccountBalances(collaboration, consumerParticipant, exchangeService, availability1);
         ReusableBusinessItemAvailability availability2 = exchangeService.findAvailability(requirement);
         assertNull(availability2);
         //WHEN
         long millisUntilFulfillment= availability1.getTo().getMillis() - clock.getCurrentTime();
         clock.advanceTime(millisUntilFulfillment, TimeUnit.MILLISECONDS);
         //THEN
-        CollaborationObservation foundExchange=new ExchangeService(getEntityManager()).findExchange(exchange.getId());
+        CollaborationInstance foundExchange=new ExchangeService(getEntityManager()).findExchange(exchange.getId());
         StorePerformance fromAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
         StorePerformance toAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
         Assert.assertEquals(900d, fromAccount.getInventoryLevel(), 0.01);
@@ -150,13 +150,13 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
 
     }
 
-    protected CollaborationObservation startExchangeAndSetAccountBalances(Collaboration collaboration, IndividualParticipant consumerParticipant, ExchangeService exchangeService, ReusableBusinessItemAvailability availability1) {
-        CollaborationObservation exchange = exchangeService.scheduleReusableProductUse(consumerParticipant.getId(), availability1);
+    protected CollaborationInstance startExchangeAndSetAccountBalances(Collaboration collaboration, IndividualParticipant consumerParticipant, ExchangeService exchangeService, ReusableBusinessItemAvailability availability1) {
+        CollaborationInstance exchange = exchangeService.scheduleReusableProductUse(consumerParticipant.getId(), availability1);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setProjectedInventoryLevel(1000d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setProjectedInventoryLevel(2000d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setInventoryLevel(1000d);
         exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
-        for (DirectedFlowObservation flow : exchange.getOwnedDirectedFlows()) {
+        for (DeliverableFlowInstance flow : exchange.getOwnedDirectedFlows()) {
             if(flow.getDeliverable().getDefinition().getName().equals("Money")){
                 flow.getQuantity().setActualValue(100d);
             }

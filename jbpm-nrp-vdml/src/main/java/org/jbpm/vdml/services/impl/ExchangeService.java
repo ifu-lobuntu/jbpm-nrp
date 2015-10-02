@@ -44,35 +44,35 @@ public class ExchangeService extends AbstractRuntimeService {
     }
 
     public void commitToExchange(Long collaborationId) {
-        MilestoneObservation mo = findExchangeMilestone(collaborationId);
+        MilestoneInstance mo = findExchangeMilestone(collaborationId);
         collaborationService.commitToMilestone(mo);
     }
 
     public void fulfillExchange(Long collaborationId) {
-        MilestoneObservation mo = findExchangeMilestone(collaborationId);
+        MilestoneInstance mo = findExchangeMilestone(collaborationId);
         collaborationService.fulfillMilestone(mo);
     }
 
-    protected MilestoneObservation findExchangeMilestone(Long collaborationId) {
-        CollaborationObservation collaborationObservation = entityManager.find(CollaborationObservation.class, collaborationId);
-        DirectlyExchangable exchangeOffering = findExchangeOffering(collaborationObservation);
-        MilestoneObservation mo = null;
+    protected MilestoneInstance findExchangeMilestone(Long collaborationId) {
+        CollaborationInstance collaborationInstance = entityManager.find(CollaborationInstance.class, collaborationId);
+        DirectlyExchangable exchangeOffering = findExchangeOffering(collaborationInstance);
+        MilestoneInstance mo = null;
         if (exchangeOffering != null) {
-            mo = collaborationObservation.findMilestone(exchangeOffering.getExchangeConfiguration().getExchangeMilestone());
+            mo = collaborationInstance.findMilestone(exchangeOffering.getExchangeConfiguration().getExchangeMilestone());
         }
         return mo;
     }
 
-    private DirectlyExchangable findExchangeOffering(CollaborationObservation collaborationObservation) {
+    private DirectlyExchangable findExchangeOffering(CollaborationInstance collaborationInstance) {
         DirectlyExchangable result = null;
         Collection<DirectlyExchangable> offers = new ArrayList<DirectlyExchangable>();
-        offers.addAll(collaborationObservation.getStoresUsed());
-        offers.addAll(collaborationObservation.getCapabilityOffersUsed());
+        offers.addAll(collaborationInstance.getStoresUsed());
+        offers.addAll(collaborationInstance.getCapabilityOffersUsed());
 
         for (DirectlyExchangable offer : offers) {
             ExchangeConfiguration ec = offer.getExchangeConfiguration();
-            if (ec != null && ec.getCollaborationToUse().equals(collaborationObservation.getCollaboration())) {
-                if (offer.getSupplier().equals(collaborationObservation.findRole(ec.getSupplierRole()).getParticipant())) {
+            if (ec != null && ec.getCollaborationToUse().equals(collaborationInstance.getCollaboration())) {
+                if (offer.getSupplier().equals(collaborationInstance.findRole(ec.getSupplierRole()).getParticipant())) {
                     result = offer;
                     break;
                 }
@@ -81,8 +81,8 @@ public class ExchangeService extends AbstractRuntimeService {
         return result;
     }
 
-    public CollaborationObservation startExchangeForService(Long requestorId, Long capabilityPerformanceId) {
-        CapabilityPerformance cp = entityManager.find(CapabilityPerformance.class, capabilityPerformanceId);
+    public CollaborationInstance startExchangeForService(Long requestorId, Long capabilityPerformanceId) {
+        CapabilityOffer cp = entityManager.find(CapabilityOffer.class, capabilityPerformanceId);
         Participant participant = entityManager.find(Participant.class, requestorId);
         Capability cpd = cp.getCapability();
         RolePerformance requestorRolePerformance = findOrCreateRole(participant, cpd.getExchangeConfiguration().getCollaborationToUse().getInitiatorRole());
@@ -90,7 +90,7 @@ public class ExchangeService extends AbstractRuntimeService {
         return collaborationService.startCollaboration(cpd.getExchangeConfiguration().getCollaborationToUse(), Arrays.asList(requestorRolePerformance, supplierRolePerformance));
     }
 
-    public CollaborationObservation startExchangeForProduct(Long requestorId, Long storePerformanceId) {
+    public CollaborationInstance startExchangeForProduct(Long requestorId, Long storePerformanceId) {
         StorePerformance cp = entityManager.find(StorePerformance.class, storePerformanceId);
         Participant participant = entityManager.find(Participant.class, requestorId);
         RolePerformance requestorRolePerformance = findOrCreateRole(participant, cp.getStoreDefinition().getExchangeConfiguration().getCollaborationToUse().getInitiatorRole());
@@ -123,7 +123,6 @@ public class ExchangeService extends AbstractRuntimeService {
         sw.start();
         solver.solve(booking);
         sw.stop();
-        System.out.println(sw.getTime());
 
         BookingSolution solution = (BookingSolution) solver.getBestSolution();
         Booking bestBooking = solution.getBookings().get(0);
@@ -135,16 +134,16 @@ public class ExchangeService extends AbstractRuntimeService {
         }
     }
 
-    public CollaborationObservation scheduleReusableProductUse(Long requestorId, ReusableBusinessItemAvailability requiredAvailability) {
+    public CollaborationInstance scheduleReusableProductUse(Long requestorId, ReusableBusinessItemAvailability requiredAvailability) {
         ReusableBusinessItemPerformance reusableResource = entityManager.find(ReusableBusinessItemPerformance.class, requiredAvailability.getReusableBusinessItemId());
         PoolPerformance cp = reusableResource.getHostingPool();
         Participant participant = entityManager.find(Participant.class, requestorId);
         Collaboration collaboration1 = cp.getStoreDefinition().getExchangeConfiguration().getCollaborationToUse();
         RolePerformance requestorRolePerformance = findOrCreateRole(participant, collaboration1.getInitiatorRole());
         RolePerformance supplierRolePerformance = findOrCreateRole(cp.getOwner(), cp.getStoreDefinition().getExchangeConfiguration().getSupplierRole());
-        CollaborationObservation observation = collaborationService.startCollaboration(collaboration1, Arrays.asList(requestorRolePerformance, supplierRolePerformance));
-        ActivityObservation ao = observation.findActivity(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking().getActivity());
-        final ResourceUseObservation resourceUse = ao.findResourceUse(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking());
+        CollaborationInstance observation = collaborationService.startCollaboration(collaboration1, Arrays.asList(requestorRolePerformance, supplierRolePerformance));
+        ActivityInstance ao = observation.findActivity(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking().getActivity());
+        final ResourceUseInstance resourceUse = ao.findResourceUse(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking());
         //TODO check for availability AGAIN here.
         resourceUse.setPlannedFromDateTime(requiredAvailability.getFrom());
         resourceUse.setPlannedToDateTime(requiredAvailability.getTo());
@@ -159,11 +158,11 @@ public class ExchangeService extends AbstractRuntimeService {
                 resourceUse.setAddress(collaboration1.getAddress());
                 break;
             case PROVIDING_STORE:
-                SupplyingStoreObservation sourcePortContainer = (SupplyingStoreObservation) resourceUse.getInput().getSourcePortContainer();
+                SupplyingStoreInstance sourcePortContainer = (SupplyingStoreInstance) resourceUse.getInput().getSourcePortContainer();
                 resourceUse.setAddress(sourcePortContainer.getStore().getAddress());
                 break;
             case RECEIVING_STORE:
-                SupplyingStoreObservation targetPortContainer = (SupplyingStoreObservation) resourceUse.getOutput().getTargetPortContainer();
+                SupplyingStoreInstance targetPortContainer = (SupplyingStoreInstance) resourceUse.getOutput().getTargetPortContainer();
                 resourceUse.setAddress(targetPortContainer.getStore().getAddress());
                 break;
             case ROLE_PARTICIPANT:
@@ -182,7 +181,7 @@ public class ExchangeService extends AbstractRuntimeService {
 
 
     public void commitToResourceUse(Long resourceUseObservationId) {
-        ResourceUseObservation ruo = entityManager.find(ResourceUseObservation.class, resourceUseObservationId);
+        ResourceUseInstance ruo = entityManager.find(ResourceUseInstance.class, resourceUseObservationId);
         if (ruo.getStatus() != ValueFlowStatus.CANCELLED) {
             commitToExchange(ruo.getActivity().getCollaboration().getId());
             ruo.setStatus(ValueFlowStatus.COMMITTED);
@@ -190,48 +189,48 @@ public class ExchangeService extends AbstractRuntimeService {
         }
     }
 
-    public CollaborationObservation findExchange(Long id) {
-        return entityManager.find(CollaborationObservation.class, id);
+    public CollaborationInstance findExchange(Long id) {
+        return entityManager.find(CollaborationInstance.class, id);
     }
 
     public void cancelBooking(Long id) {
-        CollaborationObservation collaborationObservation = findExchange(id);
-        DirectlyExchangable exchangeOffering = findExchangeOffering(collaborationObservation);
-        Set<ActivityObservation> activities = collaborationObservation.getActivities();
-        for (ActivityObservation activity : activities) {
-            for (ResourceUseObservation resourceUseObservation : activity.getResourceUseObservation()) {
-                if (resourceUseObservation.getPool().equals(exchangeOffering)) {
-                    PlannedUnavailability plannedUnavailability = resourceUseObservation.getPlannedUnavailability();
+        CollaborationInstance collaborationInstance = findExchange(id);
+        DirectlyExchangable exchangeOffering = findExchangeOffering(collaborationInstance);
+        Set<ActivityInstance> activities = collaborationInstance.getActivities();
+        for (ActivityInstance activity : activities) {
+            for (ResourceUseInstance resourceUseInstance : activity.getResourceUseInstance()) {
+                if (resourceUseInstance.getPool().equals(exchangeOffering)) {
+                    PlannedUnavailability plannedUnavailability = resourceUseInstance.getPlannedUnavailability();
                     if (plannedUnavailability != null) {
                         PersistenceUtil pu = entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
                         if (pu.isLoaded(plannedUnavailability.getSchedule(), "plannedUnavailability")) {
                             plannedUnavailability.getSchedule().getPlannedUnavailability().remove(plannedUnavailability);
                         }
                         entityManager.remove(plannedUnavailability);
-                        resourceUseObservation.setPlannedUnavailability(null);
-                        resourceUseObservation.setQuantity(0);
-                        resourceUseObservation.setStatus(ValueFlowStatus.CANCELLED);
-                        TimerService ts = TimerServiceRegistry.getInstance().get(collaborationObservation.getCollaboration().getDeploymentId());
+                        resourceUseInstance.setPlannedUnavailability(null);
+                        resourceUseInstance.setQuantity(0);
+                        resourceUseInstance.setStatus(ValueFlowStatus.CANCELLED);
+                        TimerService ts = TimerServiceRegistry.getInstance().get(collaborationInstance.getCollaboration().getDeploymentId());
                         if (ts instanceof GlobalTimerService) {
                             //Oy weh!
-                            JobHandle commitHandle = ((GlobalTimerService) ts).buildJobHandleForContext(new ScheduledResourceUseJobContext("commit", resourceUseObservation));
+                            JobHandle commitHandle = ((GlobalTimerService) ts).buildJobHandleForContext(new ScheduledResourceUseJobContext("commit", resourceUseInstance));
                             ts.removeJob(commitHandle);
-                            JobHandle fulfillHandle = ((GlobalTimerService) ts).buildJobHandleForContext(new ScheduledResourceUseJobContext("fulfill", resourceUseObservation));
+                            JobHandle fulfillHandle = ((GlobalTimerService) ts).buildJobHandleForContext(new ScheduledResourceUseJobContext("fulfill", resourceUseInstance));
                             ts.removeJob(fulfillHandle);
                         }
                     }
                 }
             }
         }
-        Set<DirectedFlowObservation> ownedDirectedFlows = collaborationObservation.getOwnedDirectedFlows();
-        for (DirectedFlowObservation directedFlow : ownedDirectedFlows) {
+        Set<DeliverableFlowInstance> ownedDirectedFlows = collaborationInstance.getOwnedDirectedFlows();
+        for (DeliverableFlowInstance directedFlow : ownedDirectedFlows) {
             directedFlow.setStatus(ValueFlowStatus.CANCELLED);
         }
     }
 
     public void fulfillResourceUse(Long resourceUseObservationId) {
         //TODO not sure we want to automate this
-        ResourceUseObservation ruo = entityManager.find(ResourceUseObservation.class, resourceUseObservationId);
+        ResourceUseInstance ruo = entityManager.find(ResourceUseInstance.class, resourceUseObservationId);
         if (ruo.getStatus() != ValueFlowStatus.CANCELLED) {
             fulfillExchange(ruo.getActivity().getCollaboration().getId());
             ruo.setStatus(ValueFlowStatus.FULFILLED);

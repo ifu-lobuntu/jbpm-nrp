@@ -111,21 +111,21 @@ public class RolePerformanceTest extends MetaEntityImportTest{
         this.producerParticipant = (IndividualParticipant) new ParticipantService(getEntityManager()).findParticipant(this.producerParticipant.getId());
         RolePerformance providingPerformance = this.producerParticipant.getRolePerformances().iterator().next();
 
-        RelationshipPerformance providedRelatiopnship = providingPerformance.getProvidedRelationships().iterator().next();
+        TrustRelationship providedRelatiopnship = providingPerformance.getProvidedRelationships().iterator().next();
         PerformanceCalculationService service = new PerformanceCalculationService(getEntityManager());
         service.calculateRelationshipPerformance(providedRelatiopnship.getId());
-        RelationshipPerformance foundPerformance= service.findRelationshipPerformance(providedRelatiopnship.getId());
-        RelationshipComponentPerformance numberOfBadPerformance= foundPerformance.findComponent(providedRelatiopnship.getValueProposition().findComponent("NumberOfBad"));
+        TrustRelationship foundPerformance= service.findRelationshipPerformance(providedRelatiopnship.getId());
+        TrustRelationshipComponent numberOfBadPerformance= foundPerformance.findComponent(providedRelatiopnship.getValueProposition().findComponent("NumberOfBad"));
         assertEquals(3d, numberOfBadPerformance.findMeasurement(numberOfBadPerformance.getValuePropositionComponent().findMeasure("NumberOfBad")).getActualValue(),0.1);
-        RelationshipComponentPerformance averageSizePerformance= foundPerformance.findComponent(providedRelatiopnship.getValueProposition().findComponent("AverageSize"));
+        TrustRelationshipComponent averageSizePerformance= foundPerformance.findComponent(providedRelatiopnship.getValueProposition().findComponent("AverageSize"));
         assertEquals(14d, averageSizePerformance.findMeasurement(averageSizePerformance.getValuePropositionComponent().findMeasure("AverageSize")).getActualValue(),0.1);
     }
 
     protected void performProject(Enum<?> rating, double s) {
         ProjectService projectService = new ProjectService(getEntityManager());
-        CollaborationObservation project = projectService.initiateProject(producerParticipant.getId(), MetaBuilder.buildUri(cm));
+        CollaborationInstance project = projectService.initiateProject(producerParticipant.getId(), MetaBuilder.buildUri(cm));
         projectService.assignParticipantToRole(consumerParticipant.getId(), project.getId(), MetaBuilder.buildUri(consumer));
-        DirectedFlowObservation fo = project.findDeliverableFlow(project.getCollaboration().findDeliverableFlow(flow.getName()));
+        DeliverableFlowInstance fo = project.findDeliverableFlow(project.getCollaboration().findDeliverableFlow(flow.getName()));
         fo.findValueAdd(fo.getDirectedFlow().findValueAdd("TestGradeMeasure")).setActualRating(rating);
         fo.findValueAdd(fo.getDirectedFlow().findValueAdd("Size")).setActualValue(s);
         projectService.flush();

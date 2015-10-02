@@ -9,7 +9,7 @@ import javax.persistence.EntityManager;
 import java.util.*;
 
 /**
- * 9. As a project custodian, when planning on a project has been completed, I want all collaborating participants, including myself, to commit to the times, locations and quantitiesm so that subsequent planning can be based on accurate data.
+ * 9. As a project custodian, when planning on a project has been completed, I want all collaborating participants, including myself, to commit to the times, locations and quantities so that subsequent planning can be based on accurate data.
  * 10. As a project custodian, when a given milestone has been reached, I want relevant flow of value to be effected so that the inventory levels on the stores and pools used reflect the current state of affairs accurately.
  */
 public class CollaborationService extends AbstractRuntimeService {
@@ -24,18 +24,18 @@ public class CollaborationService extends AbstractRuntimeService {
         this.assignmentService = new AssignmentService(entityManager);
     }
 
-    public CollaborationObservation startCollaboration(Collaboration collaboration, Collection<RolePerformance> rolePerformances) {
-        CollaborationObservation observation = new CollaborationObservation(collaboration);
+    public CollaborationInstance startCollaboration(Collaboration collaboration, Collection<RolePerformance> rolePerformances) {
+        CollaborationInstance observation = new CollaborationInstance(collaboration);
         entityManager.persist(observation);
-        syncRuntimeEntities(observation.getMilestones(), collaboration.getMilestones(), MilestoneObservation.class, observation);
-        syncRuntimeEntities(observation.getActivities(), collaboration.getActivities(), ActivityObservation.class, observation);
-        syncRuntimeEntities(observation.getSupplyingStores(), collaboration.getSupplyingStores(), SupplyingStoreObservation.class, observation);
+        syncRuntimeEntities(observation.getMilestones(), collaboration.getMilestones(), MilestoneInstance.class, observation);
+        syncRuntimeEntities(observation.getActivities(), collaboration.getActivities(), ActivityInstance.class, observation);
+        syncRuntimeEntities(observation.getSupplyingStores(), collaboration.getSupplyingStores(), SupplyingStoreInstance.class, observation);
         syncRuntimeEntities(observation.getBusinessItems(), collaboration.getBusinessItemDefinitions(), BusinessItemObservation.class, observation);
         for (BusinessItemObservation bio : observation.getBusinessItems()) {
             syncRuntimeEntities(bio.getMeasurements(), bio.getDefinition().getImmediateMeasures(), BusinessItemMeasurement.class, bio);
         }
-        syncRuntimeEntities(observation.getOwnedDirectedFlows(), collaboration.getFlows(), DirectedFlowObservation.class, observation);
-        for (DirectedFlowObservation dfo : observation.getOwnedDirectedFlows()) {
+        syncRuntimeEntities(observation.getOwnedDirectedFlows(), collaboration.getFlows(), DeliverableFlowInstance.class, observation);
+        for (DeliverableFlowInstance dfo : observation.getOwnedDirectedFlows()) {
             Collection<Measure> measures = new HashSet<Measure>(dfo.getDirectedFlow().getMeasures());
             if(dfo.getDirectedFlow().getQuantity()!=null){
                 measures.add(dfo.getDirectedFlow().getQuantity());
@@ -43,7 +43,7 @@ public class CollaborationService extends AbstractRuntimeService {
             if(dfo.getDirectedFlow().getDuration()!=null){
                 measures.add(dfo.getDirectedFlow().getDuration());
             }
-            syncRuntimeEntities(dfo.getMeasurements(), measures, DirectedFlowMeasurement.class, dfo);
+            syncRuntimeEntities(dfo.getMeasurements(), measures, DeliverableFlowMeasurement.class, dfo);
             syncRuntimeEntities(dfo.getValueAddMeasurements(), dfo.getDirectedFlow().getValueAdds(), ValueAddMeasurement.class, dfo);
             if(dfo.getDirectedFlow() instanceof DeliverableFlow){
                 Milestone milestone = ((DeliverableFlow) dfo.getDirectedFlow()).getMilestone();
@@ -52,14 +52,14 @@ public class CollaborationService extends AbstractRuntimeService {
                 }
             }
         }
-        for (ActivityObservation ao : observation.getActivities()) {
+        for (ActivityInstance ao : observation.getActivities()) {
             syncRuntimeEntities(ao.getMeasurements(), ao.getActivity().getMeasures(), ActivityMeasurement.class, ao);
-            Collection<ResourceUseObservation> ruos = syncRuntimeEntities(ao.getResourceUseObservation(), ao.getActivity().getResourceUses(), ResourceUseObservation.class, ao);
-            for (ResourceUseObservation ruo : ruos) {
+            Collection<ResourceUseInstance> ruos = syncRuntimeEntities(ao.getResourceUseInstance(), ao.getActivity().getResourceUses(), ResourceUseInstance.class, ao);
+            for (ResourceUseInstance ruo : ruos) {
                 syncRuntimeEntities(ruo.getMeasurements(), asCollection(ruo.getResourceUse().getDuration(), ruo.getResourceUse().getQuantity()),ResourceUseMeasurement.class, ruo);
             }
         }
-        for (SupplyingStoreObservation so : observation.getSupplyingStores()) {
+        for (SupplyingStoreInstance so : observation.getSupplyingStores()) {
             syncRuntimeEntities(so.getMeasurements(),so.getSupplyingStore().getMeasures(),SupplyingStoreMeasurement.class,so);
         }
         assignmentService.assignToRoles(observation, rolePerformances);
@@ -84,17 +84,17 @@ public class CollaborationService extends AbstractRuntimeService {
      * @return
      */
 
-    public ActivityObservation newActivity(String activityId, Long collaborationObservationId, Long capabilityPerformance) {
-        CollaborationObservation co = entityManager.find(CollaborationObservation.class, collaborationObservationId);
-        CapabilityPerformance cp = entityManager.find(CapabilityPerformance.class, capabilityPerformance);
+    public ActivityInstance newActivity(String activityId, Long collaborationObservationId, Long capabilityPerformance) {
+        CollaborationInstance co = entityManager.find(CollaborationInstance.class, collaborationObservationId);
+        CapabilityOffer cp = entityManager.find(CapabilityOffer.class, capabilityPerformance);
         Activity a = entityManager.find(Activity.class, activityId);
-        ActivityObservation ao = new ActivityObservation(a, co);
+        ActivityInstance ao = new ActivityInstance(a, co);
         entityManager.persist(ao);
         for (DirectedFlow flow : a.getConcludedFlows()) {
-            new DirectedFlowObservation(flow, co, co.findPortContainer(flow.getSourcePortContainer()), ao);
+            new DeliverableFlowInstance(flow, co, co.findPortContainer(flow.getSourcePortContainer()), ao);
         }
         for (DirectedFlow flow : a.getCommencedFlows()) {
-            new DirectedFlowObservation(flow, co, ao, co.findPortContainer(flow.getTargetPortContainer()));
+            new DeliverableFlowInstance(flow, co, ao, co.findPortContainer(flow.getTargetPortContainer()));
         }
         entityManager.flush();
         return ao;
@@ -102,34 +102,34 @@ public class CollaborationService extends AbstractRuntimeService {
 
     public void commitToActivity(Long collaborationId, String activityName) {
         //TODO reevaluate use of directedFlows rather than deliverableFlows
-        CollaborationObservation collaborationObservation = entityManager.find(CollaborationObservation.class, collaborationId);
-        ActivityObservation ao = collaborationObservation.findActivity(collaborationObservation.getCollaboration().findActivity(activityName));
+        CollaborationInstance collaborationInstance = entityManager.find(CollaborationInstance.class, collaborationId);
+        ActivityInstance ao = collaborationInstance.findActivity(collaborationInstance.getCollaboration().findActivity(activityName));
         commitToFlows(ao.getConcludedFlow(), ao.getCommencedFlow());
     }
     public void fulfillActivity(Long collaborationId, String activityName) {
         //TODO reevaluate use of directedFlows rather than deliverableFlows
-        CollaborationObservation collaborationObservation = entityManager.find(CollaborationObservation.class, collaborationId);
-        ActivityObservation ao = collaborationObservation.findActivity(collaborationObservation.getCollaboration().findActivity(activityName));
+        CollaborationInstance collaborationInstance = entityManager.find(CollaborationInstance.class, collaborationId);
+        ActivityInstance ao = collaborationInstance.findActivity(collaborationInstance.getCollaboration().findActivity(activityName));
         fulfillFlows(ao.getConcludedFlow(), ao.getCommencedFlow());
     }
 
-    public void commitToMilestone(MilestoneObservation mo) {
+    public void commitToMilestone(MilestoneInstance mo) {
         mo.commit();
         commitToFlows(mo.getFlows());
         entityManager.flush();
     }
 
-    public void fulfillMilestone(MilestoneObservation mo) {
+    public void fulfillMilestone(MilestoneInstance mo) {
         mo.occur();
         fulfillFlows(mo.getFlows());
         entityManager.flush();
     }
 
-    protected void commitToFlows(Set<? extends DirectedFlowObservation>... flows) {
-        for (Set<? extends DirectedFlowObservation> flowSet : flows) {
-            for (DirectedFlowObservation flow : flowSet) {
-                if (flow.getSourcePortContainer() instanceof SupplyingStoreObservation) {
-                    SupplyingStoreObservation rsp = (SupplyingStoreObservation) flow.getSourcePortContainer();
+    protected void commitToFlows(Set<? extends DeliverableFlowInstance>... flows) {
+        for (Set<? extends DeliverableFlowInstance> flowSet : flows) {
+            for (DeliverableFlowInstance flow : flowSet) {
+                if (flow.getSourcePortContainer() instanceof SupplyingStoreInstance) {
+                    SupplyingStoreInstance rsp = (SupplyingStoreInstance) flow.getSourcePortContainer();
                     if (flow.getQuantity() != null) {
                         flow.setStatus(ValueFlowStatus.COMMITTED);
                         Measurement q = flow.getQuantity();
@@ -138,8 +138,8 @@ public class CollaborationService extends AbstractRuntimeService {
                         }
                     }
                 }
-                if (flow.getTargetPortContainer() instanceof SupplyingStoreObservation) {
-                    SupplyingStoreObservation rsp = (SupplyingStoreObservation) flow.getTargetPortContainer();
+                if (flow.getTargetPortContainer() instanceof SupplyingStoreInstance) {
+                    SupplyingStoreInstance rsp = (SupplyingStoreInstance) flow.getTargetPortContainer();
                     if (flow.getQuantity() != null) {
                         Measurement q = flow.getQuantity();
                         flow.setStatus(ValueFlowStatus.COMMITTED);
@@ -153,11 +153,11 @@ public class CollaborationService extends AbstractRuntimeService {
     }
 
 
-    protected void fulfillFlows(Set<? extends DirectedFlowObservation>... flowsArray) {
-        for (Set<? extends DirectedFlowObservation> flows : flowsArray) {
-            for (DirectedFlowObservation flow : flows) {
-                if (flow.getSourcePortContainer() instanceof SupplyingStoreObservation) {
-                    SupplyingStoreObservation rsp = (SupplyingStoreObservation) flow.getSourcePortContainer();
+    protected void fulfillFlows(Set<? extends DeliverableFlowInstance>... flowsArray) {
+        for (Set<? extends DeliverableFlowInstance> flows : flowsArray) {
+            for (DeliverableFlowInstance flow : flows) {
+                if (flow.getSourcePortContainer() instanceof SupplyingStoreInstance) {
+                    SupplyingStoreInstance rsp = (SupplyingStoreInstance) flow.getSourcePortContainer();
                     if (flow.getQuantity() != null) {
                         flow.setStatus(ValueFlowStatus.FULFILLED);
                         flow.setActualDate(new DateTime());
@@ -167,8 +167,8 @@ public class CollaborationService extends AbstractRuntimeService {
                         }
                     }
                 }
-                if (flow.getTargetPortContainer() instanceof SupplyingStoreObservation) {
-                    SupplyingStoreObservation rsp = (SupplyingStoreObservation) flow.getTargetPortContainer();
+                if (flow.getTargetPortContainer() instanceof SupplyingStoreInstance) {
+                    SupplyingStoreInstance rsp = (SupplyingStoreInstance) flow.getTargetPortContainer();
                     if (flow.getQuantity() != null) {
                         Measurement q = flow.getQuantity();
                         flow.setStatus(ValueFlowStatus.FULFILLED);

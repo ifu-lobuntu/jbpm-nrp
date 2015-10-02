@@ -3,7 +3,7 @@ package org.jbpm.vdml.services;
 import org.jbpm.vdml.services.impl.MetaBuilder;
 import org.jbpm.vdml.services.impl.ParticipantService;
 import org.jbpm.vdml.services.impl.VdmlImporter;
-import org.jbpm.vdml.services.impl.model.runtime.CapabilityPerformance;
+import org.jbpm.vdml.services.impl.model.runtime.CapabilityOffer;
 import org.jbpm.vdml.services.impl.model.runtime.IndividualParticipant;
 import org.jbpm.vdml.services.impl.model.runtime.RolePerformance;
 import org.jbpm.vdml.services.impl.model.runtime.StorePerformance;
@@ -34,9 +34,9 @@ public class PartitipantTest extends MetaEntityImportTest {
         //And it is idempotent
         participantService.setCapabilities(ekke.getId(), Collections.singleton(MetaBuilder.buildUri(capability)));
         //Then
-        CapabilityPerformance capabilityPerformance=new ParticipantService(getEntityManager()).findIndividualParticipant("ekke").getCapabilityOffers().iterator().next();
-        super.assertMeasurements(capabilityPerformance.getMeasurements());
-        assertEquals(ekke.getId(), capabilityPerformance.getParticipant().getId());
+        CapabilityOffer capabilityOffer =new ParticipantService(getEntityManager()).findIndividualParticipant("ekke").getCapabilityOffers().iterator().next();
+        super.assertMeasurements(capabilityOffer.getMeasurements());
+        assertEquals(ekke.getId(), capabilityOffer.getParticipant().getId());
 
     }
 

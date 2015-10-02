@@ -9,18 +9,18 @@ import javax.persistence.ManyToOne;
 @Entity
 public class ValueAddMeasurement extends Measurement{
     @ManyToOne
-    private DirectedFlowObservation deliverableFlow;
+    private DeliverableFlowInstance deliverableFlow;
 
     public ValueAddMeasurement() {
     }
 
-    public ValueAddMeasurement(Measure measure, DirectedFlowObservation deliverableFlow) {
+    public ValueAddMeasurement(Measure measure, DeliverableFlowInstance deliverableFlow) {
         super(measure);
         this.deliverableFlow = deliverableFlow;
         this.deliverableFlow.getValueAddMeasurements().add(this);
     }
 
-    public DirectedFlowObservation getDeliverableFlow() {
+    public DeliverableFlowInstance getDeliverableFlow() {
         return deliverableFlow;
     }
 

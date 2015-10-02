@@ -18,11 +18,11 @@ public class RolePerformance implements ActivatableRuntimeEntity {
     @ManyToOne
     private Participant participant;
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL)
-    private Set<RelationshipPerformance> providedRelationships =new HashSet<RelationshipPerformance>();
+    private Set<TrustRelationship> providedRelationships =new HashSet<TrustRelationship>();
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL)
     private Set<ValuePropositionPerformance> providedValuePropositions =new HashSet<ValuePropositionPerformance>();
     @OneToMany(mappedBy = "recipient")
-    private Set<RelationshipPerformance> receivedRelationships =new HashSet<RelationshipPerformance>();
+    private Set<TrustRelationship> receivedRelationships =new HashSet<TrustRelationship>();
 
     public RolePerformance() {
     }
@@ -41,11 +41,11 @@ public class RolePerformance implements ActivatableRuntimeEntity {
         return participant;
     }
 
-    public Set<RelationshipPerformance> getProvidedRelationships() {
+    public Set<TrustRelationship> getProvidedRelationships() {
         return providedRelationships;
     }
 
-    public Set<RelationshipPerformance> getReceivedRelationships() {
+    public Set<TrustRelationship> getReceivedRelationships() {
         return receivedRelationships;
     }
 

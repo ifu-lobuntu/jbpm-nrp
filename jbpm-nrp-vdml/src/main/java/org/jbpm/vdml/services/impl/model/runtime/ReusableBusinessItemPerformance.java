@@ -40,7 +40,7 @@ public class ReusableBusinessItemPerformance implements ActivatableRuntimeEntity
     private ExternalObjectReference instanceReference=new ExternalObjectReference();
 
     @OneToMany()
-    private Set<ReusableBusinessItemMeasurement> measurements=new HashSet<ReusableBusinessItemMeasurement>();//Aggregated from ActivityObservation.measurements
+    private Set<ReusableBusinessItemMeasurement> measurements=new HashSet<ReusableBusinessItemMeasurement>();//Aggregated from ActivityInstance.measurements
 
     public ReusableBusinessItemPerformance() {
     }

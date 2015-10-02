@@ -1,8 +1,6 @@
 package org.jbpm.vdml.services.impl.model.meta;
 
-import com.vividsolutions.jts.geom.Point;
 import org.jbpm.vdml.services.impl.model.runtime.Address;
-import org.jbpm.vdml.services.impl.model.runtime.MilestoneObservation;
 
 import javax.persistence.*;
 import java.util.Collection;

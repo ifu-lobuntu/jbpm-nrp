@@ -1,8 +1,6 @@
 package org.jbpm.vdml.services.impl.model.scheduling;
 
 
-import org.jbpm.vdml.services.impl.model.runtime.ResourceUseObservation;
-
 import javax.persistence.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;

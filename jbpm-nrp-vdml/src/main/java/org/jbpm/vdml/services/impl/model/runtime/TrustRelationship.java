@@ -12,7 +12,7 @@ import java.util.Set;
 import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
-public class RelationshipPerformance implements ActivatableRuntimeEntity {
+public class TrustRelationship implements ActivatableRuntimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -26,12 +26,12 @@ public class RelationshipPerformance implements ActivatableRuntimeEntity {
     @ManyToOne
     private RolePerformance recipient;
     @OneToMany(mappedBy = "relationship")
-    private Set<RelationshipComponentPerformance> components = new HashSet<RelationshipComponentPerformance>();
+    private Set<TrustRelationshipComponent> components = new HashSet<TrustRelationshipComponent>();
 
-    public RelationshipPerformance() {
+    public TrustRelationship() {
     }
 
-    public RelationshipPerformance(ValueProposition valueProposition, RolePerformance provider) {
+    public TrustRelationship(ValueProposition valueProposition, RolePerformance provider) {
         this.valueProposition = valueProposition;
         this.provider = provider;
         this.provider.getProvidedRelationships().add(this);
@@ -57,10 +57,10 @@ public class RelationshipPerformance implements ActivatableRuntimeEntity {
         this.recipient = receiver;
         this.recipient.getReceivedRelationships().add(this);
     }
-    public RelationshipComponentPerformance findComponent(ValuePropositionComponent component){
+    public TrustRelationshipComponent findComponent(ValuePropositionComponent component){
         return findMatchingRuntimeEntity(getComponents(),component);
     }
-    public Set<RelationshipComponentPerformance> getComponents() {
+    public Set<TrustRelationshipComponent> getComponents() {
         return components;
     }
 

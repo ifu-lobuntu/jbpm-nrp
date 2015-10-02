@@ -28,43 +28,11 @@ public class TrustRelationshipService extends AbstractRuntimeService {
     }
 
     public List<ValuePropositionPerformance> findMatchingValueProposition(String valuePropositionRef, LocationCriterion location, Collection<MeasurementCriterion> criteria) {
-        StringBuilder sb = new StringBuilder();
-        int i=0;
-        for (MeasurementCriterion criterion : criteria) {
-            switch(criterion.getOperator()){
-                case BETWEEN:
-                    sb.append("(m.measure.uri = '");
-                    sb.append(criterion.getMeasureUri());
-                    sb.append("' and m.actualValue > ");
-                    sb.append(criterion.getLower());
-                    sb.append(" and m.actualValue < ");
-                    sb.append(criterion.getUpper());
-                    sb.append(") ");
-                    break;
-                case GREATER_THAN:
-                    sb.append("(m.measure.uri = '");
-                    sb.append(criterion.getMeasureUri());
-                    sb.append("' and m.actualValue > ");
-                    sb.append(criterion.getLower());
-                    sb.append(") ");
-                    break;
-                case LESS_THAN:
-                    sb.append("(m.measure.uri = '");
-                    sb.append(criterion.getMeasureUri());
-                    sb.append("' and m.actualValue < ");
-                    sb.append(criterion.getUpper());
-                    sb.append(") ");
-                    break;
-            }
-            i++;
-            if(i<criteria.size()){
-                sb.append(" or ");
-            }
-        }
+        String s = CriteriaUtil.buildCriteriaString(criteria);
         Query q = entityManager.createQuery("select distinct m.component.valueProposition from ValuePropositionComponentMeasurement  m " +
                         "where m.component.valueProposition.valueProposition.uri = :valuePropositionUri and " +
                         " distance(m.component.valueProposition.provider.participant.address.location, :desiredLocation) < :maxDistance and  " +
-                        sb.toString() +
+                        s +
                         " group by  m.component.valueProposition having count (m) >= :numberOfCriteria"
         );
         q.setParameter("valuePropositionUri", valuePropositionRef);
@@ -77,15 +45,15 @@ public class TrustRelationshipService extends AbstractRuntimeService {
         Collections.sort(resultList, new Comparator<ValuePropositionPerformance>() {
             @Override
             public int compare(ValuePropositionPerformance o1, ValuePropositionPerformance o2) {
-                Double distance1= o1.getProvider().getParticipant().getAddress().getLocation().distance(desiredLocation);
-                Double distance2= o2.getProvider().getParticipant().getAddress().getLocation().distance(desiredLocation);
+                Double distance1 = o1.getProvider().getParticipant().getAddress().getLocation().distance(desiredLocation);
+                Double distance2 = o2.getProvider().getParticipant().getAddress().getLocation().distance(desiredLocation);
                 return distance1.compareTo(distance2);
             }
         });
         return resultList;
     }
 
-    public List<RelationshipPerformance> findMyPreferredSuppliers(String valuePropositionRef, Long participantId) {
+    public List<TrustRelationship> findMyPreferredSuppliers(String valuePropositionRef, Long participantId) {
         Query q = entityManager.createQuery("select rp from RelationshipPerformance rp where rp.recipient.participant.id =:participantId and rp.valueProposition.uri=:valuePropositionUri");
         q.setParameter("participantId", participantId);
         q.setParameter("valuePropositionUri", valuePropositionRef);
@@ -96,24 +64,24 @@ public class TrustRelationshipService extends AbstractRuntimeService {
         ValueProposition valueProposition = entityManager.find(ValueProposition.class, valuePropositionRef);
         RolePerformance from = findOrCreateRole(entityManager.find(Participant.class, providerId), valueProposition.getProvider());
         RolePerformance to = findOrCreateRole(entityManager.find(Participant.class, requesterId), valueProposition.getRecipient());
-        RelationshipPerformance rp = new RelationshipPerformance(valueProposition, from);
+        TrustRelationship rp = new TrustRelationship(valueProposition, from);
         rp.setRecipient(to);
         entityManager.persist(rp);
-        Collection<RelationshipComponentPerformance> components = syncRuntimeEntities(rp.getComponents(), rp.getValueProposition().getComponents(), RelationshipComponentPerformance.class, rp);
-        for (RelationshipComponentPerformance component : components) {
-            syncRuntimeEntities(component.getMeasurements(), component.getValuePropositionComponent().getMeasures(), RelationshipComponentMeasurement.class, component);
+        Collection<TrustRelationshipComponent> components = syncRuntimeEntities(rp.getComponents(), rp.getValueProposition().getComponents(), TrustRelationshipComponent.class, rp);
+        for (TrustRelationshipComponent component : components) {
+            syncRuntimeEntities(component.getMeasurements(), component.getValuePropositionComponent().getMeasures(), TrustRelationshipComponentMeasurement.class, component);
         }
         entityManager.flush();
     }
 
     public void confirmTrustRelationship(Long relationshipId) {
-        RelationshipPerformance relationship = entityManager.find(RelationshipPerformance.class, relationshipId);
+        TrustRelationship relationship = entityManager.find(TrustRelationship.class, relationshipId);
         relationship.setStatus(TrustRelationshipStatus.CONFIRMED);
         entityManager.flush();
     }
 
     public void rejectTrustRelationship(Long relationshipId) {
-        RelationshipPerformance relationship = entityManager.find(RelationshipPerformance.class, relationshipId);
+        TrustRelationship relationship = entityManager.find(TrustRelationship.class, relationshipId);
         relationship.setStatus(TrustRelationshipStatus.REJECTED);
         //TODO - delete it?
         entityManager.flush();

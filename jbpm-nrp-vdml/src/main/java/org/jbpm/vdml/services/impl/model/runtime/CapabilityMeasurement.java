@@ -8,23 +8,23 @@ import javax.persistence.ManyToOne;
 @Entity
 public class CapabilityMeasurement extends Measurement{
     @ManyToOne
-    private CapabilityPerformance capabilityPerformance;
+    private CapabilityOffer capabilityOffer;
 
     public CapabilityMeasurement() {
     }
 
-    public CapabilityMeasurement(Measure measure, CapabilityPerformance capabilityPerformance) {
+    public CapabilityMeasurement(Measure measure, CapabilityOffer capabilityOffer) {
         super(measure);
-        this.capabilityPerformance = capabilityPerformance;
-        this.capabilityPerformance.getMeasurements().add(this);
+        this.capabilityOffer = capabilityOffer;
+        this.capabilityOffer.getMeasurements().add(this);
     }
 
-    public CapabilityPerformance getCapabilityPerformance() {
-        return capabilityPerformance;
+    public CapabilityOffer getCapabilityOffer() {
+        return capabilityOffer;
     }
 
     @Override
     public RuntimeEntity getMeasurand() {
-        return getCapabilityPerformance();
+        return getCapabilityOffer();
     }
 }

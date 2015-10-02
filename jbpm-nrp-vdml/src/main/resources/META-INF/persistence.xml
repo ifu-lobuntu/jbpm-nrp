@@ -37,39 +37,39 @@
         <class>org.jbpm.vdml.services.impl.model.meta.ValueProposition</class>
         <class>org.jbpm.vdml.services.impl.model.meta.ValuePropositionComponent</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ActivityMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ActivityObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ActivityInstance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.Address</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.BusinessItemMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.BusinessItemObservation</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ReusableBusinessItemPerformance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ReusableBusinessItemMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.CapabilityMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.CapabilityPerformance</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.CollaborationObservation</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.DirectedFlowMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.DirectedFlowObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.CapabilityOffer</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.CollaborationInstance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.DeliverableFlowMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.DeliverableFlowInstance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ExchangeConfiguration</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.IndividualParticipant</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.Measurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.MilestoneObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.MilestoneInstance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.Participant</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.PoolPerformance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentPerformance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionPerformance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ResourceUseMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ResourceUseObservation</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.PortContainerObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ResourceUseInstance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.PortContainerInstance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.RolePerformance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.StoreMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.StorePerformance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.SupplyingStoreMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.SupplyingStoreObservation</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.SupplyingStoreInstance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.TestLocation</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValueAddMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.RelationshipComponentMeasurement</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.RelationshipComponentPerformance</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.RelationshipPerformance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.TrustRelationshipComponentMeasurement</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.TrustRelationshipComponent</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.TrustRelationship</class>
         <class>org.jbpm.vdml.services.impl.model.scheduling.DailySchedule</class>
         <class>org.jbpm.vdml.services.impl.model.scheduling.PeriodInDay</class>
         <class>org.jbpm.vdml.services.impl.model.scheduling.PlannedUnavailability</class>

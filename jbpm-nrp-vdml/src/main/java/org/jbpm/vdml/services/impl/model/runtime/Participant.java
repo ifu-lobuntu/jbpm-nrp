@@ -24,7 +24,7 @@ public abstract class Participant implements SchedulableObject {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "participant")
     private Set<RolePerformance> rolePerformances =new HashSet<RolePerformance>();
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
-    private Set<CapabilityPerformance> capabilityOffers =new HashSet<CapabilityPerformance>();
+    private Set<CapabilityOffer> capabilityOffers =new HashSet<CapabilityOffer>();
 
     @OneToMany(mappedBy = "owner")
     private Set<StorePerformance> offeredStores =new HashSet<StorePerformance>();
@@ -44,7 +44,7 @@ public abstract class Participant implements SchedulableObject {
         return rolePerformances;
     }
 
-    public Set<CapabilityPerformance> getCapabilityOffers() {
+    public Set<CapabilityOffer> getCapabilityOffers() {
         return capabilityOffers;
     }
 

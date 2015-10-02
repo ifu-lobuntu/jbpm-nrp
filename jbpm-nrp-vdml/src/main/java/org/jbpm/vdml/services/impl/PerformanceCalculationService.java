@@ -17,12 +17,12 @@ public class PerformanceCalculationService extends AbstractCalculationService {
     }
 
 
-    public CapabilityPerformance findCapabilityPerformance(Long cpId) {
-        return entityManager.find(CapabilityPerformance.class, cpId);
+    public CapabilityOffer findCapabilityPerformance(Long cpId) {
+        return entityManager.find(CapabilityOffer.class, cpId);
     }
 
     public void calculateCapabilityPerformance(Long cpId) {
-        CapabilityPerformance measurand = entityManager.find(CapabilityPerformance.class, cpId);
+        CapabilityOffer measurand = entityManager.find(CapabilityOffer.class, cpId);
         Map<String, Measurement> context = new HashMap<String, Measurement>();
         addToContext(context, measurand.getMeasurements());
         Set<Measurement> otherMeasurements = new MeasurementAggregator(entityManager).resolveAggregatedMEasurements(measurand, "ActivityMeasurement m where m.activity.capabilityOffer");
@@ -73,14 +73,14 @@ public class PerformanceCalculationService extends AbstractCalculationService {
 
 
     public void calculateRelationshipPerformance(Long rpId) {
-        RelationshipPerformance vpp = entityManager.find(RelationshipPerformance.class, rpId);
+        TrustRelationship vpp = entityManager.find(TrustRelationship.class, rpId);
         String deploymentId = vpp.getValueProposition().getCollaboration().getDeploymentId();
-        for (final RelationshipComponentPerformance measurand : vpp.getComponents()) {
+        for (final TrustRelationshipComponent measurand : vpp.getComponents()) {
             Map<String, Measurement> context = new HashMap<String, Measurement>();
             addToContext(context, measurand.getMeasurements());
-            Set<Measurement> otherMeasurements = new MeasurementAggregator<RelationshipComponentPerformance>(entityManager){
+            Set<Measurement> otherMeasurements = new MeasurementAggregator<TrustRelationshipComponent>(entityManager){
                 @Override
-                protected void addAdditionalParameters(Query q,RelationshipComponentPerformance measurand) {
+                protected void addAdditionalParameters(Query q,TrustRelationshipComponent measurand) {
                     q.setParameter("measurand", measurand.getRelationship().getProvider());
                     q.setParameter("receiver", measurand.getRelationship().getRecipient());
                 }
@@ -94,8 +94,8 @@ public class PerformanceCalculationService extends AbstractCalculationService {
         return entityManager.find(ReusableBusinessItemPerformance.class, bipId);
     }
 
-    public RelationshipPerformance findRelationshipPerformance(Long id) {
-        return entityManager.find(RelationshipPerformance.class,id);
+    public TrustRelationship findRelationshipPerformance(Long id) {
+        return entityManager.find(TrustRelationship.class,id);
     }
 
     public ValuePropositionPerformance findValuePropositionPerformance(Long id) {

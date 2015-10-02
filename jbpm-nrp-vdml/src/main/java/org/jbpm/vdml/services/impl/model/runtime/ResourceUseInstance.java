@@ -12,18 +12,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class ResourceUseObservation implements RuntimeEntity {
+public class ResourceUseInstance implements RuntimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @ManyToOne
     private ResourceUse resourceUse;
     @ManyToOne
-    private ActivityObservation activity;
+    private ActivityInstance activity;
     @ManyToOne
-    private DirectedFlowObservation input;
+    private DeliverableFlowInstance input;
     @ManyToOne
-    private DirectedFlowObservation output;
+    private DeliverableFlowInstance output;
     @ManyToOne
     private Address address;
 
@@ -52,12 +52,12 @@ public class ResourceUseObservation implements RuntimeEntity {
     @Enumerated
     private ValueFlowStatus status;
 
-    public ResourceUseObservation() {
+    public ResourceUseInstance() {
     }
-    public ResourceUseObservation(ResourceUse resourceUse, ActivityObservation activity) {
+    public ResourceUseInstance(ResourceUse resourceUse, ActivityInstance activity) {
         this.resourceUse = resourceUse;
         this.activity = activity;
-        this.activity.getResourceUseObservation().add(this);
+        this.activity.getResourceUseInstance().add(this);
     }
 
 
@@ -147,11 +147,11 @@ public class ResourceUseObservation implements RuntimeEntity {
         this.quantity = quantity;
     }
 
-    public DirectedFlowObservation getOutput() {
+    public DeliverableFlowInstance getOutput() {
         return output;
     }
 
-    public void setOutput(DirectedFlowObservation output) {
+    public void setOutput(DeliverableFlowInstance output) {
         this.output = output;
     }
 
@@ -169,11 +169,11 @@ public class ResourceUseObservation implements RuntimeEntity {
         return resourceUse;
     }
 
-    public ActivityObservation getActivity() {
+    public ActivityInstance getActivity() {
         return activity;
     }
 
-    public DirectedFlowObservation getInput() {
+    public DeliverableFlowInstance getInput() {
         return input;
     }
 
@@ -181,7 +181,7 @@ public class ResourceUseObservation implements RuntimeEntity {
         return measurements;
     }
 
-    public void setInput(DirectedFlowObservation input) {
+    public void setInput(DeliverableFlowInstance input) {
         this.input = input;
     }
 

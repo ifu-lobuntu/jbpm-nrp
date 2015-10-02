@@ -14,20 +14,20 @@ import java.util.Set;
 import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
-public class DirectedFlowObservation implements RuntimeEntity{
+public class DeliverableFlowInstance implements RuntimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @ManyToOne
-    private CollaborationObservation collaboration;
+    private CollaborationInstance collaboration;
     @ManyToOne
     private DirectedFlow directedFlow;
     @ManyToOne
-    private MilestoneObservation milestone;
+    private MilestoneInstance milestone;
     @ManyToOne
-    private PortContainerObservation sourcePortContainer;
+    private PortContainerInstance sourcePortContainer;
     @ManyToOne
-    private PortContainerObservation targetPortContainer;
+    private PortContainerInstance targetPortContainer;
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime plannedDate;
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -39,12 +39,12 @@ public class DirectedFlowObservation implements RuntimeEntity{
     @OneToMany(mappedBy = "deliverableFlow")
     private Set<ValueAddMeasurement> valueAddMeasurements=new HashSet<ValueAddMeasurement>();
     @OneToMany(mappedBy = "directedFlow")
-    private Set<DirectedFlowMeasurement> measurements=new HashSet<DirectedFlowMeasurement>();
+    private Set<DeliverableFlowMeasurement> measurements=new HashSet<DeliverableFlowMeasurement>();
 
-    public DirectedFlowObservation() {
+    public DeliverableFlowInstance() {
     }
 
-    public DirectedFlowObservation(DirectedFlow directedFlow,CollaborationObservation collaboration) {
+    public DeliverableFlowInstance(DirectedFlow directedFlow, CollaborationInstance collaboration) {
         this.collaboration = collaboration;
         this.directedFlow = directedFlow;
         this.collaboration.getOwnedDirectedFlows().add(this);
@@ -55,16 +55,16 @@ public class DirectedFlowObservation implements RuntimeEntity{
         this.deliverable=collaboration.findBusinessItem(directedFlow.getDeliverable());
     }
 
-    public MilestoneObservation getMilestone() {
+    public MilestoneInstance getMilestone() {
         return milestone;
     }
 
-    public void setMilestone(MilestoneObservation milestone) {
+    public void setMilestone(MilestoneInstance milestone) {
         this.milestone = milestone;
         milestone.getFlows().add(this);
     }
 
-    public DirectedFlowObservation(DirectedFlow directedFlow, CollaborationObservation collaboration, PortContainerObservation sourcePortContainer, PortContainerObservation targetPortContainer) {
+    public DeliverableFlowInstance(DirectedFlow directedFlow, CollaborationInstance collaboration, PortContainerInstance sourcePortContainer, PortContainerInstance targetPortContainer) {
         this.collaboration = collaboration;
         this.directedFlow = directedFlow;
         this.collaboration.getOwnedDirectedFlows().add(this);
@@ -90,7 +90,7 @@ public class DirectedFlowObservation implements RuntimeEntity{
         return getDirectedFlow();
     }
 
-    public CollaborationObservation getCollaboration() {
+    public CollaborationInstance getCollaboration() {
         return collaboration;
     }
 
@@ -98,11 +98,11 @@ public class DirectedFlowObservation implements RuntimeEntity{
         return directedFlow;
     }
 
-    public PortContainerObservation getSourcePortContainer() {
+    public PortContainerInstance getSourcePortContainer() {
         return sourcePortContainer;
     }
 
-    public PortContainerObservation getTargetPortContainer() {
+    public PortContainerInstance getTargetPortContainer() {
         return targetPortContainer;
     }
 
@@ -118,11 +118,11 @@ public class DirectedFlowObservation implements RuntimeEntity{
         return valueAddMeasurements;
     }
 
-    public Set<DirectedFlowMeasurement> getMeasurements() {
+    public Set<DeliverableFlowMeasurement> getMeasurements() {
         return measurements;
     }
 
-    public DirectedFlowMeasurement getQuantity() {
+    public DeliverableFlowMeasurement getQuantity() {
         return findMatchingRuntimeEntity(getMeasurements(), getDirectedFlow().getQuantity());
     }
 
@@ -142,7 +142,7 @@ public class DirectedFlowObservation implements RuntimeEntity{
         this.actualDate = actualDate;
     }
 
-    public DirectedFlowMeasurement findMeasurement(Measure measure) {
+    public DeliverableFlowMeasurement findMeasurement(Measure measure) {
         return findMatchingRuntimeEntity(getMeasurements(), measure);
     }
 

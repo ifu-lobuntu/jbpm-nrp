@@ -24,20 +24,20 @@ public class ProjectService extends AbstractRuntimeService{
     }
     public void commitToMilestone(Long collaborationId, String milestoneName) {
         //TODO reevaluate use of directedFlows rather than deliverableFlows
-        CollaborationObservation collaborationObservation = entityManager.find(CollaborationObservation.class, collaborationId);
-        MilestoneObservation mo = collaborationObservation.findMilestone(collaborationObservation.getCollaboration().findMilestone(milestoneName));
+        CollaborationInstance collaborationInstance = entityManager.find(CollaborationInstance.class, collaborationId);
+        MilestoneInstance mo = collaborationInstance.findMilestone(collaborationInstance.getCollaboration().findMilestone(milestoneName));
         collaborationService.commitToMilestone(mo);
     }
 
     public void fulfillMilestone(Long collaborationId, String milestoneName) {
         //TODO reevaluate use of directedFlows rather than deliverableFlows
-        CollaborationObservation collaborationObservation = entityManager.find(CollaborationObservation.class, collaborationId);
-        MilestoneObservation mo = collaborationObservation.findMilestone(collaborationObservation.getCollaboration().findMilestone(milestoneName));
+        CollaborationInstance collaborationInstance = entityManager.find(CollaborationInstance.class, collaborationId);
+        MilestoneInstance mo = collaborationInstance.findMilestone(collaborationInstance.getCollaboration().findMilestone(milestoneName));
         collaborationService.fulfillMilestone(mo);
     }
 
 
-    public CollaborationObservation initiateProject(Long requestorId, String collaborationUri) {
+    public CollaborationInstance initiateProject(Long requestorId, String collaborationUri) {
         Collaboration collaboration=entityManager.find(Collaboration.class, collaborationUri);
         Participant participant = entityManager.find(Participant.class, requestorId);
         List<RolePerformance> roles=new ArrayList<RolePerformance>();
@@ -47,7 +47,7 @@ public class ProjectService extends AbstractRuntimeService{
         }
         return collaborationService.startCollaboration(collaboration, roles);
     }
-    public CollaborationObservation initiateProjectUnderCustodyOf(Long requestorId, Long custodian, String collaborationUri) {
+    public CollaborationInstance initiateProjectUnderCustodyOf(Long requestorId, Long custodian, String collaborationUri) {
         Collaboration collaboration=entityManager.find(Collaboration.class, collaborationUri);
         RolePerformance initiator = findOrCreateRole(entityManager.find(Participant.class, requestorId), collaboration.getInitiatorRole());
         RolePerformance planner= findOrCreateRole(entityManager.find(Participant.class, custodian), collaboration.getPlannerRole());
@@ -56,32 +56,32 @@ public class ProjectService extends AbstractRuntimeService{
 
 
     public RolePerformance selectCustodianForProject(Long custodianId, Long projectId) {
-        CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
+        CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
         RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, custodianId), project.getCollaboration().getPlannerRole());
         assignmentService.assignToRoles(project, Arrays.asList(rp));
         return rp;
     }
     public RolePerformance assignParticipantToRole(Long participantId, Long projectId, String roleUri) {
-        CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
+        CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
         RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, participantId), entityManager.find(Role.class,roleUri));
         assignmentService.assignToRoles(project, Arrays.asList(rp));
         return rp;
     }
     public StorePerformance assignStorePerformance(Long projectId, Long spId) {
-        CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
+        CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
         StorePerformance storePerformance = entityManager.find(StorePerformance.class, spId);
         assignmentService.assignToSupplyingStores(project.findSupplyingStore(storePerformance.getStoreDefinition()),storePerformance);
         entityManager.flush();
         return storePerformance;
     }
     public ReusableBusinessItemPerformance assignReusableBusinessItemPerformance(Long projectId, Long bipId) {
-        CollaborationObservation project = entityManager.find(CollaborationObservation.class, projectId);
+        CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
         ReusableBusinessItemPerformance storePerformance = entityManager.find(ReusableBusinessItemPerformance.class, bipId);
         assignmentService.assignToBusinessItem(project.findBusinessItem(storePerformance.getDefinition()),storePerformance);
         entityManager.flush();
         return storePerformance;
     }
-    public CollaborationObservation findProject(Long id) {
-        return entityManager.find(CollaborationObservation.class,id);
+    public CollaborationInstance findProject(Long id) {
+        return entityManager.find(CollaborationInstance.class,id);
     }
 }

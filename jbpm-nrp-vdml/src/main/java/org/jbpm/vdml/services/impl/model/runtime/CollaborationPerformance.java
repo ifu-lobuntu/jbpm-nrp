@@ -18,20 +18,20 @@ public class CollaborationPerformance extends Participant implements RuntimeEnti
 
 
     @OneToMany(mappedBy = "collaboration")
-    private Set<ActivityObservation> activities = new HashSet<ActivityObservation>();
+    private Set<ActivityInstance> activities = new HashSet<ActivityInstance>();
     @OneToMany(mappedBy = "collaboration")
-    private Set<SupplyingStoreObservation> suppliedStores = new HashSet<SupplyingStoreObservation>();
+    private Set<SupplyingStoreInstance> suppliedStores = new HashSet<SupplyingStoreInstance>();
     @ManyToMany()
     private Set<RolePerformance> rolePerformances = new HashSet<RolePerformance>();
 
     @OneToMany(mappedBy = "collaboration")
     private Set<BusinessItemObservation> businessItemObservations = new HashSet<BusinessItemObservation>();
     @OneToMany(mappedBy = "collaboration")
-    private Set<DirectedFlowObservation> directedFlowObservations = new HashSet<DirectedFlowObservation>();
+    private Set<DeliverableFlowInstance> deliverableFlowInstances = new HashSet<DeliverableFlowInstance>();
     @OneToMany(mappedBy = "toPortContainer")
-    private Set<DirectedFlowObservation> observedInput = new HashSet<DirectedFlowObservation>();
+    private Set<DeliverableFlowInstance> observedInput = new HashSet<DeliverableFlowInstance>();
     @OneToMany(mappedBy = "fromPortContainer")
-    private Set<DirectedFlowObservation> observedOutput = new HashSet<DirectedFlowObservation>();
+    private Set<DeliverableFlowInstance> observedOutput = new HashSet<DeliverableFlowInstance>();
 
 
     public CollaborationPerformance(Collaboration collaboration) {
@@ -41,7 +41,7 @@ public class CollaborationPerformance extends Participant implements RuntimeEnti
     public CollaborationPerformance() {
     }
 
-    public Set<DirectedFlowObservation> getObservedInput() {
+    public Set<DeliverableFlowInstance> getObservedInput() {
         return observedInput;
     }
 
@@ -50,7 +50,7 @@ public class CollaborationPerformance extends Participant implements RuntimeEnti
         return getCollaboration();
     }
 
-    public Set<DirectedFlowObservation> getObservedOutput() {
+    public Set<DeliverableFlowInstance> getObservedOutput() {
         return observedOutput;
     }
 
@@ -58,7 +58,7 @@ public class CollaborationPerformance extends Participant implements RuntimeEnti
         return collaboration;
     }
 
-    public Set<ActivityObservation> getActivities() {
+    public Set<ActivityInstance> getActivities() {
         return activities;
     }
 
@@ -70,11 +70,11 @@ public class CollaborationPerformance extends Participant implements RuntimeEnti
         return businessItemObservations;
     }
 
-    public Set<DirectedFlowObservation> getDirectedFlowObservations() {
-        return directedFlowObservations;
+    public Set<DeliverableFlowInstance> getDeliverableFlowInstances() {
+        return deliverableFlowInstances;
     }
 
-    public Set<SupplyingStoreObservation> getSuppliedStores() {
+    public Set<SupplyingStoreInstance> getSuppliedStores() {
         return suppliedStores;
     }
 }

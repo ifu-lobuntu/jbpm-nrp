@@ -16,7 +16,7 @@ public class BusinessItemObservation implements RuntimeEntity {
     @ManyToOne
     private BusinessItemDefinition definition;
     @ManyToOne
-    private CollaborationObservation collaboration;
+    private CollaborationInstance collaboration;
     @OneToMany(cascade = CascadeType.ALL)
     private Set<BusinessItemMeasurement> measurements = new HashSet<BusinessItemMeasurement>();
     @ManyToOne
@@ -25,7 +25,7 @@ public class BusinessItemObservation implements RuntimeEntity {
     public BusinessItemObservation() {
     }
 
-    public BusinessItemObservation(BusinessItemDefinition definition, CollaborationObservation collaboration) {
+    public BusinessItemObservation(BusinessItemDefinition definition, CollaborationInstance collaboration) {
         this.definition = definition;
         this.collaboration = collaboration;
         this.collaboration.getBusinessItems().add(this);
@@ -44,7 +44,7 @@ public class BusinessItemObservation implements RuntimeEntity {
         return definition;
     }
 
-    public CollaborationObservation getCollaboration() {
+    public CollaborationInstance getCollaboration() {
         return collaboration;
     }
 

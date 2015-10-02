@@ -7,20 +7,20 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class RelationshipComponentMeasurement extends Measurement{
+public class TrustRelationshipComponentMeasurement extends Measurement{
     @ManyToOne
-    private RelationshipComponentPerformance component;
+    private TrustRelationshipComponent component;
 
-    public RelationshipComponentMeasurement() {
+    public TrustRelationshipComponentMeasurement() {
     }
 
-    public RelationshipComponentMeasurement(Measure measure, RelationshipComponentPerformance component) {
+    public TrustRelationshipComponentMeasurement(Measure measure, TrustRelationshipComponent component) {
         super(measure);
         this.component = component;
         this.component.getMeasurements().add(this);
     }
 
-    public RelationshipComponentPerformance getComponent() {
+    public TrustRelationshipComponent getComponent() {
         return component;
     }
 

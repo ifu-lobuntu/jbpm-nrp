@@ -28,7 +28,7 @@ public class StorePerformance implements ActivatableRuntimeEntity, DirectlyExcha
     @ManyToOne
     private StoreDefinition storeDefinition;
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
-    private Set<StoreMeasurement> measurements = new HashSet<StoreMeasurement>();//Aggregated from SupplyingStoreObservation
+    private Set<StoreMeasurement> measurements = new HashSet<StoreMeasurement>();//Aggregated from SupplyingStoreInstance
     @ManyToOne
     private Address address;
     private String deploymentId;

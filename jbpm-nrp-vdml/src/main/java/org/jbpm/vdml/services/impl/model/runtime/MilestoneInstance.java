@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class MilestoneObservation implements  RuntimeEntity{
+public class MilestoneInstance implements  RuntimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -22,18 +22,18 @@ public class MilestoneObservation implements  RuntimeEntity{
     @ManyToOne
     private Milestone milestone;
     @ManyToOne
-    private CollaborationObservation collaboration;
+    private CollaborationInstance collaboration;
     @OneToMany(mappedBy = "milestone")
-    private Set<DirectedFlowObservation> flows = new HashSet<DirectedFlowObservation>();
+    private Set<DeliverableFlowInstance> flows = new HashSet<DeliverableFlowInstance>();
 
-    public MilestoneObservation(Milestone milestone, CollaborationObservation collaboration) {
+    public MilestoneInstance(Milestone milestone, CollaborationInstance collaboration) {
         this.milestone = milestone;
         this.collaboration = collaboration;
         this.collaboration.getMilestones().add(this);
         this.registeredOn=new Date();
     }
 
-    public MilestoneObservation() {
+    public MilestoneInstance() {
     }
     public void occur(){
         this.occurredOn=new Date();
@@ -59,11 +59,11 @@ public class MilestoneObservation implements  RuntimeEntity{
         return milestone;
     }
 
-    public CollaborationObservation getCollaboration() {
+    public CollaborationInstance getCollaboration() {
         return collaboration;
     }
 
-    public Set<DirectedFlowObservation> getFlows() {
+    public Set<DeliverableFlowInstance> getFlows() {
         return flows;
     }
 

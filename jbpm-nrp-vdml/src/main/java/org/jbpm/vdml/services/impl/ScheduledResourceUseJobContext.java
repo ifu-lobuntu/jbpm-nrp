@@ -4,18 +4,18 @@ import org.drools.core.common.InternalWorkingMemory;
 import org.drools.core.time.JobContext;
 import org.drools.core.time.JobHandle;
 import org.jbpm.process.core.timer.NamedJobContext;
-import org.jbpm.vdml.services.impl.model.runtime.ResourceUseObservation;
+import org.jbpm.vdml.services.impl.model.runtime.ResourceUseInstance;
 
 public class ScheduledResourceUseJobContext implements JobContext, NamedJobContext {
 
     private static final long serialVersionUID = -6838102884655245L;
-    private final ResourceUseObservation resourceUse;
+    private final ResourceUseInstance resourceUse;
     private JobHandle jobHandle;
     private Long resourceUseObservationId;
     private String entityManagerFactoryName;
     private String id;
 
-    public ScheduledResourceUseJobContext(String jobType, ResourceUseObservation resourceUse) {
+    public ScheduledResourceUseJobContext(String jobType, ResourceUseInstance resourceUse) {
         this.resourceUse = resourceUse;
         id = jobType + "_" + resourceUse.getActivity().getCollaboration().getId() + "_" + resourceUse.getActivity().getId() + "_" + resourceUse.getId();
         resourceUseObservationId = resourceUse.getId();
