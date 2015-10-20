@@ -28,7 +28,7 @@ public class AssignmentService extends AbstractRuntimeService {
             observation.getCollaborationRoles().add(rp);
             for (Activity activity : rp.getRole().getPerformedActitivities()) {
                 ActivityInstance ao = observation.findActivity(activity);
-                Query q = entityManager.createQuery("select cp from CapabilityPerformance cp where cp.participant= :participant and cp.capability=:capability");
+                Query q = entityManager.createQuery("select cp from CapabilityOffer cp where cp.participant= :participant and cp.capability=:capability");
                 q.setParameter("participant", rp.getParticipant());
                 q.setParameter("capability", activity.getCapabilityRequirement());
                 List<CapabilityOffer> result = q.getResultList();

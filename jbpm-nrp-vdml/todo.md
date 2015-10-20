@@ -1,0 +1,9 @@
+InputPortInstance
+OutputPortInstance
+InputPortMeasurement
+OutputPortMeasurement
+DeliverableFlow.multiplexing
+ActivityInstance.delegatedCollaborationInstance
+Multi ActivityInstance support (with aggrgegating measures where applicable)
+Populate ConversationFOrAction parameters from ActivityInstance
+Apply ConversationForAction parameters to ActivityInstance

@@ -16,6 +16,9 @@ ConversationForAction workflow:
 
 #2. To implement
 
+- Migrate ConversationAct to TaskImpl
+- Subclass CaseTaskWorkItemHandler to create ConversationForAction
+
 ConversationForAction workflow:
 
 - add conversation (not direct request)

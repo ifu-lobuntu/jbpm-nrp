@@ -38,11 +38,11 @@ public class SupplierMatcher extends AbstractRuntimeService {
 
     public List<CapabilityOffer> findMatchingCapabilityOffer(String capabilityUri, ReusableBusinessItemRequirement location, Collection<MeasurementCriterion> criteria) {
         String s = CriteriaUtil.buildCriteriaString(criteria);
-        Query q = entityManager.createQuery("select distinct m.capabilityPerformance from CapabilityMeasurement m " +
-                        "where m.capabilityPerformance.capability.uri = :capabilityUri and " +
-                        " distance(m.capabilityPerformance.participant.address.location, :desiredLocation) < :maxDistance and  " +
+        Query q = entityManager.createQuery("select distinct m.capabilityOffer from CapabilityMeasurement m " +
+                        "where m.capabilityOffer.capability.uri = :capabilityUri and " +
+                        " distance(m.capabilityOffer.participant.address.location, :desiredLocation) < :maxDistance and  " +
                         s +
-                        " group by  m.capabilityPerformance having count (m) >= :numberOfCriteria"
+                        " group by  m.capabilityOffer having count (m) >= :numberOfCriteria"
         );
         q.setParameter("capabilityUri", capabilityUri);
         q.setParameter("maxDistance", LocationUtil.meterToEstimatedDegrees(location.getMaxDistanceInMeter()));

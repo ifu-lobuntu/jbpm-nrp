@@ -38,7 +38,7 @@ public class DeliverableFlowInstance implements RuntimeEntity{
     private BusinessItemObservation deliverable;
     @OneToMany(mappedBy = "deliverableFlow")
     private Set<ValueAddMeasurement> valueAddMeasurements=new HashSet<ValueAddMeasurement>();
-    @OneToMany(mappedBy = "directedFlow")
+    @OneToMany(mappedBy = "deliverableFlow")
     private Set<DeliverableFlowMeasurement> measurements=new HashSet<DeliverableFlowMeasurement>();
 
     public DeliverableFlowInstance() {
