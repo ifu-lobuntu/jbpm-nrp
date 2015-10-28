@@ -8,9 +8,12 @@ import org.jbpm.vdml.services.impl.model.meta.Activity;
 import org.jbpm.vdml.services.impl.model.meta.Capability;
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
 import org.jbpm.vdml.services.impl.model.meta.DeliverableFlow;
+import org.jbpm.vdml.services.impl.model.meta.InputPort;
 import org.jbpm.vdml.services.impl.model.meta.Milestone;
 import org.jbpm.vdml.services.impl.model.meta.OutputDelegation;
+import org.jbpm.vdml.services.impl.model.meta.OutputPort;
 import org.jbpm.vdml.services.impl.model.meta.PoolDefinition;
+import org.jbpm.vdml.services.impl.model.meta.Port;
 import org.jbpm.vdml.services.impl.model.meta.PortContainer;
 import org.jbpm.vdml.services.impl.model.meta.ResourceUseLocation;
 import org.jbpm.vdml.services.impl.model.meta.Role;
@@ -43,8 +46,8 @@ public class VdmlImporter extends MetaBuilder {
     public void buildModel(String deploymentId, org.omg.vdml.ValueDeliveryModel vdm) {
 
         importCapabilities(deploymentId, vdm);
-        importStoreDefinitions(deploymentId,vdm);
-        importBusinessItemDefinitions(deploymentId,vdm);
+        importStoreDefinitions(deploymentId, vdm);
+        importBusinessItemDefinitions(deploymentId, vdm);
         for (org.omg.vdml.Collaboration collaboration : vdm.getCollaboration()) {
             buildCollaboration(deploymentId, collaboration);
         }
@@ -55,10 +58,12 @@ public class VdmlImporter extends MetaBuilder {
 
     private void configureStoreDefinitions(ValueDeliveryModel vdm) {
         for (StoreLibrary library : vdm.getStoreLibrary()) {
-            for (org.omg.vdml.StoreDefinition from : library.getStoreDefinitions()) {
-                StoreDefinition to = find(from, StoreDefinition.class);
-                org.omg.vdml.ExchangeConfiguration fromEc = from.getExchangeConfiguration();
-                to.setExchangeConfiguration(buildExchangeConfiguration(fromEc));
+            for (StoreLibraryElement from : library.getStoreLibraryElement()) {
+                if (from instanceof org.omg.vdml.StoreDefinition) {
+                    StoreDefinition to = find(from, StoreDefinition.class);
+                    org.omg.vdml.ExchangeConfiguration fromEc = ((org.omg.vdml.StoreDefinition) from).getExchangeConfiguration();
+                    to.setExchangeConfiguration(buildExchangeConfiguration(fromEc));
+                }
             }
         }
     }
@@ -89,12 +94,14 @@ public class VdmlImporter extends MetaBuilder {
 
     private void importStoreDefinitions(String deploymentId, ValueDeliveryModel vdm) {
         for (StoreLibrary library : vdm.getStoreLibrary()) {
-            for (org.omg.vdml.StoreDefinition from : library.getStoreDefinitions()) {
-                StoreDefinition to = findOrCreate(from, from instanceof org.omg.vdml.PoolDefinition ? PoolDefinition.class : StoreDefinition.class);
-                to.setDeploymentId(deploymentId);
+            for (org.omg.vdml.StoreLibraryElement from : library.getStoreLibraryElement()) {
+                if (from instanceof org.omg.vdml.StoreDefinition) {
+                    StoreDefinition to = findOrCreate(from, from instanceof org.omg.vdml.PoolDefinition ? PoolDefinition.class : StoreDefinition.class);
+                    to.setDeploymentId(deploymentId);
 
-                to.setName(from.getName());
-                measureBuilder.fromCharacteristics(to.getMeasures(), from.getCharacteristicDefinition());
+                    to.setName(from.getName());
+                    measureBuilder.fromCharacteristics(to.getMeasures(), from.getCharacteristicDefinition());
+                }
             }
         }
     }
@@ -132,6 +139,7 @@ public class VdmlImporter extends MetaBuilder {
         result.setDeploymentId(deploymentId);
         importBusinessItems(c, result);
         importRoles(c, result);
+        importPorts(c, result);
         importActivities(c, result);
         importSupplyingStores(c, result);
         if (c instanceof CapabilityMethod) {
@@ -166,7 +174,7 @@ public class VdmlImporter extends MetaBuilder {
         if (result.getInitiatorRole() == null) {
             List<Activity> initiatingActivity = new ArrayList<Activity>();
             for (Activity activity : result.getActivities()) {
-                if (activity.getInputDeliverableFlows().isEmpty() && !activity.getOutputDeliverableFlows().isEmpty()) {
+                if (activity.getInput().isEmpty() && !activity.getOutput().isEmpty()) {
                     initiatingActivity.add(activity);
                 }
             }
@@ -215,24 +223,12 @@ public class VdmlImporter extends MetaBuilder {
                 to.setQuantity(measureBuilder.findOrCreateMeasure(from.getQuantity()));
                 to.setResourceUseLocation(ResourceUseLocation.valueOf(from.getLocation().name()));
                 if (from.getResource().size() == 1) {
-                    InputPort inputPort = from.getResource().get(0);
-                    if (inputPort.getInput() == null) {
-                        if (inputPort.getDelegatedInput().size() == 1) {
-                            to.setInput(find(inputPort.getDelegatedInput().get(0), InputDelegation.class));
-                        }
-                    } else {
-                        to.setInput(find(inputPort.getInput(), DeliverableFlow.class));
-                    }
+                    org.omg.vdml.InputPort inputPort = from.getResource().get(0);
+                    to.setInput(find(inputPort, InputPort.class));
                 }
-                OutputPort outputPort = from.getDeliverable();
+                org.omg.vdml.OutputPort outputPort = from.getDeliverable();
                 if (outputPort != null) {
-                    if (outputPort.getOutput() == null) {
-                        if (outputPort.getOutputDelegation().size() == 1) {
-                            to.setInput(find(outputPort.getOutputDelegation().get(0), OutputDelegation.class));
-                        }
-                    } else {
-                        to.setOutput(find(outputPort.getOutput(), DeliverableFlow.class));
-                    }
+                    to.setOutput(find(outputPort, OutputPort.class));
                 }
             }
         }
@@ -242,17 +238,14 @@ public class VdmlImporter extends MetaBuilder {
         for (org.omg.vdml.DeliverableFlow from : c.getFlow()) {
             DeliverableFlow to = findOrCreate(from, DeliverableFlow.class, result);
             to.setName(from.getName());
-            to.setTargetName(from.getRecipient().getName());
-            to.setSourceName(from.getProvider().getName());
-            to.setSourcePortContainer(find(from.getProvider().eContainer(), PortContainer.class));
-            to.setTargetPortContainer(find(from.getRecipient().eContainer(), PortContainer.class));
+            to.setSource(find(from.getProvider(), OutputPort.class));
+            to.setTarget(find(from.getRecipient(), InputPort.class));
             BusinessItem d = from.getDeliverable();
             if (d.getDefinition() == null) {
                 to.setDeliverable(find(d, BusinessItemDefinition.class));
             } else {
                 to.setDeliverable(find(d.getDefinition(), BusinessItemDefinition.class));
             }
-            addValueAdds(to, from.getProvider().getValueAdd());
             measureBuilder.fromMeasuredCharacteristics(to.getMeasures(), from.getMeasuredCharacteristic());
             if (from.getProvider().getBatchSize() != null) {
                 to.setQuantity(measureBuilder.findOrCreateMeasure(from.getProvider().getBatchSize()));
@@ -265,25 +258,14 @@ public class VdmlImporter extends MetaBuilder {
         }
     }
 
-    private void addValueAdds(DirectedFlow to, EList<ValueAdd> valueAdd) {
-        for (ValueAdd fromValueAdd : valueAdd) {
-            Measure toValueAdd = measureBuilder.findOrCreateMeasure(fromValueAdd.getValueMeasurement());
-            if (toValueAdd != null) {
-                to.getValueAdds().add(toValueAdd);
-            }
-        }
-    }
-
     private void importPortDelegations(Collaboration result, EList<org.omg.vdml.PortDelegation> delegations) {
         for (org.omg.vdml.PortDelegation d : delegations) {
             if (d instanceof org.omg.vdml.InputDelegation) {
                 org.omg.vdml.InputDelegation from = (org.omg.vdml.InputDelegation) d;
                 InputDelegation to = findOrCreate(from, InputDelegation.class, result);
                 to.setName(from.getName());
-                to.setTargetName(from.getSource().getName());
-                to.setSourceName(from.getTarget().getName());
-                to.setSourcePortContainer(find(from.getSource().eContainer(), PortContainer.class));
-                to.setTargetPortContainer(find(from.getTarget().eContainer(), PortContainer.class));
+                to.setSource(find(from.getSource(), Port.class));
+                to.setTarget(find(from.getTarget(), Port.class));
                 BusinessItemLibraryElement bid = from.getSource().getInputDefinition();
                 if (bid == null) {
                     bid = from.getTarget().getInputDefinition();
@@ -295,10 +277,8 @@ public class VdmlImporter extends MetaBuilder {
                 org.omg.vdml.OutputDelegation from = (org.omg.vdml.OutputDelegation) d;
                 OutputDelegation to = findOrCreate(from, OutputDelegation.class, result);
                 to.setName(from.getName());
-                to.setTargetName(from.getSource().getName());
-                to.setSourceName(from.getTarget().getName());
-                to.setSourcePortContainer(find(from.getSource().eContainer(), PortContainer.class));
-                to.setTargetPortContainer(find(from.getTarget().eContainer(), PortContainer.class));
+                to.setSource(find(from.getSource(), Port.class));
+                to.setTarget(find(from.getTarget(), Port.class));
                 BusinessItemLibraryElement bid = from.getSource().getOutputDefinition();
                 if (bid == null) {
                     bid = from.getTarget().getOutputDefinition();
@@ -306,7 +286,6 @@ public class VdmlImporter extends MetaBuilder {
                 if (bid != null) {
                     to.setDeliverable(find(bid, BusinessItemDefinition.class));
                 }
-                addValueAdds(to, from.getSource().getValueAdd());
             }
         }
     }
@@ -318,6 +297,7 @@ public class VdmlImporter extends MetaBuilder {
             to.setStoreRequirement(findOrCreate(from.getStoreRequirement(), StoreDefinition.class));
             measureBuilder.fromMeasuredCharacteristics(to.getMeasures(), from.getMeasuredCharacteristic());
             to.setStoreRequirement(findOrCreate(from.getStoreRequirement(), StoreDefinition.class));
+            importPorts(from, to);
         }
     }
 
@@ -328,6 +308,31 @@ public class VdmlImporter extends MetaBuilder {
             to.setCapabilityRequirement(findOrCreate(from.getCapabilityRequirement(), Capability.class));
             measureBuilder.fromMeasuredCharacteristics(to.getMeasures(), from.getMeasuredCharacteristic());
             to.setCapabilityRequirement(findOrCreate(from.getCapabilityRequirement(), Capability.class));
+            importPorts(from, to);
+        }
+    }
+
+    private void importPorts(org.omg.vdml.PortContainer fromPortContainer, PortContainer toPortContainer) {
+        for (org.omg.vdml.Port from : fromPortContainer.getContainedPort()) {
+            Port to=null;
+            if (from instanceof org.omg.vdml.InputPort) {
+                to=findOrCreate(from,InputPort.class,toPortContainer);
+            }else{
+                OutputPort op = findOrCreate(from, OutputPort.class, toPortContainer);
+                List<MeasuredCharacteristic> mcs=new ArrayList<MeasuredCharacteristic>();
+                for (ValueAdd valueAdd : ((org.omg.vdml.OutputPort) from).getValueAdd()) {
+                    mcs.addAll(valueAdd.getMeasuredCharacteristic());
+                    if(valueAdd.getValueMeasurement()!=null) {
+                        mcs.add(valueAdd.getValueMeasurement());
+                    }
+                }
+                measureBuilder.fromMeasuredCharacteristics(op.getValueAdds(),mcs);
+                to= op;
+
+            }
+            to.setName(from.getName());
+            measureBuilder.fromMeasuredCharacteristics(to.getMeasures(), from.getMeasuredCharacteristic());
+            to.setBatchSize(measureBuilder.findOrCreateMeasure(from.getBatchSize()));
         }
     }
 

@@ -2,9 +2,7 @@ package org.jbpm.vdml.services.impl.model.runtime;
 
 
 import org.hibernate.annotations.Type;
-import org.jbpm.vdml.services.impl.model.meta.DirectedFlow;
-import org.jbpm.vdml.services.impl.model.meta.Measure;
-import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
+import org.jbpm.vdml.services.impl.model.meta.*;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -21,13 +19,17 @@ public class DeliverableFlowInstance implements RuntimeEntity{
     @ManyToOne
     private CollaborationInstance collaboration;
     @ManyToOne
-    private DirectedFlow directedFlow;
+    private DeliverableFlow deliverableFlow;
     @ManyToOne
     private MilestoneInstance milestone;
     @ManyToOne
     private PortContainerInstance sourcePortContainer;
     @ManyToOne
     private PortContainerInstance targetPortContainer;
+    @ManyToOne
+    private OutputPortInstance source;
+    @ManyToOne
+    private InputPortInstance target;
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime plannedDate;
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -37,22 +39,23 @@ public class DeliverableFlowInstance implements RuntimeEntity{
     @ManyToOne
     private BusinessItemObservation deliverable;
     @OneToMany(mappedBy = "deliverableFlow")
-    private Set<ValueAddMeasurement> valueAddMeasurements=new HashSet<ValueAddMeasurement>();
-    @OneToMany(mappedBy = "deliverableFlow")
     private Set<DeliverableFlowMeasurement> measurements=new HashSet<DeliverableFlowMeasurement>();
 
     public DeliverableFlowInstance() {
     }
 
-    public DeliverableFlowInstance(DirectedFlow directedFlow, CollaborationInstance collaboration) {
+    public DeliverableFlowInstance(DeliverableFlow deliverableFlow, CollaborationInstance collaboration) {
+        if(!(deliverableFlow instanceof DeliverableFlow)){
+            throw new IllegalArgumentException();
+        }
         this.collaboration = collaboration;
-        this.directedFlow = directedFlow;
+        this.deliverableFlow = deliverableFlow;
         this.collaboration.getOwnedDirectedFlows().add(this);
-        sourcePortContainer =collaboration.findPortContainer(directedFlow.getSourcePortContainer());
+        sourcePortContainer =collaboration.findPortContainer(deliverableFlow.getSourcePortContainer());
         sourcePortContainer.getCommencedFlow().add(this);
-        targetPortContainer =collaboration.findPortContainer(directedFlow.getTargetPortContainer());
+        targetPortContainer =collaboration.findPortContainer(deliverableFlow.getTargetPortContainer());
         targetPortContainer.getConcludedFlow().add(this);
-        this.deliverable=collaboration.findBusinessItem(directedFlow.getDeliverable());
+        this.deliverable=collaboration.findBusinessItem(deliverableFlow.getDeliverable());
     }
 
     public MilestoneInstance getMilestone() {
@@ -64,13 +67,13 @@ public class DeliverableFlowInstance implements RuntimeEntity{
         milestone.getFlows().add(this);
     }
 
-    public DeliverableFlowInstance(DirectedFlow directedFlow, CollaborationInstance collaboration, PortContainerInstance sourcePortContainer, PortContainerInstance targetPortContainer) {
+    public DeliverableFlowInstance(DeliverableFlow deliverableFlow, CollaborationInstance collaboration, PortContainerInstance sourcePortContainer, PortContainerInstance targetPortContainer) {
         this.collaboration = collaboration;
-        this.directedFlow = directedFlow;
+        this.deliverableFlow = deliverableFlow;
         this.collaboration.getOwnedDirectedFlows().add(this);
         this.sourcePortContainer =sourcePortContainer;
         this.targetPortContainer =targetPortContainer;
-        this.deliverable=collaboration.findBusinessItem(directedFlow.getDeliverable());
+        this.deliverable=collaboration.findBusinessItem(deliverableFlow.getDeliverable());
     }
 
     public Long getId() {
@@ -87,15 +90,15 @@ public class DeliverableFlowInstance implements RuntimeEntity{
 
     @Override
     public MetaEntity getMetaEntity() {
-        return getDirectedFlow();
+        return getDeliverableFlow();
     }
 
     public CollaborationInstance getCollaboration() {
         return collaboration;
     }
 
-    public DirectedFlow getDirectedFlow() {
-        return directedFlow;
+    public DeliverableFlow getDeliverableFlow() {
+        return deliverableFlow;
     }
 
     public PortContainerInstance getSourcePortContainer() {
@@ -115,7 +118,7 @@ public class DeliverableFlowInstance implements RuntimeEntity{
     }
 
     public Set<ValueAddMeasurement> getValueAddMeasurements() {
-        return valueAddMeasurements;
+        return getSource().getValueAdds();
     }
 
     public Set<DeliverableFlowMeasurement> getMeasurements() {
@@ -123,7 +126,7 @@ public class DeliverableFlowInstance implements RuntimeEntity{
     }
 
     public DeliverableFlowMeasurement getQuantity() {
-        return findMatchingRuntimeEntity(getMeasurements(), getDirectedFlow().getQuantity());
+        return findMatchingRuntimeEntity(getMeasurements(), getDeliverableFlow().getQuantity());
     }
 
     public DateTime getPlannedDate() {
@@ -149,5 +152,21 @@ public class DeliverableFlowInstance implements RuntimeEntity{
     public ValueAddMeasurement findValueAdd(Measure measure) {
         return findMatchingRuntimeEntity(getValueAddMeasurements(), measure);
 
+    }
+
+    public OutputPortInstance getSource() {
+        return source;
+    }
+
+    public void setSource(OutputPortInstance source) {
+        this.source = source;
+    }
+
+    public InputPortInstance getTarget() {
+        return target;
+    }
+
+    public void setTarget(InputPortInstance target) {
+        this.target = target;
     }
 }

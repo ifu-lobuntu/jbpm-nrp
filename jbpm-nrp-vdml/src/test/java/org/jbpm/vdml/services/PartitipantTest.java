@@ -48,7 +48,7 @@ public class PartitipantTest extends MetaEntityImportTest {
         StoreDefinition storeDef=VDMLFactory.eINSTANCE.createStoreDefinition();
         storeDef.setName("MyStore");
         super.addCharacteristics(vdm, storeDef.getCharacteristicDefinition());
-        vdm.getStoreLibrary().get(0).getStoreDefinitions().add(storeDef);
+        vdm.getStoreLibrary().get(0).getStoreLibraryElement().add(storeDef);
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);
         new VdmlImporter(getEntityManager()).buildModel(DEFAULT_DEPLOYMENT_ID, vdm);

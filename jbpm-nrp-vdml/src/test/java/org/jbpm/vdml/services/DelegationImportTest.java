@@ -3,14 +3,23 @@ package org.jbpm.vdml.services;
 
 import org.jbpm.vdml.services.impl.MetaBuilder;
 import org.jbpm.vdml.services.impl.VdmlImporter;
+import org.jbpm.vdml.services.impl.model.meta.*;
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
 import org.junit.Test;
 import org.omg.vdml.*;
+import org.omg.vdml.Activity;
+import org.omg.vdml.BusinessItemDefinition;
+import org.omg.vdml.InputDelegation;
+import org.omg.vdml.InputPort;
+import org.omg.vdml.OutputDelegation;
+import org.omg.vdml.OutputPort;
+import org.omg.vdml.Role;
 
 import java.io.ByteArrayOutputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 public class DelegationImportTest extends MetaEntityImportTest {
 
@@ -94,20 +103,17 @@ public class DelegationImportTest extends MetaEntityImportTest {
         assertSame(collaboration.getCollaborationRoles().iterator().next(), collaboration.getActivities().iterator().next().getPerformingRole());
 
         assertEquals(2, collaboration.getFlows().size());
-        assertEquals(1, collaboration.getCommencedFlows().size());
-        assertEquals(1, collaboration.getConcludedFlows().size());
-        assertEquals(1, collaboration.getConcludedFlows().iterator().next().getValueAdds().size());
-        assertEquals(1, collaboration.getActivities().iterator().next().getCommencedFlows().size());
-        assertEquals(1, collaboration.getActivities().iterator().next().getCommencedFlows().iterator().next().getValueAdds().size());
-        assertEquals(1, collaboration.getActivities().iterator().next().getConcludedFlows().size());
-        assertSame(collaboration.getCommencedFlows().iterator().next(), collaboration.getActivities().iterator().next().getConcludedFlows().iterator().next());
-        assertSame(collaboration.getConcludedFlows().iterator().next(), collaboration.getActivities().iterator().next().getCommencedFlows().iterator().next());
-    }
-    void asdf(){
-
-
-
-
+        assertEquals(1, collaboration.getInput().size());
+        assertEquals(1, collaboration.getOutput().size());
+        assertEquals(1, collaboration.getInput().iterator().next().getInputDelegations().size());
+        assertEquals(1, collaboration.getOutput().iterator().next().getDelegatedOutputs().size());
+        assertEquals(0, collaboration.getOutput().iterator().next().getValueAdds().size());
+        assertEquals(1, collaboration.getActivities().iterator().next().getInput().size());
+        assertEquals(1, collaboration.getActivities().iterator().next().getInput().iterator().next().getDelegatedInputs().size());
+        assertEquals(1, collaboration.getActivities().iterator().next().getOutput().iterator().next().getValueAdds().size());
+        assertEquals(1, collaboration.getActivities().iterator().next().getOutput().iterator().next().getOutputDelegations().size());
+        assertSame(collaboration.getInput().iterator().next().getInputDelegations().iterator().next(),collaboration.getActivities().iterator().next().getInput().iterator().next().getDelegatedInputs().iterator().next());
+        assertSame(collaboration.getOutput().iterator().next().getDelegatedOutputs().iterator().next(), collaboration.getActivities().iterator().next().getOutput().iterator().next().getOutputDelegations().iterator().next());
     }
     @Test
     public void testDelegationContext() throws Exception {
@@ -181,6 +187,8 @@ public class DelegationImportTest extends MetaEntityImportTest {
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);
         //WHEN
+        new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, delegatedCapabilityMethod);
+
         Collaboration owningCollaboration = new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cm);
         //THEN
         assertEquals(cm.getName(), owningCollaboration.getName());
@@ -195,17 +203,19 @@ public class DelegationImportTest extends MetaEntityImportTest {
         assertSame(owningCollaboration.getCollaborationRoles().iterator().next(), owningCollaboration.getActivities().iterator().next().getPerformingRole());
 
         assertEquals(2, owningCollaboration.getFlows().size());
-
-        Collaboration collaboration=new VdmlImporter(getEntityManager()).findCollaboration(MetaBuilder.buildUri(delegatedCapabilityMethod));
-        assertEquals(1, collaboration.getCommencedFlows().size());
-        assertEquals(1, collaboration.getConcludedFlows().size());
-        assertEquals(1, collaboration.getCommencedFlows().iterator().next().getValueAdds().size());
-        assertEquals(1, owningCollaboration.getActivities().iterator().next().getCommencedFlows().size());
-        assertEquals(0, owningCollaboration.getActivities().iterator().next().getCommencedFlows().iterator().next().getValueAdds().size());
-        assertEquals(1, owningCollaboration.getActivities().iterator().next().getConcludedFlows().size());
-        assertEquals(1, owningCollaboration.getActivities().iterator().next().getConcludedFlows().iterator().next().getValueAdds().size());
-        assertEquals(collaboration.getConcludedFlows().iterator().next().getUri(), owningCollaboration.getActivities().iterator().next().getCommencedFlows().iterator().next().getUri());
-        assertEquals(collaboration.getCommencedFlows().iterator().next().getUri(), owningCollaboration.getActivities().iterator().next().getConcludedFlows().iterator().next().getUri());
+        Collaboration collaboration = new VdmlImporter(getEntityManager()).findCollaboration(MetaBuilder.buildUri(delegatedCapabilityMethod));
+        assertEquals(1, collaboration.getOutput().size());
+        assertEquals(1, collaboration.getInput().size());
+        assertEquals(1, collaboration.getOutput().iterator().next().getOutputDelegations().size());
+        assertEquals(1, collaboration.getInput().iterator().next().getDelegatedInputs().size());
+        assertEquals(1, collaboration.getOutput().iterator().next().getValueAdds().size());
+        assertEquals(1, owningCollaboration.getActivities().iterator().next().getOutput().size());
+        assertEquals(1, owningCollaboration.getActivities().iterator().next().getOutput().iterator().next().getDelegatedOutputs().size());
+        assertEquals(0, owningCollaboration.getActivities().iterator().next().getOutput().iterator().next().getValueAdds().size());
+        assertEquals(1, owningCollaboration.getActivities().iterator().next().getInput().size());
+        assertEquals(1, owningCollaboration.getActivities().iterator().next().getInput().iterator().next().getInputDelegations().size());
+        assertEquals(collaboration.getInput().iterator().next().getDelegatedInputs().iterator().next().getUri(), owningCollaboration.getActivities().iterator().next().getInput().iterator().next().getInputDelegations().iterator().next().getUri());
+        assertEquals(collaboration.getOutput().iterator().next().getOutputDelegations().iterator().next().getUri(), owningCollaboration.getActivities().iterator().next().getOutput().iterator().next().getDelegatedOutputs().iterator().next().getUri());
 
     }
 }

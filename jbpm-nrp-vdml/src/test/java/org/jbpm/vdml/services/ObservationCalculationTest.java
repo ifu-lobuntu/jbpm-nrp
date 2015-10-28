@@ -10,7 +10,12 @@ import org.omg.smm.Characteristic;
 import org.omg.vdml.*;
 import org.omg.vdml.Activity;
 import org.omg.vdml.BusinessItemDefinition;
+import org.omg.vdml.DeliverableFlow;
+import org.omg.vdml.OutputPort;
+import org.omg.vdml.ResourceUse;
 import org.omg.vdml.Role;
+import org.omg.vdml.StoreDefinition;
+import org.omg.vdml.SupplyingStore;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
@@ -173,7 +178,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         DeliverableFlowInstance profitFlowObservation = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(profitFlow.getName()));
         assertEquals(316d - 10 - 30, profitFlowObservation.getQuantity().getActualValue(), 0.01d);
         DeliverableFlowInstance featureFlow = projecFound.findDeliverableFlow(projecFound.getCollaboration().findDeliverableFlow(this.featureFlow.getName()));
-        ValueAddMeasurement onTimeDelivery = featureFlow.findValueAdd(featureFlow.getDirectedFlow().findValueAdd("OnTimeDelivery"));
+        ValueAddMeasurement onTimeDelivery = featureFlow.findValueAdd(((org.jbpm.vdml.services.impl.model.meta.DeliverableFlow)featureFlow.getDeliverableFlow()).findValueAdd("OnTimeDelivery"));
         assertEquals(-120d, onTimeDelivery.getActualValue(), 0.01d);
     }
 

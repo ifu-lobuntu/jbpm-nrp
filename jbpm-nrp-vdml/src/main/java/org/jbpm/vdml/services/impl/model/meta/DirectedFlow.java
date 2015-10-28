@@ -18,21 +18,19 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
     private String name;
     @ManyToOne
     private Collaboration owningCollaboration;
-    private String sourceName;
-    private String targetName;
     @ManyToOne
     private Measure quantity;
     @ManyToOne
     private Measure duration;
     @ManyToOne
-    private PortContainer sourcePortContainer;
+    private Port source;
     @ManyToOne
-    private PortContainer targetPortContainer;
+    private Port target;
 
     @ManyToOne
     private BusinessItemDefinition deliverable;
     @ManyToMany
-    private Set<Measure> valueAdds=new HashSet<Measure>();
+    private Set<Measure> measures=new HashSet<Measure>();
     public DirectedFlow() {
     }
 
@@ -46,13 +44,9 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
         return owningCollaboration;
     }
 
-    @Override
-    public Collection<Measure> getMeasures() {
-        return getValueAdds();
-    }
 
-    public Set<Measure> getValueAdds() {
-        return valueAdds;
+    public Set<Measure> getMeasures() {
+        return measures;
     }
 
     public Measure getDuration() {
@@ -84,49 +78,20 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
         return uri;
     }
 
-    public String getSourceName() {
-        return sourceName;
-    }
-
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
-    }
-
-    public String getTargetName() {
-        return targetName;
-    }
-
-    public void setTargetName(String targetName) {
-        this.targetName = targetName;
-    }
-
     public PortContainer getSourcePortContainer() {
-        return sourcePortContainer;
-    }
-
-    public void setSourcePortContainer(PortContainer sourcePortContainer) {
-        if(this.sourcePortContainer!=null){
-            this.sourcePortContainer.getCommencedFlows().remove(this);
-        }
-        this.sourcePortContainer = sourcePortContainer;
-        if(this.sourcePortContainer!=null){
-            this.sourcePortContainer.getCommencedFlows().add(this);
-        }
-
+        return source.getPortContainer();
     }
 
     public PortContainer getTargetPortContainer() {
-        return targetPortContainer;
+        return target.getPortContainer();
     }
 
-    public void setTargetPortContainer(PortContainer targetPortContainer) {
-        if(this.targetPortContainer!=null){
-            this.targetPortContainer.getConcludedFlows().remove(this);
-        }
-        this.targetPortContainer = targetPortContainer;
-        if(this.targetPortContainer!=null){
-            this.targetPortContainer.getConcludedFlows().add(this);
-        }
+    public Port getSource() {
+        return source;
+    }
+
+    public Port getTarget() {
+        return target;
     }
 
     @Override
@@ -143,7 +108,25 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
         return findByName(getMeasures(), name);
     }
 
-    public Measure findValueAdd(String name) {
-        return findByName(getValueAdds(), name);
+    public void setTarget(Port target) {
+        if(this.target!=null){
+            this.target.getInflows().remove(this);
+        }
+        this.target = target;
+
+        if(this.target!=null){
+            this.target.getInflows().add(this);
+        }
+    }
+
+    public void setSource(Port source) {
+        if(this.source!=null){
+            this.source.getOutflows().remove(this);
+        }
+        this.source = source;
+
+        if(this.source!=null){
+            this.source.getOutflows().add(this);
+        }
     }
 }

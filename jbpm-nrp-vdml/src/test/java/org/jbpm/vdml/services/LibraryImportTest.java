@@ -21,7 +21,7 @@ public class LibraryImportTest extends MetaEntityImportTest {
         MeasureLibrary ml=vdm.getMetricsModel().get(0).getLibraries().get(0);
         StoreLibrary sl = vdm.getStoreLibrary().get(0);
         StoreDefinition sd = VDMLFactory.eINSTANCE.createStoreDefinition();
-        sl.getStoreDefinitions().add(sd);
+        sl.getStoreLibraryElement().add(sd);
         sd.setName("SupplyStuffDef");
         addCharacteristics(vdm, sd.getCharacteristicDefinition());
 

@@ -23,14 +23,17 @@
         <class>org.jbpm.vdml.services.impl.model.meta.DirectedFlow</class>
         <class>org.jbpm.vdml.services.impl.model.meta.EnumeratedMeasure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.InputDelegation</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.InputPort</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Measure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Milestone</class>
         <class>org.jbpm.vdml.services.impl.model.meta.NamedMeasure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.OutputDelegation</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.OutputPort</class>
         <class>org.jbpm.vdml.services.impl.model.meta.RescaledMeasure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.ResourceUse</class>
         <class>org.jbpm.vdml.services.impl.model.meta.PoolDefinition</class>
         <class>org.jbpm.vdml.services.impl.model.meta.PortContainer</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.Port</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Role</class>
         <class>org.jbpm.vdml.services.impl.model.meta.StoreDefinition</class>
         <class>org.jbpm.vdml.services.impl.model.meta.SupplyingStore</class>

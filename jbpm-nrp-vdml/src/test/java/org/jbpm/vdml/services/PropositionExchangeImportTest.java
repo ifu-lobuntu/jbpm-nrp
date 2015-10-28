@@ -3,12 +3,18 @@ package org.jbpm.vdml.services;
 
 import org.jbpm.vdml.services.impl.MetaBuilder;
 import org.jbpm.vdml.services.impl.VdmlImporter;
+import org.jbpm.vdml.services.impl.model.meta.*;
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
-import org.jbpm.vdml.services.impl.model.meta.CollectiveMeasure;
-import org.jbpm.vdml.services.impl.model.meta.DirectMeasure;
-import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.junit.Test;
 import org.omg.vdml.*;
+import org.omg.vdml.Activity;
+import org.omg.vdml.BusinessItemDefinition;
+import org.omg.vdml.DeliverableFlow;
+import org.omg.vdml.InputPort;
+import org.omg.vdml.OutputPort;
+import org.omg.vdml.Role;
+import org.omg.vdml.ValueProposition;
+import org.omg.vdml.ValuePropositionComponent;
 
 import java.io.ByteArrayOutputStream;
 
@@ -111,14 +117,14 @@ public class PropositionExchangeImportTest extends MetaEntityImportTest {
 
         assertEquals(1, collaboration.getFlows().size());
         assertEquals("flow", collaboration.getFlows().iterator().next().getName());
-        assertEquals(1, collaboration.getFlows().iterator().next().getValueAdds().size());
+        assertEquals(1, ((org.jbpm.vdml.services.impl.model.meta.OutputPort)collaboration.getFlows().iterator().next().getSource()).getValueAdds().size());
         org.jbpm.vdml.services.impl.model.meta.Role myFoundRole=importer.findRole(MetaBuilder.buildUri(myRole));
         assertEquals(1, myFoundRole.getProvidedValuePropositions().size());
         assertEquals(1, myFoundRole.getProvidedValuePropositions().iterator().next().getComponents().size());
         assertEquals(1, myFoundRole.getProvidedValuePropositions().iterator().next().getComponents().iterator().next().getMeasures().size());
         Measure m = myFoundRole.getProvidedValuePropositions().iterator().next().getComponents().iterator().next().getMeasures().iterator().next();
         CollectiveMeasure cm= (CollectiveMeasure) m;
-        Measure m2 = collaboration.getFlows().iterator().next().getValueAdds().iterator().next();
+        Measure m2 = ((org.jbpm.vdml.services.impl.model.meta.OutputPort)collaboration.getFlows().iterator().next().getSource()).getValueAdds().iterator().next();
         DirectMeasure dm= (DirectMeasure) m2;
         assertEquals(dm.getUri(), cm.getAggregatedMeasures().iterator().next().getUri());
     }

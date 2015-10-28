@@ -37,7 +37,7 @@ public class FindPooledResourceTest extends AbstractPoolExchangeTest {
         org.jbpm.vdml.services.impl.model.meta.Collaboration collaboration = buildDefaultStoreExchange(vdm);
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant consumerParticipant = participantService.createIndividualParticipant("Consumer");
-        EList<StoreDefinition> storeDefs = vdm.getStoreLibrary().get(0).getStoreDefinitions();
+        EList<StoreLibraryElement> storeDefs = vdm.getStoreLibrary().get(0).getStoreLibraryElement();
         List<String> storeDefIds = Arrays.asList(MetaBuilder.buildUri(findByName(storeDefs, "ResourcePool")));
         String tukTukDefinitionId = MetaBuilder.buildUri(findByName(vdm.getBusinessItemLibrary().get(0).getBusinessItemLibraryElement(), "TukTukDefinition"));
         IndividualParticipant supplier1 = createSupplier1(participantService, storeDefIds, tukTukDefinitionId);

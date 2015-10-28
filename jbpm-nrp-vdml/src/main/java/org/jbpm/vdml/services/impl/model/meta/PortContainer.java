@@ -1,10 +1,6 @@
 package org.jbpm.vdml.services.impl.model.meta;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.InheritanceType;
-import javax.persistence.Inheritance;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,10 +11,10 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
     private String uri;
     private String name;
 
-    @OneToMany(mappedBy = "sourcePortContainer")
-    private Set<DirectedFlow> commencedFlows = new HashSet<DirectedFlow>();
-    @OneToMany(mappedBy = "targetPortContainer")
-    private Set<DirectedFlow> concludedFlows = new HashSet<DirectedFlow>();
+    @OneToMany(mappedBy = "portContainer",cascade = CascadeType.ALL)
+    private Set<InputPort> input= new HashSet<InputPort>();
+    @OneToMany(mappedBy = "portContainer",cascade = CascadeType.ALL)
+    private Set<OutputPort> output= new HashSet<OutputPort>();
 
     public PortContainer(String uri) {
         this.uri = uri;
@@ -26,6 +22,14 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
 
 
     protected PortContainer() {
+    }
+
+    public Set<InputPort> getInput() {
+        return input;
+    }
+
+    public Set<OutputPort> getOutput() {
+        return output;
     }
 
     @Override
@@ -36,22 +40,6 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
     @Override
     public String getUri() {
         return uri;
-    }
-
-    public Set<DirectedFlow> getCommencedFlows() {
-        return commencedFlows;
-    }
-
-    public Set<DirectedFlow> getConcludedFlows() {
-        return concludedFlows;
-    }
-
-    public Set<DeliverableFlow> getOutputDeliverableFlows() {
-        return getDeliverableFlowsFrom(getCommencedFlows());
-    }
-
-    public Set<DeliverableFlow> getInputDeliverableFlows() {
-        return getDeliverableFlowsFrom(getConcludedFlows());
     }
 
     protected Set<DeliverableFlow> getDeliverableFlowsFrom(Set<DirectedFlow> source) {

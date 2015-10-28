@@ -232,7 +232,7 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
     protected StoreDefinition createStore(ValueDeliveryModel vdm, BusinessItemDefinition resource, String name) {
         StoreLibrary sl = vdm.getStoreLibrary().get(0);
         StoreDefinition sd = VDMLFactory.eINSTANCE.createStoreDefinition();
-        sl.getStoreDefinitions().add(sd);
+        sl.getStoreLibraryElement().add(sd);
         sd.setName(name);
         sd.setResource(resource);
         return sd;
@@ -241,7 +241,7 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
     protected PoolDefinition createPool(ValueDeliveryModel vdm, BusinessItemDefinition reusableResource, String name) {
         StoreLibrary sl = vdm.getStoreLibrary().get(0);
         PoolDefinition pd = VDMLFactory.eINSTANCE.createPoolDefinition();
-        sl.getStoreDefinitions().add(pd);
+        sl.getStoreLibraryElement().add(pd);
         pd.setName(name);
         pd.setResource(reusableResource);
         return pd;

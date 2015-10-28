@@ -12,9 +12,9 @@ public class ResourceUse implements MetaEntity{
     @ManyToOne
     private Activity activity;
     @ManyToOne
-    private DirectedFlow input;
+    private InputPort input;
     @ManyToOne
-    private DirectedFlow output;
+    private OutputPort output;
     @ManyToOne
     private Measure quantity;
     @ManyToOne
@@ -43,19 +43,19 @@ public class ResourceUse implements MetaEntity{
         return activity;
     }
 
-    public DirectedFlow getInput() {
+    public InputPort getInput() {
         return input;
     }
 
-    public void setInput(DirectedFlow input) {
+    public void setInput(InputPort input) {
         this.input = input;
     }
 
-    public DirectedFlow getOutput() {
+    public OutputPort getOutput() {
         return output;
     }
 
-    public void setOutput(DirectedFlow output) {
+    public void setOutput(OutputPort output) {
         this.output = output;
     }
 

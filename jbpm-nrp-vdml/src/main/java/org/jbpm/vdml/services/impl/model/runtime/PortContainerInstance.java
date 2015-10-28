@@ -1,6 +1,7 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 import org.jbpm.vdml.services.impl.model.meta.DeliverableFlow;
+import org.jbpm.vdml.services.impl.model.meta.Port;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
     private Set<DeliverableFlowInstance> concludedFlow = new HashSet<DeliverableFlowInstance>();
     @OneToMany(mappedBy = "sourcePortContainer")
     private Set<DeliverableFlowInstance> commencedFlow = new HashSet<DeliverableFlowInstance>();
+    @OneToMany(mappedBy = "portContainer")
+    private Set<PortInstance> containedPorts= new HashSet<PortInstance>();
 
     public PortContainerInstance() {
     }
@@ -29,6 +32,27 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
     public Long getId() {
         return id;
     }
+
+    public Set<PortInstance> getContainedPorts() {
+        return containedPorts;
+    }
+    public Set<OutputPortInstance> getOutputPorts(){
+        return findPorts(OutputPortInstance.class);
+    }
+    public Set<InputPortInstance> getInputPorts(){
+        return findPorts(InputPortInstance.class);
+    }
+
+    protected <T extends PortInstance> Set<T> findPorts(Class<T> aClass) {
+        Set<T> result = new HashSet<T>();
+        for (PortInstance port : containedPorts) {
+            if(aClass.isInstance(port)){
+                result.add((T) port);
+            }
+        }
+        return result;
+    }
+
     public Set<DeliverableFlowInstance> getConcludedFlow() {
         return concludedFlow;
     }
@@ -36,7 +60,7 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
     public Set<DeliverableFlowInstance> getInputDeliverableFlows() {
         Set<DeliverableFlowInstance> result = new HashSet<DeliverableFlowInstance>();
         for (DeliverableFlowInstance f : concludedFlow) {
-            if(f.getDirectedFlow() instanceof DeliverableFlow){
+            if(f.getDeliverableFlow() instanceof DeliverableFlow){
                 result.add(f);
             }
         }

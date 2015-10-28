@@ -36,17 +36,19 @@ public class CollaborationService extends AbstractRuntimeService {
         }
         syncRuntimeEntities(observation.getOwnedDirectedFlows(), collaboration.getFlows(), DeliverableFlowInstance.class, observation);
         for (DeliverableFlowInstance dfo : observation.getOwnedDirectedFlows()) {
-            Collection<Measure> measures = new HashSet<Measure>(dfo.getDirectedFlow().getMeasures());
-            if(dfo.getDirectedFlow().getQuantity()!=null){
-                measures.add(dfo.getDirectedFlow().getQuantity());
+            Collection<Measure> measures = new HashSet<Measure>(dfo.getDeliverableFlow().getMeasures());
+            if(dfo.getDeliverableFlow().getQuantity()!=null){
+                measures.add(dfo.getDeliverableFlow().getQuantity());
             }
-            if(dfo.getDirectedFlow().getDuration()!=null){
-                measures.add(dfo.getDirectedFlow().getDuration());
+            if(dfo.getDeliverableFlow().getDuration()!=null){
+                measures.add(dfo.getDeliverableFlow().getDuration());
             }
             syncRuntimeEntities(dfo.getMeasurements(), measures, DeliverableFlowMeasurement.class, dfo);
-            syncRuntimeEntities(dfo.getValueAddMeasurements(), dfo.getDirectedFlow().getValueAdds(), ValueAddMeasurement.class, dfo);
-            if(dfo.getDirectedFlow() instanceof DeliverableFlow){
-                Milestone milestone = ((DeliverableFlow) dfo.getDirectedFlow()).getMilestone();
+            if(dfo.getDeliverableFlow().getSource() instanceof OutputPort){
+                syncRuntimeEntities(dfo.getValueAddMeasurements(), dfo.getDeliverableFlow().getSource().getValueAdds(), ValueAddMeasurement.class, dfo);
+            }
+            if(dfo.getDeliverableFlow() instanceof DeliverableFlow){
+                Milestone milestone = dfo.getDeliverableFlow().getMilestone();
                 if(milestone!=null){
                     dfo.setMilestone(observation.findMilestone(milestone));
                 }
@@ -90,14 +92,15 @@ public class CollaborationService extends AbstractRuntimeService {
         Activity a = entityManager.find(Activity.class, activityId);
         ActivityInstance ao = new ActivityInstance(a, co);
         entityManager.persist(ao);
-        for (DirectedFlow flow : a.getConcludedFlows()) {
-            new DeliverableFlowInstance(flow, co, co.findPortContainer(flow.getSourcePortContainer()), ao);
-        }
-        for (DirectedFlow flow : a.getCommencedFlows()) {
-            new DeliverableFlowInstance(flow, co, ao, co.findPortContainer(flow.getTargetPortContainer()));
-        }
-        entityManager.flush();
-        return ao;
+        throw new RuntimeException();
+//        for (DirectedFlow flow : a.getConcludedFlows()) {
+//            new DeliverableFlowInstance(flow, co, co.findPortContainer(flow.getSourcePortContainer()), ao);
+//        }
+//        for (DirectedFlow flow : a.getCommencedFlows()) {
+//            new DeliverableFlowInstance(flow, co, ao, co.findPortContainer(flow.getTargetPortContainer()));
+//        }
+//        entityManager.flush();
+//        return ao;
     }
 
     public void commitToActivity(Long collaborationId, String activityName) {

@@ -26,7 +26,7 @@ public class CollaborationImportTest extends MetaEntityImportTest {
 
         StoreLibrary sl = vdm.getStoreLibrary().get(0);
         StoreDefinition sd = VDMLFactory.eINSTANCE.createStoreDefinition();
-        sl.getStoreDefinitions().add(sd);
+        sl.getStoreLibraryElement().add(sd);
         sd.setName("SupplyStuffDef");
 
         CapabilityLibrary cl = vdm.getCapabilitylibrary().get(0);
@@ -92,8 +92,8 @@ public class CollaborationImportTest extends MetaEntityImportTest {
         assertEquals("GoWithTheFlow", collaboration.getFlows().iterator().next().getName());
         assertSame(collaboration.getActivities().iterator().next(), collaboration.getFlows().iterator().next().getSourcePortContainer());
         assertSame(collaboration.getSupplyingStores().iterator().next(), collaboration.getFlows().iterator().next().getTargetPortContainer());
-        assertEquals("from", collaboration.getFlows().iterator().next().getSourceName());
-        assertEquals("to", collaboration.getFlows().iterator().next().getTargetName());
+        assertEquals("from", collaboration.getFlows().iterator().next().getSource().getName());
+        assertEquals("to", collaboration.getFlows().iterator().next().getTarget().getName());
 
     }
     @Test
@@ -103,7 +103,7 @@ public class CollaborationImportTest extends MetaEntityImportTest {
         StoreLibrary sl = VDMLFactory.eINSTANCE.createStoreLibrary();
         vdm.getStoreLibrary().add(sl);
         StoreDefinition sd = VDMLFactory.eINSTANCE.createStoreDefinition();
-        sl.getStoreDefinitions().add(sd);
+        sl.getStoreLibraryElement().add(sd);
         sd.setName("SupplyStuffDef");
 
         CapabilityLibrary cl = VDMLFactory.eINSTANCE.createCapabilityLibrary();
@@ -177,7 +177,7 @@ public class CollaborationImportTest extends MetaEntityImportTest {
         assertEquals(1, collaboration.getActivities().size());
         assertEquals("DoStuff", collaboration.getActivities().iterator().next().getName());
         assertEquals(1, collaboration.getActivities().iterator().next().getResourceUses().size());
-        assertSame(collaboration.getActivities().iterator().next().getConcludedFlows().iterator().next(), collaboration.getActivities().iterator().next().getResourceUses().iterator().next().getInput());
-        assertSame(collaboration.getActivities().iterator().next().getCommencedFlows().iterator().next(), collaboration.getActivities().iterator().next().getResourceUses().iterator().next().getOutput());
+        assertSame(collaboration.getActivities().iterator().next().getInput().iterator().next(), collaboration.getActivities().iterator().next().getResourceUses().iterator().next().getInput());
+        assertSame(collaboration.getActivities().iterator().next().getOutput().iterator().next(), collaboration.getActivities().iterator().next().getResourceUses().iterator().next().getOutput());
     }
 }

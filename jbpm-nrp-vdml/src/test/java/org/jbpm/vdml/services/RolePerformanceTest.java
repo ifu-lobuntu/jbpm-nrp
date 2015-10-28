@@ -6,6 +6,11 @@ import org.junit.Test;
 import org.omg.smm.Accumulator;
 import org.omg.smm.Characteristic;
 import org.omg.vdml.*;
+import org.omg.vdml.Activity;
+import org.omg.vdml.DeliverableFlow;
+import org.omg.vdml.Role;
+import org.omg.vdml.ValueProposition;
+import org.omg.vdml.ValuePropositionComponent;
 import test.TestGradeMeasure;
 
 import java.io.ByteArrayOutputStream;
@@ -126,8 +131,8 @@ public class RolePerformanceTest extends MetaEntityImportTest{
         CollaborationInstance project = projectService.initiateProject(producerParticipant.getId(), MetaBuilder.buildUri(cm));
         projectService.assignParticipantToRole(consumerParticipant.getId(), project.getId(), MetaBuilder.buildUri(consumer));
         DeliverableFlowInstance fo = project.findDeliverableFlow(project.getCollaboration().findDeliverableFlow(flow.getName()));
-        fo.findValueAdd(fo.getDirectedFlow().findValueAdd("TestGradeMeasure")).setActualRating(rating);
-        fo.findValueAdd(fo.getDirectedFlow().findValueAdd("Size")).setActualValue(s);
+        fo.findValueAdd(((org.jbpm.vdml.services.impl.model.meta.DeliverableFlow) fo.getDeliverableFlow()).findValueAdd("TestGradeMeasure")).setActualRating(rating);
+        fo.findValueAdd(((org.jbpm.vdml.services.impl.model.meta.DeliverableFlow)fo.getDeliverableFlow()).findValueAdd("Size")).setActualValue(s);
         projectService.flush();
     }
 

@@ -28,7 +28,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant consumerParticipant = participantService.createIndividualParticipant("Consumer");
         IndividualParticipant supplierParticipant = participantService.createIndividualParticipant("StoreOwner");
-        EList<StoreDefinition> storeDefs = vdm.getStoreLibrary().get(0).getStoreDefinitions();
+        EList<StoreLibraryElement> storeDefs = vdm.getStoreLibrary().get(0).getStoreLibraryElement();
 
         participantService.setStores(supplierParticipant.getId(), Arrays.asList(MetaBuilder.buildUri(findByName(storeDefs, "ProductStore"))));
         ExchangeService exchangeService = new ExchangeService(getEntityManager());
@@ -100,7 +100,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant consumerParticipant = participantService.createIndividualParticipant("Consumer");
         IndividualParticipant supplierParticipant = participantService.createIndividualParticipant("StoreOwner");
-        EList<StoreDefinition> storeDefs = vdm.getStoreLibrary().get(0).getStoreDefinitions();
+        EList<StoreLibraryElement> storeDefs = vdm.getStoreLibrary().get(0).getStoreLibraryElement();
 
         participantService.setStores(supplierParticipant.getId(), Arrays.asList(MetaBuilder.buildUri(findByName(storeDefs, "ProductStore"))));
         ExchangeService exchangeService = new ExchangeService(getEntityManager());
