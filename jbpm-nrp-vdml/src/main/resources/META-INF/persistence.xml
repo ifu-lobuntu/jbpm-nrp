@@ -15,6 +15,7 @@
         <class>org.jbpm.vdml.services.impl.model.meta.BinaryMeasure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.BusinessItemDefinition</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Capability</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.CapabilityMethod</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Collaboration</class>
         <class>org.jbpm.vdml.services.impl.model.meta.CollectiveMeasure</class>
         <class>org.jbpm.vdml.services.impl.model.meta.CountingMeasure</class>
@@ -35,9 +36,14 @@
         <class>org.jbpm.vdml.services.impl.model.meta.PortContainer</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Port</class>
         <class>org.jbpm.vdml.services.impl.model.meta.Role</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.RoleInCapabilityMethod</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.RoleInNetwork</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.RoleMapping</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.RoleResource</class>
         <class>org.jbpm.vdml.services.impl.model.meta.StoreDefinition</class>
         <class>org.jbpm.vdml.services.impl.model.meta.SupplyingStore</class>
         <class>org.jbpm.vdml.services.impl.model.meta.ValueAdd</class>
+        <class>org.jbpm.vdml.services.impl.model.meta.ValueNetwork</class>
         <class>org.jbpm.vdml.services.impl.model.meta.ValueProposition</class>
         <class>org.jbpm.vdml.services.impl.model.meta.ValuePropositionComponent</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ActivityMeasurement</class>
@@ -74,9 +80,10 @@
         <class>org.jbpm.vdml.services.impl.model.runtime.TrustRelationshipComponent</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.TrustRelationship</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValueAddInstance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValueAddInstanceMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValueElementInstance</class>
-        <class>org.jbpm.vdml.services.impl.model.runtime.ValueElementInstanceMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentInstance</class>
+        <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentInstanceMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionInstance</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentPerformanceMeasurement</class>
         <class>org.jbpm.vdml.services.impl.model.runtime.ValuePropositionComponentPerformance</class>

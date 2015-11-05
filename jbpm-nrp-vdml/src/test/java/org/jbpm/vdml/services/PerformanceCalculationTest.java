@@ -29,7 +29,9 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         this.cm = VDMLFactory.eINSTANCE.createCapabilityMethod();
         vdm.getCollaboration().add(cm);
         cm.setName("DoStuffs");
-        Activity activity = addActivity(codeUserStory, cm, createRole(cm, "Developer"), "CodeUserStory");
+        OrgUnit valueNetwork=createValueNetwork(vdm, "TheValueNetwork");
+
+        Activity activity = addActivity(codeUserStory, cm, createRole(cm,valueNetwork, "Developer"), "CodeUserStory");
         Characteristic duration = buildNamedMeasure(vdm, "Duration");
         cm.setInitialActivity(activity);
         Characteristic quality = buildTheGradeMeasure(vdm);
@@ -80,12 +82,13 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         StoreDefinition freshProduceStore = createStore(vdm, freshProduce, "FreshProduceStore");
         CapabilityDefinition orderFreshProduce=createCapabilityDefinition(vdm, "OrderFreshProduce");
         CapabilityDefinition supplyFreshProduce=createCapabilityDefinition(vdm, "SupplyFreshProduce");
+        OrgUnit valueNetwork=createValueNetwork(vdm, "TheValueNetwork");
         this.cm = VDMLFactory.eINSTANCE.createCapabilityMethod();
         vdm.getCollaboration().add(cm);
         cm.setName("DoStuffs");
-        Activity orderFreshProduceActivity=addActivity(orderFreshProduce, cm, createRole(cm, "Consumer"), "OrderFreshProduce");
+        Activity orderFreshProduceActivity=addActivity(orderFreshProduce, cm, createRole(cm,valueNetwork, "Consumer"), "OrderFreshProduce");
         cm.setInitialActivity(orderFreshProduceActivity);
-        Role farmer = createRole(cm, "Farmer");
+        Role farmer = createRole(cm, valueNetwork,"Farmer");
         SupplyingStore supplyingFreshProduceStore = addSupplyingStore(cm, freshProduceStore, farmer, "SupplyFreshProduce", "InventoryLevel");
         Characteristic lateness = buildDirectMeasure(vdm, "Lateness");//Usually derived from outgoing flows
         Characteristic quality = buildTheGradeMeasure(vdm);//Usually derived from outgoing businessItems
@@ -141,9 +144,10 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         this.cm = VDMLFactory.eINSTANCE.createCapabilityMethod();
         vdm.getCollaboration().add(cm);
         cm.setName("DoStuffs");
-        Activity orderFreshProduceActivity=addActivity(orderTukTuk, cm, createRole(cm, "Consumer"), "OrderFreshProduce");
+        OrgUnit valueNetwork=createValueNetwork(vdm, "TheValueNetwork");
+        Activity orderFreshProduceActivity=addActivity(orderTukTuk, cm, createRole(cm,valueNetwork, "Consumer"), "OrderFreshProduce");
         cm.setInitialActivity(orderFreshProduceActivity);
-        addSupplyingPool(cm, tukTukFleet, createRole(cm, "TukTukProvider"),"TukTukFleet","NumberOfTukTuks" );
+        addSupplyingPool(cm, tukTukFleet, createRole(cm,valueNetwork, "TukTukProvider"),"TukTukFleet","NumberOfTukTuks" );
         addBusinessItem(tukTuk, cm);
         Characteristic lateness = buildDirectMeasure(vdm, "Lateness");//Usually derived from outgoing flows
         Characteristic quality = buildTheGradeMeasure(vdm);//Usually derived from outgoing businessItems

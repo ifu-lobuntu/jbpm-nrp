@@ -24,7 +24,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
     @Test
     public void testExchange() throws Exception{
         ValueDeliveryModel vdm = buildModel();
-        org.jbpm.vdml.services.impl.model.meta.Collaboration collaboration = buildDefaultStoreExchange(vdm);
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration = buildDefaultStoreExchange(vdm);
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant consumerParticipant = participantService.createIndividualParticipant("Consumer");
         IndividualParticipant supplierParticipant = participantService.createIndividualParticipant("StoreOwner");
@@ -44,15 +44,15 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         assertNotNull(exchange.findRole(collaboration.findRole("Consumer")));
         assertNotNull(exchange.findRole(collaboration.findRole("Provider")));
         assertEquals(3, exchange.getSupplyingStores().size());
-        assertNotNull(exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")));
-        assertNotNull(exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")));
-        assertNotNull(exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")));
+        assertNotNull(exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("FromAccount")));
+        assertNotNull(exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ToAccount")));
+        assertNotNull(exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ProductStore")));
 
         assertEquals(consumerParticipant.getId(), exchange.findRole(collaboration.findRole("Consumer")).getParticipant().getId());
         assertEquals(supplierParticipant.getId(), exchange.findRole(collaboration.findRole("Provider")).getParticipant().getId());
-        assertEquals(consumerParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().getOwner().getId());
-        assertEquals(supplierParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().getOwner().getId());
-        assertEquals(supplierParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().getOwner().getId());
+        assertEquals(consumerParticipant.getId(), exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().getOwner().getId());
+        assertEquals(supplierParticipant.getId(), exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().getOwner().getId());
+        assertEquals(supplierParticipant.getId(), exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().getOwner().getId());
         assertEquals(consumerParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("Request")).getCapabilityOffer().getParticipant().getId());
         assertEquals(supplierParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("Provide")).getCapabilityOffer().getParticipant().getId());
         assertEquals(consumerParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("Receive")).getCapabilityOffer().getParticipant().getId());
@@ -64,9 +64,9 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         new ExchangeService(getEntityManager()).commitToExchange(exchangeId);
         //THEN
         CollaborationInstance exchange=new ExchangeService(getEntityManager()).findExchange(exchangeId);
-        StorePerformance fromAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
-        StorePerformance toAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
-        StorePerformance fromStore = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ProductStore")).getStore();
+        StorePerformance fromAccount = exchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
+        StorePerformance toAccount = exchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
+        StorePerformance fromStore = exchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("ProductStore")).getStore();
         assertEquals(1000d, fromAccount.getInventoryLevel(),0.01);
         assertEquals(900d, fromAccount.getProjectedInventoryLevel(),0.01);
         assertEquals(2000d, toAccount.getInventoryLevel(),0.01);
@@ -83,9 +83,9 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         exchangeService.fulfillExchange(exchangeId);
         //THEN
         CollaborationInstance exchange=new ExchangeService(getEntityManager()).findExchange(exchangeId);
-        StorePerformance fromAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
-        StorePerformance toAccount = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
-        StorePerformance fromStore = exchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ProductStore")).getStore();
+        StorePerformance fromAccount = exchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
+        StorePerformance toAccount = exchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
+        StorePerformance fromStore = exchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("ProductStore")).getStore();
         assertEquals(900d, fromAccount.getInventoryLevel(),0.01);
         assertEquals(900d, fromAccount.getProjectedInventoryLevel(),0.01);
         assertEquals(2100d, toAccount.getInventoryLevel(), 0.01);
@@ -96,7 +96,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
 
     protected Long startExchangeAndProvideQuantities() throws IOException {
         ValueDeliveryModel vdm = buildModel();
-        org.jbpm.vdml.services.impl.model.meta.Collaboration collaboration = buildDefaultStoreExchange(vdm);
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration = buildDefaultStoreExchange(vdm);
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant consumerParticipant = participantService.createIndividualParticipant("Consumer");
         IndividualParticipant supplierParticipant = participantService.createIndividualParticipant("StoreOwner");
@@ -105,12 +105,12 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         participantService.setStores(supplierParticipant.getId(), Arrays.asList(MetaBuilder.buildUri(findByName(storeDefs, "ProductStore"))));
         ExchangeService exchangeService = new ExchangeService(getEntityManager());
         CollaborationInstance exchange = exchangeService.startExchangeForProduct(consumerParticipant.getId(), supplierParticipant.getOfferedStores().iterator().next().getId());
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setProjectedInventoryLevel(1000d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setProjectedInventoryLevel(2000d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setInventoryLevel(1000d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setProjectedInventoryLevel(100d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setInventoryLevel(100d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setProjectedInventoryLevel(1000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setProjectedInventoryLevel(2000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setInventoryLevel(1000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setProjectedInventoryLevel(100d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().setInventoryLevel(100d);
         for (DeliverableFlowInstance flow : exchange.getOwnedDirectedFlows()) {
             if(flow.getDeliverable().getDefinition().getName().equals("Money")){
                 flow.getQuantity().setActualValue(100d);
@@ -122,7 +122,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         return exchange.getId();
     }
 
-    protected org.jbpm.vdml.services.impl.model.meta.Collaboration buildDefaultStoreExchange(ValueDeliveryModel vdm) throws IOException {
+    protected org.jbpm.vdml.services.impl.model.meta.CapabilityMethod buildDefaultStoreExchange(ValueDeliveryModel vdm) throws IOException {
         BusinessItemDefinition money = createBusinessItemDefinition(vdm, "Money");
 
 
@@ -149,10 +149,10 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         BusinessItem productBusinessItem = addBusinessItem(productDefinition, cp);
         BusinessItem orderBusinessItem = addBusinessItem(orderDefinition, cp);
         BusinessItem moneyBusinessItem = addBusinessItem(money, cp);
+        OrgUnit network=createValueNetwork(vdm, "Newtokr");
+        Role storeOwner = createRole(cp,network, "Provider");
 
-        Role storeOwner = createRole(cp, "Provider");
-
-        Role consumer = createRole(cp, "Consumer");
+        Role consumer = createRole(cp, network,"Consumer");
 
         SupplyingStore fromAccount = addSupplyingStore(cp, account, consumer, "FromAccount", "amount");
 
@@ -186,7 +186,7 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         VdmlImporter vi = new VdmlImporter(getEntityManager());
         vi.buildModel(DEFAULT_DEPLOYMENT_ID, vdm);
         org.jbpm.vdml.services.impl.model.meta.Collaboration collaboration = vi.buildCollaboration(DEFAULT_DEPLOYMENT_ID, cp);
-        return collaboration;
+        return (org.jbpm.vdml.services.impl.model.meta.CapabilityMethod) collaboration;
     }
 
 

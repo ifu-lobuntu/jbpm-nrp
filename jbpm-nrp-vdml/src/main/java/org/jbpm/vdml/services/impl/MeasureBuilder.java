@@ -65,10 +65,12 @@ public class MeasureBuilder extends MetaBuilder {
                 CountingMeasure cm = new CountingMeasure();
                 org.omg.smm.Measure countedMeasure = source.getCountedMeasureTo().getToCountedMeasure();
                 cm.setMeasureToCount(buildReference(countedMeasure));
-                if (countedMeasure instanceof RankingMeasure || countedMeasure instanceof GradeMeasure) {
-                    cm.setValuesToCount(source.getOperation().getBody().replaceAll("\\bvalue\\b", "actualRating"));
-                } else {
-                    cm.setValuesToCount(source.getOperation().getBody().replaceAll("\\bvalue\\b", "actualValue"));
+                if (source.getOperation() != null) {
+                    if (countedMeasure instanceof RankingMeasure || countedMeasure instanceof GradeMeasure) {
+                        cm.setValuesToCount(source.getOperation().getBody().replaceAll("\\bvalue\\b", "actualRating"));
+                    } else {
+                        cm.setValuesToCount(source.getOperation().getBody().replaceAll("\\bvalue\\b", "actualValue"));
+                    }
                 }
                 result = cm;
             } else if (measure instanceof org.omg.smm.DirectMeasure) {
@@ -109,7 +111,7 @@ public class MeasureBuilder extends MetaBuilder {
             }
             result.setName(measure.getName());
             result.setUri(buildUri(measure));
-            System.out.println("Measure [" + measure.eClass().getName() +"]:"+measure.getName() +" (" + result.getUri()+")");
+            System.out.println("Measure [" + measure.eClass().getName() + "]:" + measure.getName() + " (" + result.getUri() + ")");
             entityManager.persist(result);
         }
         return result;

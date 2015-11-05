@@ -4,13 +4,16 @@ import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.meta.ValueElement;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
+
 @Entity
-@DiscriminatorColumn(name="type")
+@DiscriminatorColumn(name="type",length = 40)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class ValueElementInstance implements RuntimeEntity {
+public abstract class ValueElementInstance implements RuntimeEntity {
     @ManyToOne
     private ValueElement valueElement;
     @ManyToMany
@@ -23,8 +26,7 @@ public class ValueElementInstance implements RuntimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToMany(mappedBy = "valueElement",cascade = CascadeType.ALL)
-    private Set<ValueElementInstanceMeasurement> measurements=new HashSet<ValueElementInstanceMeasurement>();
+
     public ValueElementInstance(ValueElement valueElement) {
         this.valueElement = valueElement;
     }
@@ -42,7 +44,6 @@ public class ValueElementInstance implements RuntimeEntity {
         return valueElement;
     }
 
-
     public ValueElement getValueElement() {
         return valueElement;
     }
@@ -55,7 +56,5 @@ public class ValueElementInstance implements RuntimeEntity {
         return aggregatedTo;
     }
 
-    public Set<ValueElementInstanceMeasurement> getMeasurements() {
-        return measurements;
-    }
+    public abstract Collection<? extends Measurement> getMeasurements();
 }

@@ -1,9 +1,6 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
-import org.jbpm.vdml.services.impl.model.meta.Collaboration;
-import org.jbpm.vdml.services.impl.model.meta.Milestone;
-import org.jbpm.vdml.services.impl.model.meta.ResourceUse;
-import org.jbpm.vdml.services.impl.model.meta.Role;
+import org.jbpm.vdml.services.impl.model.meta.*;
 
 import javax.persistence.*;
 import java.util.concurrent.TimeUnit;
@@ -14,9 +11,9 @@ public class ExchangeConfiguration {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @ManyToOne
-    private Collaboration collaborationToUse;
+    private CapabilityMethod collaborationToUse;
     @ManyToOne
-    private Role supplierRole;
+    private RoleInCapabilityMethod supplierRole;
     @ManyToOne
     private Milestone exchangeMilestone;
     @ManyToOne
@@ -27,11 +24,11 @@ public class ExchangeConfiguration {
         return id;
     }
 
-    public Collaboration getCollaborationToUse() {
+    public CapabilityMethod getCollaborationToUse() {
         return collaborationToUse;
     }
 
-    public void setCollaborationToUse(Collaboration collaborationToUse) {
+    public void setCollaborationToUse(CapabilityMethod collaborationToUse) {
         this.collaborationToUse = collaborationToUse;
     }
 
@@ -51,11 +48,11 @@ public class ExchangeConfiguration {
         this.poolBooking = poolBooking;
     }
 
-    public Role getSupplierRole() {
+    public RoleInCapabilityMethod getSupplierRole() {
         return supplierRole;
     }
 
-    public void setSupplierRole(Role supplierRole) {
+    public void setSupplierRole(RoleInCapabilityMethod supplierRole) {
         this.supplierRole = supplierRole;
     }
 

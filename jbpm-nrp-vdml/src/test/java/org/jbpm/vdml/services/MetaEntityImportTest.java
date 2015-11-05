@@ -158,7 +158,7 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         return addToLibrary(l, collectiveMeasure);
     }
 
-    protected Characteristic buildBinaryMeasure(ValueDeliveryModel l,String name, Characteristic a, Characteristic b, BinaryFunctor functor) {
+    protected Characteristic buildBinaryMeasure(ValueDeliveryModel l, String name, Characteristic a, Characteristic b, BinaryFunctor functor) {
         BinaryMeasure binaryMeasure = SMMFactory.eINSTANCE.createBinaryMeasure();
         binaryMeasure.setName(name);
         binaryMeasure.setFunctor(functor);
@@ -172,13 +172,15 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         base2.setToDimensionalMeasure((DimensionalMeasure) b.getMeasure().get(0));
         return addToLibrary(l, binaryMeasure);
     }
+
     protected void addCharacteristics(EList<Characteristic> characteristicDefinition, Characteristic... source) {
         for (Characteristic characteristic : source) {
             characteristicDefinition.add(characteristic);
         }
     }
-    protected Characteristic buildRescaledMeasure(ValueDeliveryModel l,String name, Characteristic a, double offset, double multiplier) {
-        RescaledMeasure rescaledMeasure= SMMFactory.eINSTANCE.createRescaledMeasure();
+
+    protected Characteristic buildRescaledMeasure(ValueDeliveryModel l, String name, Characteristic a, double offset, double multiplier) {
+        RescaledMeasure rescaledMeasure = SMMFactory.eINSTANCE.createRescaledMeasure();
         rescaledMeasure.setName(name);
         rescaledMeasure.setOffset(offset);
         rescaledMeasure.setMultiplier(multiplier);
@@ -191,13 +193,16 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         rescaledMeasure.setOffset(offset);
         return addToLibrary(l, rescaledMeasure);
     }
-    protected Characteristic buildCountingMeasure(ValueDeliveryModel l,String name, Characteristic a, String matchOperation){
+
+    protected Characteristic buildCountingMeasure(ValueDeliveryModel l, String name, Characteristic a, String matchOperation) {
         CountingMeasure countingMeasure = SMMFactory.eINSTANCE.createCountingMeasure();
         countingMeasure.setName(name);
-        Operation operation = SMMFactory.eINSTANCE.createOperation();
-        countingMeasure.setOperation(operation);
-        countingMeasure.getOperation().setBody(matchOperation);
-        l.getMetricsModel().get(0).getLibraries().get(0).getMeasureElements().add(operation);
+        if (matchOperation != null) {
+            Operation operation = SMMFactory.eINSTANCE.createOperation();
+            countingMeasure.setOperation(operation);
+            countingMeasure.getOperation().setBody(matchOperation);
+            l.getMetricsModel().get(0).getLibraries().get(0).getMeasureElements().add(operation);
+        }
         CountingMeasureRelationship countingMeasureRelationship = SMMFactory.eINSTANCE.createCountingMeasureRelationship();
         countingMeasure.setCountedMeasureTo(countingMeasureRelationship);
         countingMeasureRelationship.setToCountedMeasure(a.getMeasure().get(0));
@@ -221,11 +226,23 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         return requestProduct;
     }
 
-    protected Role createRole(CapabilityMethod cp, String name) {
-        Role consumer = VDMLFactory.eINSTANCE.createPerformer();
-        cp.getCollaborationRole().add(consumer);
-        consumer.setName(name);
-        return consumer;
+    protected Performer createRole(CapabilityMethod cp, OrgUnit network, String name) {
+        Performer capabilityMethodRole = createRole(cp, name);
+        Role networkRole = VDMLFactory.eINSTANCE.createPosition();
+        network.getCollaborationRole().add(networkRole);
+        networkRole.setName(name);
+        Assignment assignment = VDMLFactory.eINSTANCE.createAssignment();
+        assignment.setAssignedRole(capabilityMethodRole);
+        assignment.setParticipant(networkRole);
+        cp.getOwnedAssignment().add(assignment);
+        return capabilityMethodRole;
+    }
+
+    protected Performer createRole(CapabilityMethod cp, String name) {
+        Performer capabilityMethodRole = VDMLFactory.eINSTANCE.createPerformer();
+        cp.getCollaborationRole().add(capabilityMethodRole);
+        capabilityMethodRole.setName(name);
+        return capabilityMethodRole;
     }
 
     protected CapabilityDefinition createCapabilityDefinition(ValueDeliveryModel vdm, String s) {
@@ -263,12 +280,14 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         Characteristic characteristic = addToLibrary(l, directMeasure1);
         return characteristic;
     }
+
     protected Characteristic buildNamedMeasure(ValueDeliveryModel l, String name) {
         NamedMeasure result = SMMFactory.eINSTANCE.createNamedMeasure();
         result.setName(name);
         Characteristic characteristic = addToLibrary(l, result);
         return characteristic;
     }
+
     protected Characteristic buildTheGradeMeasure(ValueDeliveryModel l) {
         GradeMeasure result = SMMFactory.eINSTANCE.createGradeMeasure();
         result.setName("TestGradeMeasure");
@@ -365,8 +384,15 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         workBusinessItem.setName(workDefinition.getName());
         return workBusinessItem;
     }
+
     protected CapabilityMethod createCapabilityMethod(ValueDeliveryModel vdm, String name) {
-        CapabilityMethod cm= VDMLFactory.eINSTANCE.createCapabilityMethod();
+        CapabilityMethod cm = VDMLFactory.eINSTANCE.createCapabilityMethod();
+        cm.setName(name);
+        vdm.getCollaboration().add(cm);
+        return cm;
+    }
+    protected OrgUnit createValueNetwork(ValueDeliveryModel vdm, String name) {
+        OrgUnit cm = VDMLFactory.eINSTANCE.createOrgUnit();
         cm.setName(name);
         vdm.getCollaboration().add(cm);
         return cm;
@@ -391,8 +417,9 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         vp.getComponent().add(component);
         return component;
     }
+
     protected ValueProposition addValueProposition(Role provider, Role recipient, String name) {
-        ValueProposition vp= VDMLFactory.eINSTANCE.createValueProposition();
+        ValueProposition vp = VDMLFactory.eINSTANCE.createValueProposition();
         vp.setName(name);
         provider.getProvidedProposition().add(vp);
         vp.setRecipient(recipient);

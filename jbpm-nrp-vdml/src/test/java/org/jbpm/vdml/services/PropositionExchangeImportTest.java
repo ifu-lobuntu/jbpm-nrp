@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.omg.vdml.*;
 import org.omg.vdml.Activity;
 import org.omg.vdml.BusinessItemDefinition;
+import org.omg.vdml.CapabilityMethod;
 import org.omg.vdml.DeliverableFlow;
 import org.omg.vdml.InputPort;
 import org.omg.vdml.OutputPort;
@@ -106,7 +107,7 @@ public class PropositionExchangeImportTest extends MetaEntityImportTest {
         //When
         VdmlImporter importer = new VdmlImporter(getEntityManager());
         importer.buildCollaboration(DEFAULT_DEPLOYMENT_ID, cp);
-        Collaboration collaboration= importer.findCollaboration(MetaBuilder.buildUri(cp));
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration= (org.jbpm.vdml.services.impl.model.meta.CapabilityMethod) importer.findCollaboration(MetaBuilder.buildUri(cp));
 
         //Then
         //THEN

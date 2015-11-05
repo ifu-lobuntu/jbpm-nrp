@@ -2,12 +2,15 @@ package org.jbpm.vdml.services;
 
 
 import org.jbpm.vdml.services.impl.VdmlImporter;
+import org.jbpm.vdml.services.impl.model.meta.*;
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
 import org.junit.Test;
 import org.omg.vdml.*;
 import org.omg.vdml.Activity;
+import org.omg.vdml.CapabilityMethod;
 import org.omg.vdml.DeliverableFlow;
 import org.omg.vdml.InputDelegation;
+import org.omg.vdml.InputPort;
 import org.omg.vdml.ResourceUse;
 import org.omg.vdml.Role;
 import org.omg.vdml.StoreDefinition;
@@ -69,7 +72,7 @@ public class CollaborationImportTest extends MetaEntityImportTest {
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);
         //WHEN
-        Collaboration collaboration = new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cp);
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration = (org.jbpm.vdml.services.impl.model.meta.CapabilityMethod) new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cp);
         //THEN
         assertEquals(cp.getName(), collaboration.getName());
         assertEquals(1, collaboration.getCollaborationRoles().size());
@@ -170,7 +173,7 @@ public class CollaborationImportTest extends MetaEntityImportTest {
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);
         //WHEN
-        Collaboration collaboration = new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cp);
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration = (org.jbpm.vdml.services.impl.model.meta.CapabilityMethod) new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cp);
         //THEN
         assertEquals(cp.getName(), collaboration.getName());
 

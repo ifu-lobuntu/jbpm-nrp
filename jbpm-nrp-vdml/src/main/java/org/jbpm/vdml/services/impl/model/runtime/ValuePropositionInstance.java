@@ -16,7 +16,7 @@ public class ValuePropositionInstance implements ActivatableRuntimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private boolean active;
+    private boolean active=true;
     @ManyToOne
     private ValueProposition valueProposition;
     @ManyToOne

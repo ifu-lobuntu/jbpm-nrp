@@ -59,6 +59,7 @@ public class ObservationCalculationService extends AbstractCalculationService {
             for (ValueElementInstance vei : c.getAggregatedFrom()) {
                 oc.putAll(vei.getMeasurements());
             }
+            oc.putAll(c.getMeasurements());
             super.resolveAllMeasurements(deploymentId, oc);
         }
     }

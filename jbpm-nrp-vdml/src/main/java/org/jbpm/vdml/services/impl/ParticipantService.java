@@ -47,7 +47,7 @@ public class ParticipantService extends AbstractRuntimeService {
     }
 
     public void setRoles(Long participantId, Collection<String> roleIds) {
-        Collection<Role> storeDefinitions = entityManager.createQuery("select c from Role c where c.uri in :roleIds").setParameter("roleIds", roleIds).getResultList();
+        Collection<RoleInNetwork> storeDefinitions = entityManager.createQuery("select c from RoleInNetwork c where c.uri in :roleIds").setParameter("roleIds", roleIds).getResultList();
         Participant participant = entityManager.find(Participant.class, participantId);
         syncRuntimeEntities(participant.getRolePerformances(), storeDefinitions, RolePerformance.class, participant);
         for (RolePerformance cp : participant.getRolePerformances()) {

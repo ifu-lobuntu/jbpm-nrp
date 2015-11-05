@@ -25,7 +25,7 @@ public class CollaborationService extends AbstractRuntimeService {
         this.assignmentService = new AssignmentService(entityManager);
     }
 
-    public CollaborationInstance startCollaboration(Collaboration collaboration, Collection<RolePerformance> rolePerformances) {
+    public CollaborationInstance startCollaboration(CapabilityMethod collaboration, Collection<RolePerformance> rolePerformances) {
         CollaborationInstance observation = new CollaborationInstance(collaboration);
         entityManager.persist(observation);
         syncRuntimeEntities(observation.getMilestones(), collaboration.getMilestones(), MilestoneInstance.class, observation);
@@ -82,7 +82,7 @@ public class CollaborationService extends AbstractRuntimeService {
                 syncRuntimeEntities(opi.getMeasurements(), port.getMeasures(), PortMeasurement.class, opi, port.getBatchSize());
                 syncRuntimeEntities(opi.getValueAdds(), ((OutputPort) port).getValueAdds(), ValueAddInstance.class, opi);
                 for (ValueAddInstance valueAddInstance : opi.getValueAdds()) {
-                    syncRuntimeEntities(valueAddInstance.getMeasurements(),valueAddInstance.getValueAdd().getMeasures(), ValueElementInstanceMeasurement.class,valueAddInstance, valueAddInstance.getValueAdd().getValueMeasure());
+                    syncRuntimeEntities(valueAddInstance.getMeasurements(),valueAddInstance.getValueAdd().getMeasures(), ValueAddInstanceMeasurement.class,valueAddInstance, valueAddInstance.getValueAdd().getValueMeasure());
                 }
             } else {
                 InputPortInstance opi = new InputPortInstance((InputPort) port, ai);

@@ -20,13 +20,13 @@ public class CountingMeasure extends Measure {
     @Override
     protected void readInformation(ObjectInputStream objectInputStream) throws IOException, ClassNotFoundException {
         this.measureToCount=new EmfReference(objectInputStream.readUTF());
-        this.valuesToCount= objectInputStream.readUTF();
+        this.valuesToCount= (String) objectInputStream.readObject();//could be null
     }
 
     @Override
     protected void writeInformation(ObjectOutputStream oos) throws IOException {
         oos.writeUTF(measureToCount.getUri());
-        oos.writeUTF(valuesToCount);
+        oos.writeObject(valuesToCount);//Could be null
     }
 
     public EmfReference getMeasureToCount() {

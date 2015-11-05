@@ -12,13 +12,13 @@ public class SupplyingStore extends PortContainer {
     @ManyToOne
     private StoreDefinition storeRequirement;
     @ManyToOne
-    private Role supplyingRole;
+    private RoleInCapabilityMethod supplyingRole;
     @ManyToOne
-    private Collaboration collaboration;
+    private CapabilityMethod collaboration;
     @ManyToMany
     private Set<Measure> measures = new HashSet<Measure>();//Aggregated from resource.measures
 
-    public SupplyingStore(String uri, Role supplyingRole) {
+    public SupplyingStore(String uri, RoleInCapabilityMethod supplyingRole) {
         super(uri);
         this.supplyingRole = supplyingRole;
         this.supplyingRole.getSupplyingStores().add(this);
@@ -29,11 +29,11 @@ public class SupplyingStore extends PortContainer {
     public SupplyingStore() {
     }
 
-    public Role getSupplyingRole() {
+    public RoleInCapabilityMethod getSupplyingRole() {
         return supplyingRole;
     }
 
-    public Collaboration getCollaboration() {
+    public CapabilityMethod getCollaboration() {
         return collaboration;
     }
 

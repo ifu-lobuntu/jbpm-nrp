@@ -1,9 +1,8 @@
 package org.jbpm.vdml.services.impl.model.meta;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import com.google.common.collect.UnmodifiableListIterator;
+
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,17 +17,21 @@ public class Activity extends PortContainer {
     @ManyToOne
     private Capability capabilityRequirement;
     @ManyToOne
-    private Role performingRole;
+    private RoleInCapabilityMethod performingRole;
     @ManyToOne
-    private Collaboration collaboration;
+    private CapabilityMethod collaboration;
     @ManyToOne
-    private Collaboration delegatingCollaboration;
+    private CapabilityMethod delegatingCollaboration;
     @ManyToOne
     private Measure duration;
     @ManyToMany
     private Set<Measure> measures=new HashSet<Measure>();
+    @OneToMany(mappedBy = "delegatingActivity", cascade = CascadeType.ALL)
+    private Set<RoleMapping> roleMappings=new HashSet<RoleMapping>();
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
+    private Set<RoleResource> roleResources=new HashSet<RoleResource>();
 
-    public Activity(String uri, Role performingRole) {
+    public Activity(String uri, RoleInCapabilityMethod performingRole) {
         super(uri);
         this.performingRole = performingRole;
         this.collaboration= performingRole.getCollaboration();
@@ -39,11 +42,11 @@ public class Activity extends PortContainer {
     public Activity() {
     }
 
-    public Collaboration getCollaboration() {
+    public CapabilityMethod getCollaboration() {
         return collaboration;
     }
 
-    public Role getPerformingRole() {
+    public RoleInCapabilityMethod getPerformingRole() {
         return performingRole;
     }
     public Capability getCapabilityRequirement() {
@@ -54,11 +57,11 @@ public class Activity extends PortContainer {
         this.capabilityRequirement = capabilityRequirement;
     }
 
-    public Collaboration getDelegatingCollaboration() {
+    public CapabilityMethod getDelegatingCollaboration() {
         return delegatingCollaboration;
     }
 
-    public void setDelegatingCollaboration(Collaboration delegatingCollaboration) {
+    public void setDelegatingCollaboration(CapabilityMethod delegatingCollaboration) {
         this.delegatingCollaboration = delegatingCollaboration;
     }
 
@@ -86,4 +89,13 @@ public class Activity extends PortContainer {
     public ResourceUse findResourceUse(String name) {
         return findByName(getResourceUses(),name);
     }
+
+    public Set<RoleMapping> getRoleMappings() {
+        return roleMappings;
+    }
+
+    public Set<RoleResource> getRoleResources() {
+        return roleResources;
+    }
+
 }

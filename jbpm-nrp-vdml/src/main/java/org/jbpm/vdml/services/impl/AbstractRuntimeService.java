@@ -2,6 +2,7 @@ package org.jbpm.vdml.services.impl;
 
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.jbpm.vdml.services.impl.model.meta.Role;
+import org.jbpm.vdml.services.impl.model.meta.RoleInNetwork;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 
 import javax.persistence.EntityManager;
@@ -75,14 +76,14 @@ public class AbstractRuntimeService extends MetaBuilder {
         entityManager.flush();
     }
 
-    protected RolePerformance findOrCreateRole(Participant participant, Role requestorRole) {
+    protected RolePerformance findOrCreateRole(Participant participant, RoleInNetwork roleInNetwork) {
         Query q = entityManager.createQuery("select rp from RolePerformance rp where rp.participant=:participant and rp.role=:role");
         q.setParameter("participant", participant);
-        q.setParameter("role", requestorRole);
+        q.setParameter("role", roleInNetwork);
         List<RolePerformance> resultList = q.getResultList();
         RolePerformance rp = null;
         if (resultList.isEmpty()) {
-            rp = new RolePerformance(requestorRole, participant);
+            rp = new RolePerformance(roleInNetwork, participant);
             entityManager.persist(rp);
             entityManager.flush();
         } else {

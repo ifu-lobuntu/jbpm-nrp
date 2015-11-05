@@ -10,10 +10,8 @@ import org.jbpm.vdml.services.api.model.MeasurementCriterion;
 import org.jbpm.vdml.services.impl.*;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 import org.junit.Test;
-import org.omg.smm.Accumulator;
 import org.omg.smm.Characteristic;
 import org.omg.vdml.*;
-import test.TestGradeMeasure;
 
 import javax.persistence.EntityManager;
 import java.io.ByteArrayOutputStream;
@@ -36,14 +34,15 @@ public class TrustRelationshipTest extends MetaEntityImportTest {
         CapabilityDefinition produceDefinition = createCapabilityDefinition(vdm, "Produce");
         CapabilityDefinition comsumeDefinition = createCapabilityDefinition(vdm, "Consume");
         this.cm = createCapabilityMethod(vdm, "SomeCapabilityMethod");
-        Role supplier = createRole(cm, "Supplier");
-        this.consumer = createRole(cm, "Consumer");
+        OrgUnit network=createValueNetwork(vdm, "TheNEtwork");
+        Role supplier = createRole(cm, network, "Supplier");
+        this.consumer = createRole(cm, network,"Consumer");
         Activity produce = addActivity(produceDefinition, cm, supplier, "Produce");
         Activity consume = addActivity(comsumeDefinition, cm, consumer, "Consume");
         cm.setInitialActivity(produce);
         BusinessItem stuff = addBusinessItem(createBusinessItemDefinition(vdm, "Stuff"), cm);
         this.flow = addDeliverableFlow(cm, stuff, produce, consume, "out", "in");
-        ValueProposition vp = addValueProposition(supplier, consumer, "TheProposition");
+        ValueProposition vp = addValueProposition((Position)supplier.getRoleAssignment().get(0).getParticipant(), (Position)consumer.getRoleAssignment().get(0).getParticipant(), "TheProposition");
         Characteristic measure1 = buildDirectMeasure(vdm, "Measure1");
         ValuePropositionComponent component1 = addComponent(vp, measure1);
         Characteristic measure2 = buildDirectMeasure(vdm, "Measure2");
@@ -54,11 +53,11 @@ public class TrustRelationshipTest extends MetaEntityImportTest {
         new VdmlImporter(getEntityManager()).buildModel(DEFAULT_DEPLOYMENT_ID, vdm);
         ParticipantService participantService = new ParticipantService(getEntityManager());
         this.consumerParticipant = participantService.createIndividualParticipant("Consumer");
-        performProject(5d, 500d, "Five");//Not in all criteria
-        performProject(6, 800d, "Six");//Good, second closest
-        performProject(7, 2000d, "Seven");//Good, too far
-        performProject(8, 300d, "Eight");//Good, closest
-        performProject(9, 2000d, "Nine");//Not in all criteria
+        setupParticipants(5d, 500d, "Five");//Not in all criteria
+        setupParticipants(6, 800d, "Six");//Good, second closest
+        setupParticipants(7, 2000d, "Seven");//Good, too far
+        setupParticipants(8, 300d, "Eight");//Good, closest
+        setupParticipants(9, 2000d, "Nine");//Not in all criteria
         //WHEN
 
         TrustRelationshipService service = new TrustRelationshipService(getEntityManager());
@@ -72,7 +71,7 @@ public class TrustRelationshipTest extends MetaEntityImportTest {
         assertEquals("Six", ((IndividualParticipant)result.get(1).getProvider().getParticipant()).getUserName());
     }
 
-    protected void performProject(double value, double distance, String participantName) {
+    protected void setupParticipants(double value, double distance, String participantName) {
         EntityManager entityManager = getEntityManager();
         GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
         Point location = geometryFactory.createPoint(new Coordinate(0d, LocationUtil.meterToEstimatedDegrees(distance)));

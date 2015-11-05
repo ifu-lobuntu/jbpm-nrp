@@ -66,11 +66,12 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         vdm.getCollaboration().add(implementUserStoryMethod);
         implementUserStoryMethod.setName("ImplementUserStory");
         detailUserStories = super.createCapabilityDefinition(vdm, "DetailUserStories");
-        Role productOwnerRole = createRole(implementUserStoryMethod, "ProductOwner");
+        OrgUnit network=createValueNetwork(vdm, "Network");
+        Role productOwnerRole = createRole(implementUserStoryMethod, network,"ProductOwner");
         detailUserStoryActivity = addActivity(detailUserStories, implementUserStoryMethod, productOwnerRole, "DetailUserStories");
         implementUserStoryMethod.setInitialActivity(detailUserStoryActivity);
         codeUserStory = super.createCapabilityDefinition(vdm, "CodeUserStory");
-        Role developerRole = createRole(implementUserStoryMethod, "Developer");
+        Role developerRole = createRole(implementUserStoryMethod, network,"Developer");
         codeUserStoryActivity = addActivity(codeUserStory, implementUserStoryMethod, developerRole, "CodeUserStory");
 
         BusinessItemDefinition executableFeature = createBusinessItemDefinition(vdm, "ExecutableFeature");
@@ -317,7 +318,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         Long projectId = project.getId();
         new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
         CollaborationInstance projectFound = new ProjectService(getEntityManager()).findProject(projectId);
-        SupplyingStoreInstance backlog = projectFound.findSupplyingStore(projectFound.getCollaboration().findSupplyingStore("ReleasePlan"));
+        SupplyingStoreInstance backlog = projectFound.findFirstSupplyingStore(projectFound.getCollaboration().findSupplyingStore("ReleasePlan"));
         SupplyingStoreMeasurement latenessDifficultyRatio = backlog.findMeasurement(backlog.getSupplyingStore().findMeasure("LatenessDifficultyRatio"));
         assertEquals(50 / 9d, latenessDifficultyRatio.getActualValue(), 0.01d);
     }

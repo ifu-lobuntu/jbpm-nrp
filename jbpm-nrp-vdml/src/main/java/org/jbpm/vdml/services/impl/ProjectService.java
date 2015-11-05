@@ -2,9 +2,7 @@ package org.jbpm.vdml.services.impl;
 
 
 import org.jbpm.vdml.services.api.model.LinkedExternalObject;
-import org.jbpm.vdml.services.impl.model.meta.Activity;
-import org.jbpm.vdml.services.impl.model.meta.Collaboration;
-import org.jbpm.vdml.services.impl.model.meta.Role;
+import org.jbpm.vdml.services.impl.model.meta.*;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 
 import javax.persistence.EntityManager;
@@ -40,39 +38,46 @@ public class ProjectService extends AbstractRuntimeService{
 
 
     public CollaborationInstance initiateProject(Long requestorId, String collaborationUri) {
-        Collaboration collaboration=entityManager.find(Collaboration.class, collaborationUri);
+        CapabilityMethod collaboration=entityManager.find(CapabilityMethod.class, collaborationUri);
         Participant participant = entityManager.find(Participant.class, requestorId);
         List<RolePerformance> roles=new ArrayList<RolePerformance>();
-        roles.add(findOrCreateRole(participant, collaboration.getInitiatorRole()));
+        roles.add(findOrCreateRole(participant, collaboration.getInitiatorRole().getFulfillingNetworkRole()));
         if(collaboration.getPlannerRole()!=null && !collaboration.getInitiatorRole().equals(collaboration.getPlannerRole())){
-            roles.add(findOrCreateRole(participant, collaboration.getPlannerRole()));
+            roles.add(findOrCreateRole(participant, collaboration.getPlannerRole().getFulfillingNetworkRole()));
         }
         return collaborationService.startCollaboration(collaboration, roles);
     }
     public CollaborationInstance initiateProjectUnderCustodyOf(Long requestorId, Long custodian, String collaborationUri) {
-        Collaboration collaboration=entityManager.find(Collaboration.class, collaborationUri);
-        RolePerformance initiator = findOrCreateRole(entityManager.find(Participant.class, requestorId), collaboration.getInitiatorRole());
-        RolePerformance planner= findOrCreateRole(entityManager.find(Participant.class, custodian), collaboration.getPlannerRole());
+        CapabilityMethod collaboration=entityManager.find(CapabilityMethod.class, collaborationUri);
+        RolePerformance initiator = findOrCreateRole(entityManager.find(Participant.class, requestorId), collaboration.getInitiatorRole().getFulfillingNetworkRole());
+        RolePerformance planner= findOrCreateRole(entityManager.find(Participant.class, custodian), collaboration.getPlannerRole().getFulfillingNetworkRole());
         return collaborationService.startCollaboration(collaboration, Arrays.asList(initiator, planner));
     }
 
 
     public RolePerformance selectCustodianForProject(Long custodianId, Long projectId) {
         CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
-        RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, custodianId), project.getCollaboration().getPlannerRole());
+        RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, custodianId), project.getCollaboration().getPlannerRole().getFulfillingNetworkRole());
         assignmentService.assignToRoles(project, Arrays.asList(rp));
         return rp;
     }
     public RolePerformance assignParticipantToRole(Long participantId, Long projectId, String roleUri) {
         CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
-        RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, participantId), entityManager.find(Role.class,roleUri));
+        RolePerformance rp = findOrCreateRole(entityManager.find(Participant.class, participantId), entityManager.find(RoleInCapabilityMethod.class,roleUri).getFulfillingNetworkRole());
         assignmentService.assignToRoles(project, Arrays.asList(rp));
         return rp;
+    }
+    public RolePerformance assignParticipantToActivity(Long capabilityOfferId, Long activityId) {
+        ActivityInstance project = entityManager.find(ActivityInstance.class, activityId);
+        CapabilityOffer co = entityManager.find(CapabilityOffer.class,capabilityOfferId);
+        RolePerformance result = assignmentService.assignToActivities(project, co);
+        entityManager.flush();
+        return result;
     }
     public StorePerformance assignStorePerformance(Long projectId, Long spId) {
         CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
         StorePerformance storePerformance = entityManager.find(StorePerformance.class, spId);
-        assignmentService.assignToSupplyingStores(project.findSupplyingStore(storePerformance.getStoreDefinition()),storePerformance);
+        assignmentService.assignToSupplyingStores(project.findFirstSupplyingStore(storePerformance.getStoreDefinition()),storePerformance);
         entityManager.flush();
         return storePerformance;
     }

@@ -14,6 +14,7 @@ import org.jbpm.process.core.timer.impl.GlobalTimerService;
 import org.jbpm.vdml.services.api.model.ReusableBusinessItemAvailability;
 import org.jbpm.vdml.services.api.model.ReusableBusinessItemRequirement;
 import org.jbpm.vdml.services.impl.model.meta.Capability;
+import org.jbpm.vdml.services.impl.model.meta.CapabilityMethod;
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 import org.jbpm.vdml.services.impl.model.scheduling.PlannedUnavailability;
@@ -85,16 +86,16 @@ public class ExchangeService extends AbstractRuntimeService {
         CapabilityOffer cp = entityManager.find(CapabilityOffer.class, capabilityPerformanceId);
         Participant participant = entityManager.find(Participant.class, requestorId);
         Capability cpd = cp.getCapability();
-        RolePerformance requestorRolePerformance = findOrCreateRole(participant, cpd.getExchangeConfiguration().getCollaborationToUse().getInitiatorRole());
-        RolePerformance supplierRolePerformance = findOrCreateRole(cp.getParticipant(), cpd.getExchangeConfiguration().getSupplierRole());
+        RolePerformance requestorRolePerformance = findOrCreateRole(participant, cpd.getExchangeConfiguration().getCollaborationToUse().getInitiatorRole().getFulfillingNetworkRole());
+        RolePerformance supplierRolePerformance = findOrCreateRole(cp.getParticipant(), cpd.getExchangeConfiguration().getSupplierRole().getFulfillingNetworkRole());
         return collaborationService.startCollaboration(cpd.getExchangeConfiguration().getCollaborationToUse(), Arrays.asList(requestorRolePerformance, supplierRolePerformance));
     }
 
     public CollaborationInstance startExchangeForProduct(Long requestorId, Long storePerformanceId) {
         StorePerformance cp = entityManager.find(StorePerformance.class, storePerformanceId);
         Participant participant = entityManager.find(Participant.class, requestorId);
-        RolePerformance requestorRolePerformance = findOrCreateRole(participant, cp.getStoreDefinition().getExchangeConfiguration().getCollaborationToUse().getInitiatorRole());
-        RolePerformance supplierRolePerformance = findOrCreateRole(cp.getOwner(), cp.getStoreDefinition().getExchangeConfiguration().getSupplierRole());
+        RolePerformance requestorRolePerformance = findOrCreateRole(participant, cp.getStoreDefinition().getExchangeConfiguration().getCollaborationToUse().getInitiatorRole().getFulfillingNetworkRole());
+        RolePerformance supplierRolePerformance = findOrCreateRole(cp.getOwner(), cp.getStoreDefinition().getExchangeConfiguration().getSupplierRole().getFulfillingNetworkRole());
         return collaborationService.startCollaboration(cp.getStoreDefinition().getExchangeConfiguration().getCollaborationToUse(), Arrays.asList(requestorRolePerformance, supplierRolePerformance));
     }
 
@@ -138,9 +139,9 @@ public class ExchangeService extends AbstractRuntimeService {
         ReusableBusinessItemPerformance reusableResource = entityManager.find(ReusableBusinessItemPerformance.class, requiredAvailability.getReusableBusinessItemId());
         PoolPerformance cp = reusableResource.getHostingPool();
         Participant participant = entityManager.find(Participant.class, requestorId);
-        Collaboration collaboration1 = cp.getStoreDefinition().getExchangeConfiguration().getCollaborationToUse();
-        RolePerformance requestorRolePerformance = findOrCreateRole(participant, collaboration1.getInitiatorRole());
-        RolePerformance supplierRolePerformance = findOrCreateRole(cp.getOwner(), cp.getStoreDefinition().getExchangeConfiguration().getSupplierRole());
+        CapabilityMethod collaboration1 = cp.getStoreDefinition().getExchangeConfiguration().getCollaborationToUse();
+        RolePerformance requestorRolePerformance = findOrCreateRole(participant, collaboration1.getInitiatorRole().getFulfillingNetworkRole());
+        RolePerformance supplierRolePerformance = findOrCreateRole(cp.getOwner(), cp.getStoreDefinition().getExchangeConfiguration().getSupplierRole().getFulfillingNetworkRole());
         CollaborationInstance observation = collaborationService.startCollaboration(collaboration1, Arrays.asList(requestorRolePerformance, supplierRolePerformance));
         ActivityInstance ao = observation.findFirstActivity(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking().getActivity());
         final ResourceUseInstance resourceUse = ao.findResourceUse(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking());

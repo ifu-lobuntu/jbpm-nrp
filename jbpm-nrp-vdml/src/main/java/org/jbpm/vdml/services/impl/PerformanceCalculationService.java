@@ -65,7 +65,7 @@ public class PerformanceCalculationService extends AbstractCalculationService {
                 protected void addAdditionalParameters(Query q,ValuePropositionComponentPerformance measurand) {
                     q.setParameter("measurand", measurand.getValueProposition().getProvider());
                 }
-            }.resolveAggregatedMEasurements(measurand, "ValueAddMeasurement m where m.outputPort.portContainer.responsibleRolePerformance ");
+            }.resolveAggregatedMEasurements(measurand, "ValuePropositionComponentInstanceMeasurement m where m.valuePropositionComponent.valueProposition.provider ");
             resolveObservedMeasures(deploymentId, context, otherMeasurements);
         }
         entityManager.flush();
@@ -84,7 +84,7 @@ public class PerformanceCalculationService extends AbstractCalculationService {
                     q.setParameter("measurand", measurand.getRelationship().getProvider());
                     q.setParameter("receiver", measurand.getRelationship().getRecipient());
                 }
-            }.resolveAggregatedMEasurements(measurand, "ValueElementInstanceMeasurement m where m.deliverableFlow.targetPortContainer.responsibleRolePerformance = :receiver and m.portContainer.responsibleRolePerformance ");
+            }.resolveAggregatedMEasurements(measurand, "ValuePropositionComponentInstanceMeasurement m where  m.valuePropositionComponent.valueProposition.recipient = :receiver and  m.valuePropositionComponent.valueProposition.provider ");
             resolveObservedMeasures(deploymentId, context, otherMeasurements);
         }
         entityManager.flush();

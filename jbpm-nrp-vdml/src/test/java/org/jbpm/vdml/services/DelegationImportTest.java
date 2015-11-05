@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.omg.vdml.*;
 import org.omg.vdml.Activity;
 import org.omg.vdml.BusinessItemDefinition;
+import org.omg.vdml.CapabilityMethod;
 import org.omg.vdml.InputDelegation;
 import org.omg.vdml.InputPort;
 import org.omg.vdml.OutputDelegation;
@@ -89,7 +90,7 @@ public class DelegationImportTest extends MetaEntityImportTest {
         vdm.eResource().save(new ByteArrayOutputStream(), null);
         //WHEN
         new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cp);
-        Collaboration collaboration=new VdmlImporter(getEntityManager()).findCollaboration(MetaBuilder.buildUri(cp));
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration=(org.jbpm.vdml.services.impl.model.meta.CapabilityMethod) new VdmlImporter(getEntityManager()).findCollaboration(MetaBuilder.buildUri(cp));
 
         //THEN
         assertEquals(cp.getName(), collaboration.getName());
@@ -190,7 +191,7 @@ public class DelegationImportTest extends MetaEntityImportTest {
         //WHEN
         new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, delegatedCapabilityMethod);
 
-        Collaboration owningCollaboration = new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cm);
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod owningCollaboration = (org.jbpm.vdml.services.impl.model.meta.CapabilityMethod) new VdmlImporter(getEntityManager()).buildCollaboration(DEFAULT_DEPLOYMENT_ID, cm);
         //THEN
         assertEquals(cm.getName(), owningCollaboration.getName());
         assertEquals(1, owningCollaboration.getCollaborationRoles().size());

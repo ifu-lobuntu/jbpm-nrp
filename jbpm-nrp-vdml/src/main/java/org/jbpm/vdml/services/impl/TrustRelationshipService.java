@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.Point;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.jbpm.vdml.services.api.model.LocationCriterion;
 import org.jbpm.vdml.services.api.model.MeasurementCriterion;
+import org.jbpm.vdml.services.impl.model.meta.RoleInNetwork;
 import org.jbpm.vdml.services.impl.model.meta.ValueProposition;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 
@@ -62,8 +63,8 @@ public class TrustRelationshipService extends AbstractRuntimeService {
 
     public void requestTrustRelationship(String valuePropositionRef, Long requesterId, Long providerId) {
         ValueProposition valueProposition = entityManager.find(ValueProposition.class, valuePropositionRef);
-        RolePerformance from = findOrCreateRole(entityManager.find(Participant.class, providerId), valueProposition.getProvider());
-        RolePerformance to = findOrCreateRole(entityManager.find(Participant.class, requesterId), valueProposition.getRecipient());
+        RolePerformance from = findOrCreateRole(entityManager.find(Participant.class, providerId), (RoleInNetwork) valueProposition.getProvider());
+        RolePerformance to = findOrCreateRole(entityManager.find(Participant.class, requesterId), (RoleInNetwork) valueProposition.getRecipient());
         TrustRelationship rp = new TrustRelationship(valueProposition, from);
         rp.setRecipient(to);
         entityManager.persist(rp);

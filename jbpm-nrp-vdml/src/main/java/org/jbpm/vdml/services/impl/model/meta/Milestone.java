@@ -14,12 +14,12 @@ public class Milestone implements MetaEntity{
     private String name;
 
     @ManyToOne
-    private Collaboration collaboration;
+    private CapabilityMethod collaboration;
 
     public Milestone() {
     }
 
-    public Milestone(String uri, Collaboration collaboration) {
+    public Milestone(String uri, CapabilityMethod collaboration) {
         this.uri = uri;
         this.collaboration = collaboration;
         this.collaboration.getMilestones().add(this);
@@ -40,7 +40,7 @@ public class Milestone implements MetaEntity{
         return name;
     }
 
-    public Collaboration getCollaboration() {
+    public CapabilityMethod getCollaboration() {
         return collaboration;
     }
 }

@@ -8,11 +8,11 @@ import org.jbpm.vdml.services.api.model.ReusableBusinessItemRequirement;
 import org.jbpm.vdml.services.impl.ExchangeService;
 import org.jbpm.vdml.services.impl.MetaBuilder;
 import org.jbpm.vdml.services.impl.ParticipantService;
+import org.jbpm.vdml.services.impl.model.meta.CapabilityMethod;
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 import org.junit.Assert;
 import org.junit.Test;
-import org.omg.vdml.StoreDefinition;
 import org.omg.vdml.StoreLibraryElement;
 import org.omg.vdml.ValueDeliveryModel;
 
@@ -79,7 +79,7 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
     @Test
     public void testCommit() throws Exception {
         ValueDeliveryModel vdm = buildModel();
-        org.jbpm.vdml.services.impl.model.meta.Collaboration collaboration = buildDefaultStoreExchange(vdm);
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration = buildDefaultStoreExchange(vdm);
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant consumerParticipant = participantService.createIndividualParticipant("Consumer");
         EList<StoreLibraryElement> storeDefs = vdm.getStoreLibrary().get(0).getStoreLibraryElement();
@@ -105,8 +105,8 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
         clock.advanceTime(millisUntilCommitment, TimeUnit.MILLISECONDS);
         //THEN
         CollaborationInstance foundExchange=new ExchangeService(getEntityManager()).findExchange(exchange.getId());
-        StorePerformance fromAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
-        StorePerformance toAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
+        StorePerformance fromAccount = foundExchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
+        StorePerformance toAccount = foundExchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
         Assert.assertEquals(1000d, fromAccount.getInventoryLevel(), 0.01);
         Assert.assertEquals(900d, fromAccount.getProjectedInventoryLevel(), 0.01);
         Assert.assertEquals(2000d, toAccount.getInventoryLevel(), 0.01);
@@ -116,7 +116,7 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
     @Test
     public void testFulfill() throws Exception {
         ValueDeliveryModel vdm = buildModel();
-        org.jbpm.vdml.services.impl.model.meta.Collaboration collaboration = buildDefaultStoreExchange(vdm);
+        org.jbpm.vdml.services.impl.model.meta.CapabilityMethod collaboration = buildDefaultStoreExchange(vdm);
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant consumerParticipant = participantService.createIndividualParticipant("Consumer");
         EList<StoreLibraryElement> storeDefs = vdm.getStoreLibrary().get(0).getStoreLibraryElement();
@@ -142,8 +142,8 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
         clock.advanceTime(millisUntilFulfillment, TimeUnit.MILLISECONDS);
         //THEN
         CollaborationInstance foundExchange=new ExchangeService(getEntityManager()).findExchange(exchange.getId());
-        StorePerformance fromAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
-        StorePerformance toAccount = foundExchange.findSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
+        StorePerformance fromAccount = foundExchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("FromAccount")).getStore();
+        StorePerformance toAccount = foundExchange.findFirstSupplyingStore(exchange.getCollaboration().findSupplyingStore("ToAccount")).getStore();
         Assert.assertEquals(900d, fromAccount.getInventoryLevel(), 0.01);
         Assert.assertEquals(900d, fromAccount.getProjectedInventoryLevel(), 0.01);
         Assert.assertEquals(2100d, toAccount.getInventoryLevel(), 0.01);
@@ -151,12 +151,12 @@ public class PooledExchangeTest extends AbstractPoolExchangeTest {
 
     }
 
-    protected CollaborationInstance startExchangeAndSetAccountBalances(Collaboration collaboration, IndividualParticipant consumerParticipant, ExchangeService exchangeService, ReusableBusinessItemAvailability availability1) {
+    protected CollaborationInstance startExchangeAndSetAccountBalances(CapabilityMethod collaboration, IndividualParticipant consumerParticipant, ExchangeService exchangeService, ReusableBusinessItemAvailability availability1) {
         CollaborationInstance exchange = exchangeService.scheduleReusableProductUse(consumerParticipant.getId(), availability1);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setProjectedInventoryLevel(1000d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setProjectedInventoryLevel(2000d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setInventoryLevel(1000d);
-        exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setProjectedInventoryLevel(1000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setProjectedInventoryLevel(2000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().setInventoryLevel(1000d);
+        exchange.findFirstSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().setInventoryLevel(2000d);
         for (DeliverableFlowInstance flow : exchange.getOwnedDirectedFlows()) {
             if(flow.getDeliverable().getDefinition().getName().equals("Money")){
                 flow.getQuantity().setActualValue(100d);

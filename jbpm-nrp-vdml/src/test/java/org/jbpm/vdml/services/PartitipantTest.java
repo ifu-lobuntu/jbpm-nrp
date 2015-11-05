@@ -71,16 +71,18 @@ public class PartitipantTest extends MetaEntityImportTest {
         CapabilityMethod cm = VDMLFactory.eINSTANCE.createCapabilityMethod();
         vdm.getCollaboration().add(cm);
         cm.setName("MyCapabilityMethod");
-        Performer performer=VDMLFactory.eINSTANCE.createPerformer();
-        cm.getPerformer().add(performer);
-        performer.setName("MyRole");
-        Performer otherPerformer=VDMLFactory.eINSTANCE.createPerformer();
-        cm.getPerformer().add(otherPerformer);
-        otherPerformer.setName("YourRole");
+        OrgUnit network=createValueNetwork(vdm, "Network");
+                ;
+        Performer performer=createRole(cm, network,"MyRole");
+        Assignment networkAssignment = performer.getRoleAssignment().get(0);
+        Position performerInNetwork= (Position) networkAssignment.getParticipant();
+
+        Performer otherPerformer=createRole(cm, network, "YourRole");
+        Position otherPerformerInNetwork= (Position) otherPerformer.getRoleAssignment().get(0).getParticipant();
         ValueProposition vp=VDMLFactory.eINSTANCE.createValueProposition();
-        performer.getProvidedProposition().add(vp);
+        performerInNetwork.getProvidedProposition().add(vp);
         vp.setName("MyValueToYou");
-        vp.setRecipient(otherPerformer);
+        vp.setRecipient(otherPerformerInNetwork);
         vdm.eResource().save(new ByteArrayOutputStream(), null);
         ValuePropositionComponent vpc=VDMLFactory.eINSTANCE.createValuePropositionComponent();
         vp.getComponent().add(vpc);
@@ -90,9 +92,9 @@ public class PartitipantTest extends MetaEntityImportTest {
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant ekke = participantService.createIndividualParticipant("ekke");
         //When
-        participantService.setRoles(ekke.getId(), Collections.singleton(MetaBuilder.buildUri(performer)));
+        participantService.setRoles(ekke.getId(), Collections.singleton(MetaBuilder.buildUri(networkAssignment.getParticipant())));
         //And it is idempotent
-        participantService.setRoles(ekke.getId(), Collections.singleton(MetaBuilder.buildUri(performer)));
+        participantService.setRoles(ekke.getId(), Collections.singleton(MetaBuilder.buildUri(networkAssignment.getParticipant())));
         //Then
         RolePerformance rolePerformance=new ParticipantService(getEntityManager()).findIndividualParticipant("ekke").getRolePerformances().iterator().next();
         assertEquals(ekke.getId(), rolePerformance.getParticipant().getId());

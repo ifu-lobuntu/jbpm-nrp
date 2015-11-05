@@ -1,7 +1,7 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
-import org.jbpm.vdml.services.impl.model.meta.Role;
+import org.jbpm.vdml.services.impl.model.meta.RoleInNetwork;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ public class RolePerformance implements ActivatableRuntimeEntity {
     private Long id;
     private boolean active;
     @ManyToOne
-    private Role role;
+    private RoleInNetwork role;
     @ManyToOne
     private Participant participant;
     @OneToMany(mappedBy = "provider",cascade = CascadeType.ALL)
@@ -27,13 +27,13 @@ public class RolePerformance implements ActivatableRuntimeEntity {
     public RolePerformance() {
     }
 
-    public RolePerformance(Role role, Participant participant) {
+    public RolePerformance(RoleInNetwork role, Participant participant) {
         this.role = role;
         this.participant = participant;
         this.participant.getRolePerformances().add(this);
     }
 
-    public Role getRole() {
+    public RoleInNetwork getRole() {
         return role;
     }
 

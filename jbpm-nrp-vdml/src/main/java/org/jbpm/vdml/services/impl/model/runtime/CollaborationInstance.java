@@ -15,7 +15,7 @@ import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMa
 public class CollaborationInstance extends PortContainerInstance {
 
     @ManyToOne
-    private Collaboration collaboration;
+    private CapabilityMethod collaboration;
 
     @OneToMany(mappedBy = "collaboration",cascade = CascadeType.ALL)
     private Set<ActivityInstance> activities = new HashSet<ActivityInstance>();
@@ -35,7 +35,7 @@ public class CollaborationInstance extends PortContainerInstance {
     @OneToMany(mappedBy = "collaboration",cascade = CascadeType.ALL)
     private Set<ValuePropositionInstance> valuePropositions= new HashSet<ValuePropositionInstance>();
 
-    public CollaborationInstance(Collaboration collaboration) {
+    public CollaborationInstance(CapabilityMethod collaboration) {
         this.collaboration = collaboration;
     }
 
@@ -46,7 +46,7 @@ public class CollaborationInstance extends PortContainerInstance {
         if (pc instanceof Activity) {
             return findFirstActivity((Activity) pc);
         } else {
-            return findSupplyingStore((SupplyingStore) pc);
+            return findFirstSupplyingStore((SupplyingStore) pc);
         }
     }
 
@@ -58,7 +58,7 @@ public class CollaborationInstance extends PortContainerInstance {
         return findMatchingRuntimeEntity(this.getActivities(), pc);
     }
 
-    public SupplyingStoreInstance findSupplyingStore(SupplyingStore pc) {
+    public SupplyingStoreInstance findFirstSupplyingStore(SupplyingStore pc) {
         return findMatchingRuntimeEntity(this.getSupplyingStores(), pc);
     }
 
@@ -93,7 +93,7 @@ public class CollaborationInstance extends PortContainerInstance {
         return getCollaboration();
     }
 
-    public Collaboration getCollaboration() {
+    public CapabilityMethod getCollaboration() {
         return collaboration;
     }
 
@@ -117,8 +117,8 @@ public class CollaborationInstance extends PortContainerInstance {
         return supplyingStores;
     }
 
-    public RolePerformance findRole(Role role) {
-        return findMatchingRuntimeEntity(getCollaborationRoles(), role);
+    public RolePerformance findRole(RoleInCapabilityMethod role) {
+        return findMatchingRuntimeEntity(getCollaborationRoles(), role.getFulfillingNetworkRole());
     }
 
     public Set<MilestoneInstance> getMilestones() {
@@ -148,7 +148,7 @@ public class CollaborationInstance extends PortContainerInstance {
         return findMatchingRuntimeEntity(getOwnedDirectedFlows(),flow);
     }
 
-    public SupplyingStoreInstance findSupplyingStore(StoreDefinition definition) {
+    public SupplyingStoreInstance findFirstSupplyingStore(StoreDefinition definition) {
         for (SupplyingStoreInstance so : getSupplyingStores()) {
             if(so.getSupplyingStore().getStoreRequirement().equals(definition)){
                 return so;
@@ -183,12 +183,12 @@ public class CollaborationInstance extends PortContainerInstance {
         }
     }
 
-    private Collection<SupplyingStoreInstance> findSupplyingStores(SupplyingStore pc) {
+    public Collection<SupplyingStoreInstance> findSupplyingStores(SupplyingStore pc) {
         return findMatchingRuntimeEntities(getSupplyingStores(), pc);
 
     }
 
-    private Collection<ActivityInstance> findActivities(Activity pc) {
+    public Collection<ActivityInstance> findActivities(Activity pc) {
         return findMatchingRuntimeEntities(getActivities(), pc);
     }
 
@@ -200,8 +200,8 @@ public class CollaborationInstance extends PortContainerInstance {
         }
         return null;
     }
-    public Collection<? extends RolePerformance> findRolePerformances(Role role){
-        return findMatchingRuntimeEntities(getCollaborationRoles(), role);
+    public Collection<? extends RolePerformance> findRolePerformances(RoleInCapabilityMethod role){
+        return findMatchingRuntimeEntities(getCollaborationRoles(), role.getFulfillingNetworkRole());
     }
 
 }

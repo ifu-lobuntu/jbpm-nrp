@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Role implements MetaEntity {
+@DiscriminatorColumn(name="type")
+public abstract class Role implements MetaEntity {
     @Id
     private String uri;
     private String name;

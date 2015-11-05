@@ -6,11 +6,15 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
+
 @Entity
 @DiscriminatorValue("ValuePropositionComponentInstance")
 public class ValuePropositionComponentInstance extends ValueElementInstance{
     @ManyToOne
     private ValuePropositionInstance valueProposition;
+    @OneToMany(mappedBy = "valuePropositionComponent",cascade = CascadeType.ALL)
+    private Set<ValuePropositionComponentInstanceMeasurement> measurements=new HashSet<ValuePropositionComponentInstanceMeasurement>();
 
     public ValuePropositionComponentInstance() {
     }
@@ -42,5 +46,13 @@ public class ValuePropositionComponentInstance extends ValueElementInstance{
             getAggregatedFrom().add(vad);
             vad.getAggregatedTo().add(this);
         }
+    }
+
+    public ValuePropositionComponentInstanceMeasurement getValueMeasurement(){
+        return findMatchingRuntimeEntity(getMeasurements(),getValueElement().getValueMeasure());
+    }
+
+    public Set<ValuePropositionComponentInstanceMeasurement> getMeasurements() {
+        return measurements;
     }
 }

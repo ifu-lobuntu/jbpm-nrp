@@ -74,7 +74,7 @@ public class AbstractCalculationService {
         } else if (measurement.getMeasure() instanceof CountingMeasure) {
             CountingMeasure collectiveMeasure = (CountingMeasure) measurement.getMeasure();
             String exp = collectiveMeasure.getValuesToCount();
-            Object values = resolveMeasurements(deploymentId, context, Collections.singleton(collectiveMeasure.getMeasureToCount()), exp.contains("actualRating"),true);
+            Object values = resolveMeasurements(deploymentId, context, Collections.singleton(collectiveMeasure.getMeasureToCount()), exp!=null && exp.contains("actualRating"),true);
             if (values != null) {
                 Counter c = new Counter(collectiveMeasure.getValuesToCount());
                 double value = values instanceof double[] ? c.getValue((double[]) values) : c.getValue((Enum<?>[]) values);

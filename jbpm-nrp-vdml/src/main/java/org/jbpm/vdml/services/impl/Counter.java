@@ -13,6 +13,9 @@ public class Counter {
     }
 
     public double getValue(double[] d) {
+        if(expression==null){
+            return d.length;
+        }
         try {
             int count = 0;
             ScriptEngine se = new ScriptEngineManager().getEngineByName("javascript");
@@ -30,9 +33,12 @@ public class Counter {
     }
 
     public double getValue(Enum<?>[] d) {
+        if(expression==null){
+            return d.length;
+        }
         int count = 0;
         int firstIndex = expression.indexOf('\'');
-        String name = expression.substring(firstIndex, expression.indexOf('\'', firstIndex + 1));
+        String name = expression.substring(firstIndex+1, expression.indexOf('\'', firstIndex + 1));
         for (Enum<?> anEnum : d) {
             if (anEnum.name().equalsIgnoreCase(name)) {
                 count++;
