@@ -44,18 +44,67 @@ public class DeliverableFlowInstance implements RuntimeEntity{
     public DeliverableFlowInstance() {
     }
 
+    /**
+     * This is the constructor used when a collaboration is started. It assumes single instances of each activity and businessitem
+     */
     public DeliverableFlowInstance(DeliverableFlow deliverableFlow, CollaborationInstance collaboration) {
-        if(!(deliverableFlow instanceof DeliverableFlow)){
-            throw new IllegalArgumentException();
+        init(deliverableFlow, collaboration);
+        linkSource(collaboration.findPortContainer(this.deliverableFlow.getSourcePortContainer()));
+        linkTarget(collaboration.findPortContainer(this.deliverableFlow.getTargetPortContainer()));
+        this.deliverable=collaboration.findFirstBusinessItem(this.deliverableFlow.getDeliverable());
+    }
+
+    /**
+     * This is the constructor used when a new instance of the activity is created. It assumes multiple instances of the business item.
+     */
+    public DeliverableFlowInstance(CollaborationInstance collaboration, BusinessItemObservation bio, InputPortInstance target) {
+        init(target.getPort().getInput(), collaboration);
+        linkSource(collaboration.findPortContainer(this.deliverableFlow.getSourcePortContainer()));
+        linkTarget(target.getPortContainer());
+        this.deliverable=bio;
+    }
+
+
+    public DeliverableFlowInstance(CollaborationInstance collaboration, InputPortInstance target) {
+        init(target.getPort().getInput(), collaboration);
+        linkSource(collaboration.findPortContainer(this.deliverableFlow.getSourcePortContainer()));
+        linkTarget(target.getPortContainer());
+        linkToExistingBusinessItem(getSource().getOutflow());
+    }
+    public DeliverableFlowInstance(CollaborationInstance collaboration, OutputPortInstance source,BusinessItemObservation bio) {
+        init(source.getPort().getOutput(), collaboration);
+        linkSource(source.getPortContainer());
+        linkTarget(collaboration.findPortContainer(this.deliverableFlow.getTargetPortContainer()));
+        setDeliverable(bio);
+    }
+
+    private void linkToExistingBusinessItem(Set<DeliverableFlowInstance> peerFlows) {
+        for (DeliverableFlowInstance f : peerFlows) {
+            if(f.getDeliverable()!=null){
+                setDeliverable(f.getDeliverable());
+                break;
+            }
         }
+    }
+
+    private void linkTarget(PortContainerInstance targetPortContainer) {
+        this.targetPortContainer = targetPortContainer;
+        this.targetPortContainer.getConcludedFlow().add(this);
+        this.target=targetPortContainer.findInputPort(this.deliverableFlow.getTarget());
+        this.target.getInflow().add(this);
+    }
+
+    private void linkSource(PortContainerInstance sourcePortContainer) {
+        this.sourcePortContainer = sourcePortContainer;
+        this.sourcePortContainer.getCommencedFlow().add(this);
+        this.source =sourcePortContainer.findOutputPort(this.deliverableFlow.getSource());
+        this.source.getOutflow().add(this);
+    }
+
+    private void init(DeliverableFlow deliverableFlow, CollaborationInstance collaboration) {
         this.collaboration = collaboration;
         this.deliverableFlow = deliverableFlow;
         this.collaboration.getOwnedDirectedFlows().add(this);
-        sourcePortContainer =collaboration.findPortContainer(deliverableFlow.getSourcePortContainer());
-        sourcePortContainer.getCommencedFlow().add(this);
-        targetPortContainer =collaboration.findPortContainer(deliverableFlow.getTargetPortContainer());
-        targetPortContainer.getConcludedFlow().add(this);
-        this.deliverable=collaboration.findBusinessItem(deliverableFlow.getDeliverable());
     }
 
     public MilestoneInstance getMilestone() {
@@ -67,14 +116,6 @@ public class DeliverableFlowInstance implements RuntimeEntity{
         milestone.getFlows().add(this);
     }
 
-    public DeliverableFlowInstance(DeliverableFlow deliverableFlow, CollaborationInstance collaboration, PortContainerInstance sourcePortContainer, PortContainerInstance targetPortContainer) {
-        this.collaboration = collaboration;
-        this.deliverableFlow = deliverableFlow;
-        this.collaboration.getOwnedDirectedFlows().add(this);
-        this.sourcePortContainer =sourcePortContainer;
-        this.targetPortContainer =targetPortContainer;
-        this.deliverable=collaboration.findBusinessItem(deliverableFlow.getDeliverable());
-    }
 
     public Long getId() {
         return id;
@@ -117,16 +158,18 @@ public class DeliverableFlowInstance implements RuntimeEntity{
         return deliverable;
     }
 
-    public Set<ValueAddMeasurement> getValueAddMeasurements() {
-        return getSource().getValueAdds();
-    }
 
     public Set<DeliverableFlowMeasurement> getMeasurements() {
         return measurements;
     }
 
-    public DeliverableFlowMeasurement getQuantity() {
-        return findMatchingRuntimeEntity(getMeasurements(), getDeliverableFlow().getQuantity());
+    public PortMeasurement getQuantity() {
+        if(getSource().getPort().getBatchSize()!=null){
+            return getSource().getBatchSize();
+        }else if(getTarget().getPort().getBatchSize()!=null){
+            return getTarget().getBatchSize();
+        }
+        return null;
     }
 
     public DateTime getPlannedDate() {
@@ -147,11 +190,6 @@ public class DeliverableFlowInstance implements RuntimeEntity{
 
     public DeliverableFlowMeasurement findMeasurement(Measure measure) {
         return findMatchingRuntimeEntity(getMeasurements(), measure);
-    }
-
-    public ValueAddMeasurement findValueAdd(Measure measure) {
-        return findMatchingRuntimeEntity(getValueAddMeasurements(), measure);
-
     }
 
     public OutputPortInstance getSource() {

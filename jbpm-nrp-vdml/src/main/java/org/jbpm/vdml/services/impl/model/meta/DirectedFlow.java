@@ -18,8 +18,8 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
     private String name;
     @ManyToOne
     private Collaboration owningCollaboration;
-    @ManyToOne
-    private Measure quantity;
+//    @ManyToOne
+//    private Measure quantity;
     @ManyToOne
     private Measure duration;
     @ManyToOne
@@ -57,13 +57,13 @@ public abstract class DirectedFlow implements MetaEntity,MeasurableElement {
         this.duration = duration;
     }
 
-    public Measure getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Measure quantity) {
-        this.quantity = quantity;
-    }
+//    public Measure getQuantity() {
+//        return quantity;
+//    }
+//
+//    public void setQuantity(Measure quantity) {
+//        this.quantity = quantity;
+//    }
 
     public BusinessItemDefinition getDeliverable() {
         return deliverable;

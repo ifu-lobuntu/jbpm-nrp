@@ -13,6 +13,7 @@ import org.omg.vdml.DeliverableFlow;
 import org.omg.vdml.InputPort;
 import org.omg.vdml.OutputPort;
 import org.omg.vdml.Role;
+import org.omg.vdml.ValueAdd;
 import org.omg.vdml.ValueProposition;
 import org.omg.vdml.ValuePropositionComponent;
 
@@ -124,8 +125,8 @@ public class PropositionExchangeImportTest extends MetaEntityImportTest {
         assertEquals(1, myFoundRole.getProvidedValuePropositions().iterator().next().getComponents().iterator().next().getMeasures().size());
         Measure m = myFoundRole.getProvidedValuePropositions().iterator().next().getComponents().iterator().next().getMeasures().iterator().next();
         CollectiveMeasure cm= (CollectiveMeasure) m;
-        Measure m2 = ((org.jbpm.vdml.services.impl.model.meta.OutputPort)collaboration.getFlows().iterator().next().getSource()).getValueAdds().iterator().next();
-        DirectMeasure dm= (DirectMeasure) m2;
+        org.jbpm.vdml.services.impl.model.meta.ValueAdd m2 = ((org.jbpm.vdml.services.impl.model.meta.OutputPort)collaboration.getFlows().iterator().next().getSource()).getValueAdds().iterator().next();
+        DirectMeasure dm= (DirectMeasure) m2.getValueMeasure();
         assertEquals(dm.getUri(), cm.getAggregatedMeasures().iterator().next().getUri());
     }
 }

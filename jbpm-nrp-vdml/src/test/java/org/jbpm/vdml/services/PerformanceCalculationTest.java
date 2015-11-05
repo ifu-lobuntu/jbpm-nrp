@@ -33,12 +33,12 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         Characteristic duration = buildNamedMeasure(vdm, "Duration");
         cm.setInitialActivity(activity);
         Characteristic quality = buildTheGradeMeasure(vdm);
-        addMeasuredCharacteristics(activity.getMeasuredCharacteristic(), duration,quality);
+        addMeasuredCharacteristics(activity.getMeasuredCharacteristic(), duration, quality);
         Characteristic averageDuration=buildCollectiveMeasure(vdm, duration, "AverageDuration", Accumulator.AVERAGE);
         Characteristic goodCount=buildCountingMeasure(vdm, "GoodCount", quality, "value='GOOD'");
         Characteristic biggerThanHourCount=buildCountingMeasure(vdm, "BiggerThanHourCount", duration, "value>60");
         Characteristic horriblyConvolutedMeasure=buildBinaryMeasure(vdm, "HorriblyConvolutedMeasure", goodCount, biggerThanHourCount,BinaryFunctor.PLUS);
-        addCharacteristics(codeUserStory.getCharacteristicDefinition(),averageDuration,goodCount,biggerThanHourCount,horriblyConvolutedMeasure);
+        addCharacteristics(codeUserStory.getCharacteristicDefinition(), averageDuration, goodCount, biggerThanHourCount, horriblyConvolutedMeasure);
         vdm.eResource().save(new ByteArrayOutputStream(),null );
         new VdmlImporter(getEntityManager()).buildModel(DEFAULT_DEPLOYMENT_ID, vdm);
 
@@ -89,7 +89,7 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         SupplyingStore supplyingFreshProduceStore = addSupplyingStore(cm, freshProduceStore, farmer, "SupplyFreshProduce", "InventoryLevel");
         Characteristic lateness = buildDirectMeasure(vdm, "Lateness");//Usually derived from outgoing flows
         Characteristic quality = buildTheGradeMeasure(vdm);//Usually derived from outgoing businessItems
-        addMeasuredCharacteristics(supplyingFreshProduceStore.getMeasuredCharacteristic(), lateness,quality);
+        addMeasuredCharacteristics(supplyingFreshProduceStore.getMeasuredCharacteristic(), lateness, quality);
         Characteristic averageLateness=buildCollectiveMeasure(vdm, lateness, "AverageLateness", Accumulator.AVERAGE);
         Characteristic goodCount=buildCountingMeasure(vdm, "GoodCount", quality, "value='GOOD'");
         Characteristic laterThanHourCount=buildCountingMeasure(vdm, "LaterThanHourCount", lateness, "value>60");
@@ -151,7 +151,7 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         Characteristic goodCount=buildCountingMeasure(vdm, "GoodCount", quality, "value='GOOD'");
         Characteristic laterThanHourCount=buildCountingMeasure(vdm, "LaterThanHourCount", lateness, "value>60");
         Characteristic horriblyConvolutedMeasure=buildBinaryMeasure(vdm, "HorriblyConvolutedMeasure", goodCount, laterThanHourCount,BinaryFunctor.PLUS);
-        addCharacteristics(tukTuk.getCharacteristicDefinition(), lateness, quality, averageLateness, goodCount,laterThanHourCount, horriblyConvolutedMeasure);
+        addCharacteristics(tukTuk.getCharacteristicDefinition(), lateness, quality, averageLateness, goodCount, laterThanHourCount, horriblyConvolutedMeasure);
         vdm.eResource().save(new ByteArrayOutputStream(), null);
         new VdmlImporter(getEntityManager()).buildModel(DEFAULT_DEPLOYMENT_ID, vdm);
 

@@ -36,7 +36,7 @@ public class FindPerformanceTest extends MetaEntityImportTest{
         Characteristic measure2 = buildDirectMeasure(vdm, "Measure2");
         Characteristic measure3 = buildDirectMeasure(vdm, "Measure3");
 
-        addCharacteristics(produceDefinition.getCharacteristicDefinition(),measure1,measure2,measure3);
+        addCharacteristics(produceDefinition.getCharacteristicDefinition(), measure1, measure2, measure3);
 
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);

@@ -1,6 +1,8 @@
 package org.jbpm.vdml.services.impl;
 
 
+import org.jbpm.vdml.services.api.model.LinkedExternalObject;
+import org.jbpm.vdml.services.impl.model.meta.Activity;
 import org.jbpm.vdml.services.impl.model.meta.Collaboration;
 import org.jbpm.vdml.services.impl.model.meta.Role;
 import org.jbpm.vdml.services.impl.model.runtime.*;
@@ -77,11 +79,19 @@ public class ProjectService extends AbstractRuntimeService{
     public ReusableBusinessItemPerformance assignReusableBusinessItemPerformance(Long projectId, Long bipId) {
         CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
         ReusableBusinessItemPerformance storePerformance = entityManager.find(ReusableBusinessItemPerformance.class, bipId);
-        assignmentService.assignToBusinessItem(project.findBusinessItem(storePerformance.getDefinition()),storePerformance);
+        assignmentService.assignToBusinessItem(project.findFirstBusinessItem(storePerformance.getDefinition()),storePerformance);
         entityManager.flush();
         return storePerformance;
     }
     public CollaborationInstance findProject(Long id) {
         return entityManager.find(CollaborationInstance.class,id);
+    }
+
+    public ActivityInstance newActivity(Long projectId, String activityUri, String inputName, LinkedExternalObject linkedExternalObject) {
+        CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
+        Activity activity=entityManager.find(Activity.class,activityUri);
+        ActivityInstance newActivity = collaborationService.newActivity(project, activity, inputName, linkedExternalObject);
+        entityManager.flush();
+        return newActivity;
     }
 }

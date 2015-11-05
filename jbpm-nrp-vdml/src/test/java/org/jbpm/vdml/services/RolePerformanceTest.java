@@ -130,9 +130,9 @@ public class RolePerformanceTest extends MetaEntityImportTest{
         ProjectService projectService = new ProjectService(getEntityManager());
         CollaborationInstance project = projectService.initiateProject(producerParticipant.getId(), MetaBuilder.buildUri(cm));
         projectService.assignParticipantToRole(consumerParticipant.getId(), project.getId(), MetaBuilder.buildUri(consumer));
-        DeliverableFlowInstance fo = project.findDeliverableFlow(project.getCollaboration().findDeliverableFlow(flow.getName()));
-        fo.findValueAdd(((org.jbpm.vdml.services.impl.model.meta.DeliverableFlow) fo.getDeliverableFlow()).findValueAdd("TestGradeMeasure")).setActualRating(rating);
-        fo.findValueAdd(((org.jbpm.vdml.services.impl.model.meta.DeliverableFlow)fo.getDeliverableFlow()).findValueAdd("Size")).setActualValue(s);
+        DeliverableFlowInstance fo = project.findFirstDeliverableFlow(project.getCollaboration().findDeliverableFlow(flow.getName()));
+        fo.getSource().findValueAdd(fo.getDeliverableFlow().getSource().findValueAdd("TestGradeMeasure")).getValueMeasurement().setActualRating(rating);
+        fo.getSource().findValueAdd(fo.getDeliverableFlow().getSource().findValueAdd("Size")).getValueMeasurement().setActualValue(s);
         projectService.flush();
     }
 

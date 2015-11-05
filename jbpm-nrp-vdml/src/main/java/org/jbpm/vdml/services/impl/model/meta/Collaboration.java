@@ -127,4 +127,12 @@ public class Collaboration extends PortContainer {
     public Set<DirectedFlow> getOwnedDirectedFlows() {
         return ownedDirectedFlows;
     }
+
+    public Collection<ValueProposition> getValuePropositions() {
+        Set<ValueProposition> result = new HashSet<ValueProposition>();
+        for (Role role : getCollaborationRoles()) {
+            result.addAll(role.getProvidedValuePropositions());
+        }
+        return result;
+    }
 }

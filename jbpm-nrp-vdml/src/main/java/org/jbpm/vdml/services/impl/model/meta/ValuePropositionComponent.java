@@ -1,57 +1,62 @@
 package org.jbpm.vdml.services.impl.model.meta;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.*;
+import java.util.*;
 
 import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
 
 @Entity
-public class ValuePropositionComponent implements MetaEntity,MeasurableElement{
-    @Id
-    private String uri;
-    private String name;
+@DiscriminatorValue("ValuePropositionComponent")
+public class ValuePropositionComponent extends ValueElement {
     @ManyToOne
     private ValueProposition valueProposition;
-    @ManyToMany
-    private Set<Measure> measures = new HashSet<Measure>();
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Measure percentageWeight;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Measure satisfactionLevel;
+
     public ValuePropositionComponent(String uri, ValueProposition valueProposition) {
-        this.uri = uri;
+        super(uri);
         this.valueProposition = valueProposition;
         this.valueProposition.getComponents().add(this);
+
     }
 
     public ValuePropositionComponent() {
     }
 
-    @Override
-    public String getUri() {
-        return uri;
+    public Measure getPercentageWeight() {
+        return percentageWeight;
+    }
+
+    public void setPercentageWeight(Measure percentageWeight) {
+        this.percentageWeight = percentageWeight;
+    }
+
+    public Measure getSatisfactionLevel() {
+        return satisfactionLevel;
+    }
+
+    public void setSatisfactionLevel(Measure satisfactionLevel) {
+        this.satisfactionLevel = satisfactionLevel;
     }
 
     public ValueProposition getValueProposition() {
         return valueProposition;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public Set<Measure> getMeasures() {
-        return measures;
-    }
-
-    public Measure findMeasure(String name) {
-        return findByName(getMeasures(),name);
+    public Map<PortContainer, Collection<ValueAdd>> findValueProducers() {
+        Map<PortContainer, Collection<ValueAdd>> valueProducers = new HashMap<PortContainer, Collection<ValueAdd>>();
+        for (ValueElement ve : getAggregatedFrom()) {
+            if (ve instanceof ValueAdd) {
+                ValueAdd va = (ValueAdd) ve;
+                Collection<ValueAdd> vas = valueProducers.get(va.getOutputPort().getPortContainer());
+                if (vas == null) {
+                    valueProducers.put(va.getOutputPort().getPortContainer(), vas = new HashSet<ValueAdd>());
+                }
+                vas.add(va);
+            }
+        }
+        return valueProducers;
     }
 }

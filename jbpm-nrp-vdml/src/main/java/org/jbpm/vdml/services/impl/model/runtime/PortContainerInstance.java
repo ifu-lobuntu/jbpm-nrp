@@ -1,11 +1,12 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
-import org.jbpm.vdml.services.impl.model.meta.DeliverableFlow;
-import org.jbpm.vdml.services.impl.model.meta.Port;
+import org.jbpm.vdml.services.impl.model.meta.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -21,7 +22,7 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
     private Set<DeliverableFlowInstance> concludedFlow = new HashSet<DeliverableFlowInstance>();
     @OneToMany(mappedBy = "sourcePortContainer")
     private Set<DeliverableFlowInstance> commencedFlow = new HashSet<DeliverableFlowInstance>();
-    @OneToMany(mappedBy = "portContainer")
+    @OneToMany(mappedBy = "portContainer",cascade = CascadeType.ALL)
     private Set<PortInstance> containedPorts= new HashSet<PortInstance>();
 
     public PortContainerInstance() {
@@ -71,11 +72,32 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
         return commencedFlow;
     }
 
-    protected RolePerformance getResponsibleRolePerformance() {
+    public RolePerformance getResponsibleRolePerformance() {
         return responsibleRolePerformance;
     }
 
     protected void setResponsibleRolePerformance(RolePerformance responsibleRolePerformance) {
         this.responsibleRolePerformance = responsibleRolePerformance;
+    }
+
+    public OutputPortInstance findOutputPort(OutputPort port) {
+        return (OutputPortInstance) findMatchingRuntimeEntity(getContainedPorts(),port);
+    }
+    public InputPortInstance findInputPort(InputPort port) {
+        return (InputPortInstance)findMatchingRuntimeEntity(getContainedPorts(), port);
+    }
+
+    public Set<ValueAddInstance> findValueAdds(Set<ValueAdd> valueAddsAggregatedFrom) {
+        Set<ValueAddInstance> result=new HashSet<ValueAddInstance>();
+        for (PortInstance pi : containedPorts) {
+            if(pi instanceof OutputPortInstance){
+                for (ValueAddInstance valueAddInstance : ((OutputPortInstance) pi).getValueAdds()) {
+                    if(valueAddsAggregatedFrom.contains(valueAddInstance.getValueAdd())){
+                        result.add(valueAddInstance);
+                    }
+                }
+            }
+        }
+        return result;
     }
 }

@@ -61,7 +61,8 @@ public class FailureAfterCommitmentTest extends AbstractConversationForActionTes
 	}
 
 	@Test
-	public void testDeclareInadequate() {
+	public void testDeclareInadequate() throws Exception{
+		getTransaction().begin();;
 		// Given
 		ConversationForActionServiceImpl service = createConversationService();
 		super.requestToAssertComplete(service);

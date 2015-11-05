@@ -12,7 +12,7 @@ public class DeliverableFlow extends DirectedFlow{
 
     public DeliverableFlow() {
     }
-    public Measure findValueAdd(String name) {
+    public ValueAdd findValueAdd(String name) {
         return findByName(((OutputPort) getSource()).getValueAdds(), name);
     }
 

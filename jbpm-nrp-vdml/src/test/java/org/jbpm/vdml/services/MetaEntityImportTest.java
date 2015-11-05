@@ -75,26 +75,32 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         }
 
     }
-    protected void addMeasuredCharacteristics(List<MeasuredCharacteristic> measuredCharacteristics, Characteristic ... characteristics) {
+
+
+    protected void addMeasuredCharacteristics(List<MeasuredCharacteristic> measuredCharacteristics, Characteristic... characteristics) {
         for (Characteristic characteristic : characteristics) {
-            MeasuredCharacteristic mc = VDMLFactory.eINSTANCE.createMeasuredCharacteristic();
-            mc.setName(characteristic.getName());
-            mc.setCharacteristicDefinition(characteristic);
-            measuredCharacteristics.add(mc);
-        }
-    }
-    protected void addMeasuredCharacteristics(ValueDeliveryModel l, List<MeasuredCharacteristic> measuredCharacteristics) {
-        ArrayList<Characteristic> characteristics = new ArrayList<Characteristic>();
-        addCharacteristics(l, characteristics);
-        for (Characteristic characteristic : characteristics) {
-            MeasuredCharacteristic mc = VDMLFactory.eINSTANCE.createMeasuredCharacteristic();
-            mc.setName(characteristic.getName());
-            mc.setCharacteristicDefinition(characteristic);
+            MeasuredCharacteristic mc = buildMeasuredCharacteristic(characteristic);
             measuredCharacteristics.add(mc);
         }
     }
 
-    protected void addCharacteristics(ValueDeliveryModel l, List<Characteristic> characteristicDefinition) {
+    protected MeasuredCharacteristic buildMeasuredCharacteristic(Characteristic characteristic) {
+        MeasuredCharacteristic mc = VDMLFactory.eINSTANCE.createMeasuredCharacteristic();
+        mc.setName(characteristic.getName());
+        mc.setCharacteristicDefinition(characteristic);
+        return mc;
+    }
+
+    protected void addTestMeasuredCharacteristics(ValueDeliveryModel l, List<MeasuredCharacteristic> measuredCharacteristics) {
+        ArrayList<Characteristic> characteristics = new ArrayList<Characteristic>();
+        addTestCharacteristics(l, characteristics);
+        for (Characteristic characteristic : characteristics) {
+            MeasuredCharacteristic mc = buildMeasuredCharacteristic(characteristic);
+            measuredCharacteristics.add(mc);
+        }
+    }
+
+    protected void addTestCharacteristics(ValueDeliveryModel l, List<Characteristic> characteristicDefinition) {
         Characteristic e = buildDirectMeasure(l);
         characteristicDefinition.add(e);
 
@@ -166,22 +172,22 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         base2.setToDimensionalMeasure((DimensionalMeasure) b.getMeasure().get(0));
         return addToLibrary(l, binaryMeasure);
     }
-    protected void addCharacteristics(EList<Characteristic> characteristicDefinition, Characteristic ... source) {
+    protected void addCharacteristics(EList<Characteristic> characteristicDefinition, Characteristic... source) {
         for (Characteristic characteristic : source) {
             characteristicDefinition.add(characteristic);
         }
     }
-    protected Characteristic buildRescaledMeasure(ValueDeliveryModel l,String name, Characteristic a, double offset, double m) {
+    protected Characteristic buildRescaledMeasure(ValueDeliveryModel l,String name, Characteristic a, double offset, double multiplier) {
         RescaledMeasure rescaledMeasure= SMMFactory.eINSTANCE.createRescaledMeasure();
         rescaledMeasure.setName(name);
         rescaledMeasure.setOffset(offset);
-        rescaledMeasure.setMultiplier(m);
+        rescaledMeasure.setMultiplier(multiplier);
         RescaledMeasureRelationship rescaledMeasureRelationship = SMMFactory.eINSTANCE.createRescaledMeasureRelationship();
         DimensionalMeasure value = (DimensionalMeasure) a.getMeasure().get(0);
         rescaledMeasureRelationship.setFromDimensionalMeasure(value);
         rescaledMeasure.getRescalesFrom().add(rescaledMeasureRelationship);
         rescaledMeasure.setName(name);
-        rescaledMeasure.setMultiplier(m);
+        rescaledMeasure.setMultiplier(multiplier);
         rescaledMeasure.setOffset(offset);
         return addToLibrary(l, rescaledMeasure);
     }
@@ -303,6 +309,7 @@ public abstract class MetaEntityImportTest extends AbstractVdmlServiceTest {
         cp.getFlow().add(flow);
         flow.setDeliverable(businessItem);
         flow.setName("From" + from.getName() + "To" + to.getName());
+        System.out.println(flow.getName());
         flow.setProvider(VDMLFactory.eINSTANCE.createOutputPort());
         flow.getProvider().setName(fromPortName);
         from.getContainedPort().add(flow.getProvider());

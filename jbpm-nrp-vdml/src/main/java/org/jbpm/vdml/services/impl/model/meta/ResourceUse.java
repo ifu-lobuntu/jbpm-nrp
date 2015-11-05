@@ -19,6 +19,7 @@ public class ResourceUse implements MetaEntity{
     private Measure quantity;
     @ManyToOne
     private Measure duration;
+    private boolean isInputDriven;
     @Enumerated
     private ResourceUseLocation resourceUseLocation;
 
@@ -81,6 +82,14 @@ public class ResourceUse implements MetaEntity{
 
     public void setResourceUseLocation(ResourceUseLocation resourceUseLocation) {
         this.resourceUseLocation = resourceUseLocation;
+    }
+
+    public boolean isInputDriven() {
+        return isInputDriven;
+    }
+
+    public void setIsInputDriven(boolean isInputDriven) {
+        this.isInputDriven = isInputDriven;
     }
 
     @Override

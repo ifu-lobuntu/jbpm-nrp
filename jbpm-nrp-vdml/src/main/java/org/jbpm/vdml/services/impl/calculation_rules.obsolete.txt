@@ -1,0 +1,209 @@
+Calculation sequence and availability in context
+Phase 1
+BusinessItems:
+1. The measures of all calculation accessible (marked as such) related businessItems
+2. Its own measures;
+
+Phase 2
+Incoming DeliverableFlow
+1. The measures of the deliverable businessItem
+2. The measures of the source outputPort
+
+Phase 3
+InputPorts:
+Step 1.
+1. The measures of all incoming deliverableFlows
+2. The measures of all incoming businessItems
+?3. The measures of all related outputDriven resourceUses
+
+Step 2.
+3. The measures of peer inputPorts
+
+Phase 4
+InputDriven ResourceUses
+Step 1.
+1. The measures of all incoming deliverableFlows
+2. The measures of all incoming businessItems
+3. The measures of all incoming inputPorts
+Step 2.
+4. The measures of other ResourceUses
+
+Phase 5
+Outgoing DeliverableFlow
+
+Phase 6
+Output Ports
+
+Phase 7
+OutputDriven ResourceUses
+Step 1.
+1. The measures of all outgoing deliverableFlows
+2. The measures of all outgoing businessItems
+3. The measures of all outgoing outputPorts
+Step 2.
+4. The measures of other ResourceUses
+
+Phase 8
+PortContainerInstance (SupplyingStore/Activity)
+
+Phase 9
+ValueAdds
+
+
+Example code:
+
+    private void resolveNodeMeasurements(String deploymentId, PortContainerInstance ao) {
+        ObservationContext context = new ObservationContext();
+        for (InputPortInstance ipi : ao.getInputPorts()) {
+            context.putAll(ipi.getMeasurements());
+            for (DeliverableFlowInstance dfi : ipi.getInflow()) {
+                context.putAll(dfi.getMeasurements());
+            }
+        }
+        if (ao instanceof ActivityInstance) {
+            for (ResourceUseInstance ruo : ((ActivityInstance) ao).getResourceUseInstance()) {
+                context.putAll(ruo.getMeasurements());
+            }
+        }
+        context.putAll(ao.getMeasurements());
+        resolveObservedMeasures(deploymentId, context, ao.getMeasurements());
+    }
+
+    private void resolveInputDrivenResourceUses(String deploymentId, PortContainerInstance ao) {
+        if (ao instanceof ActivityInstance) {
+            //Step 1 - incoming data
+            for (ResourceUseInstance ruo : ((ActivityInstance) ao).getResourceUseInstance()) {
+                if (ruo.getResourceUse().isInputDriven()) {
+                    ObservationContext context = new ObservationContext();
+                    context.putAll(ruo.getInput().getMeasurements());
+                    for (DeliverableFlowInstance deliverableFlowInstance : ruo.getInput().getInflow()) {
+                        context.putAll(deliverableFlowInstance.getMeasurements());
+                        if (deliverableFlowInstance.getDeliverable() != null) {
+                            context.putAll(deliverableFlowInstance.getDeliverable().getMeasurements());
+                        }
+                    }
+                    context.putAll(ruo.getMeasurements());
+                    resolveObservedMeasures(deploymentId, context, ruo.getMeasurements());
+                }
+            }
+            //Step 2 - peer data
+            ObservationContext context = new ObservationContext();
+            for (ResourceUseInstance ruo : ((ActivityInstance) ao).getResourceUseInstance()) {
+                if (ruo.getResourceUse().isInputDriven()) {
+                    context.putAll(ruo.getMeasurements());
+                }
+            }
+            for (ResourceUseInstance ruo : ((ActivityInstance) ao).getResourceUseInstance()) {
+                if (ruo.getResourceUse().isInputDriven()) {
+                    resolveObservedMeasures(deploymentId, context, ruo.getMeasurements());
+                }
+            }
+        }
+    }
+
+    private void resolveOutputDrivenResourceUses(String deploymentId, PortContainerInstance ao) {
+        if (ao instanceof ActivityInstance) {
+            for (ResourceUseInstance ruo : ((ActivityInstance) ao).getResourceUseInstance()) {
+                if (!ruo.getResourceUse().isInputDriven()) {
+                    ObservationContext context = new ObservationContext();
+                    context.putAll(ruo.getOutput().getMeasurements());
+                    for (DeliverableFlowInstance deliverableFlowInstance : ruo.getOutput().getOutflow()) {
+                        context.putAll(deliverableFlowInstance.getMeasurements());
+                    }
+                    context.putAll(ruo.getMeasurements());
+                    resolveObservedMeasures(deploymentId, context, ruo.getMeasurements());
+                }
+            }
+        }
+    }
+
+    private void resolveInputPorts(String deploymentId, PortContainerInstance ao) {
+        //Step 1, incoming data
+        for (InputPortInstance ipi : ao.getInputPorts()) {
+            ObservationContext context = new ObservationContext();
+            for (DeliverableFlowInstance dfi : ipi.getInflow()) {
+                if (dfi.getDeliverable() != null) {
+                    context.putAll(dfi.getDeliverable().getMeasurements());
+                }
+                context.putAll(dfi.getMeasurements());
+            }
+            context.putAll(ipi.getMeasurements());
+            resolveObservedMeasures(deploymentId, context, ipi.getMeasurements());
+        }
+        //Step 2, peer data
+        ObservationContext context = new ObservationContext();
+        for (InputPortInstance ipi : ao.getInputPorts()) {
+            context.putAll(ipi.getMeasurements());
+        }
+        for (InputPortInstance ipi : ao.getInputPorts()) {
+            resolveObservedMeasures(deploymentId, context, ipi.getMeasurements());
+        }
+    }
+
+    private void resolveOutputPorts(String deploymentId, PortContainerInstance ao) {
+        //Step 1, outgoing data
+        for (OutputPortInstance opi : ao.getOutputPorts()) {
+            ObservationContext context = new ObservationContext();
+            for (DeliverableFlowInstance dfi : opi.getOutflow()) {
+                if (dfi.getDeliverable() != null) {
+                    context.putAll(dfi.getDeliverable().getMeasurements());
+                }
+                context.putAll(dfi.getMeasurements());
+            }
+            context.putAll(opi.getMeasurements());
+            resolveObservedMeasures(deploymentId, context, opi.getMeasurements());
+        }
+        //Step 3, peer data
+        ObservationContext context = new ObservationContext();
+        for (PortInstance opi : ao.getContainedPorts()) {
+            context.putAll(opi.getMeasurements());
+        }
+        for (OutputPortInstance opi : ao.getOutputPorts()) {
+            resolveObservedMeasures(deploymentId, context, opi.getMeasurements());
+        }
+    }
+
+    private void resolveAllIncomingFlows(String deploymentId, PortContainerInstance ao) {
+        for (InputPortInstance ipi : ao.getInputPorts()) {
+            for (DeliverableFlowInstance dfi : ipi.getInflow()) {
+                ObservationContext context = new ObservationContext();
+                if (dfi.getDeliverable() != null) {
+                    context.putAll(dfi.getDeliverable().getMeasurements());
+                }
+                context.putAll(dfi.getMeasurements());
+                context.putAll(dfi.getSource().getMeasurements());
+                resolveObservedMeasures(deploymentId, context, dfi.getMeasurements());
+            }
+        }
+        //Step 2 - peers
+        ObservationContext context = new ObservationContext();
+        for (InputPortInstance ipi : ao.getInputPorts()) {
+            for (DeliverableFlowInstance dfi : ipi.getInflow()) {
+                if (dfi.getDeliverable() != null) {
+                    context.putAll(dfi.getDeliverable().getMeasurements());
+                }
+                context.putAll(dfi.getMeasurements());
+                context.putAll(dfi.getSource().getMeasurements());
+            }
+        }
+        for (InputPortInstance ipi : ao.getInputPorts()) {
+            for (DeliverableFlowInstance dfi : ipi.getInflow()) {
+                resolveObservedMeasures(deploymentId, context, dfi.getMeasurements());
+            }
+        }
+    }
+
+    private void resolveAllOutgoingFlows(String deploymentId, PortContainerInstance ao) {
+        for (OutputPortInstance opi : ao.getOutputPorts()) {
+            for (DeliverableFlowInstance dfi : opi.getOutflow()) {
+                ObservationContext context = new ObservationContext();
+                if (dfi.getDeliverable() != null) {
+                    context.putAll(dfi.getDeliverable().getMeasurements());
+                }
+                context.putAll(dfi.getMeasurements());
+                context.putAll(dfi.getSource().getMeasurements());
+                resolveObservedMeasures(deploymentId, context, dfi.getMeasurements());
+            }
+        }
+    }
+

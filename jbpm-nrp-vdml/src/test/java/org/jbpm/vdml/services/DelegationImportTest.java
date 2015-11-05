@@ -14,6 +14,7 @@ import org.omg.vdml.InputPort;
 import org.omg.vdml.OutputDelegation;
 import org.omg.vdml.OutputPort;
 import org.omg.vdml.Role;
+import org.omg.vdml.ValueAdd;
 
 import java.io.ByteArrayOutputStream;
 

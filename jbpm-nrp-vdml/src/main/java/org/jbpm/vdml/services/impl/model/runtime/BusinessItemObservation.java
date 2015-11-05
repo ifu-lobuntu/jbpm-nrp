@@ -20,8 +20,10 @@ public class BusinessItemObservation implements RuntimeEntity {
     @OneToMany(cascade = CascadeType.ALL)
     private Set<BusinessItemMeasurement> measurements = new HashSet<BusinessItemMeasurement>();
     @ManyToOne
-    private ReusableBusinessItemPerformance instanceReference;
+    private ReusableBusinessItemPerformance sharedReference;
 
+    @Embedded
+    private ExternalObjectReference localReference;
     public BusinessItemObservation() {
     }
 
@@ -48,12 +50,12 @@ public class BusinessItemObservation implements RuntimeEntity {
         return collaboration;
     }
 
-    public ReusableBusinessItemPerformance getInstanceReference() {
-        return instanceReference;
+    public ReusableBusinessItemPerformance getSharedReference() {
+        return sharedReference;
     }
 
-    public void setInstanceReference(ReusableBusinessItemPerformance instanceReference) {
-        this.instanceReference = instanceReference;
+    public void setSharedReference(ReusableBusinessItemPerformance sharedReference) {
+        this.sharedReference = sharedReference;
     }
     public BusinessItemMeasurement findMeasurement(Measure m){
         return findMatchingRuntimeEntity(getMeasurements(),m);
@@ -61,5 +63,13 @@ public class BusinessItemObservation implements RuntimeEntity {
 
     public Set<BusinessItemMeasurement> getMeasurements() {
         return measurements;
+    }
+
+    public ExternalObjectReference getLocalReference() {
+        return localReference;
+    }
+
+    public void setLocalReference(ExternalObjectReference localReference) {
+        this.localReference = localReference;
     }
 }

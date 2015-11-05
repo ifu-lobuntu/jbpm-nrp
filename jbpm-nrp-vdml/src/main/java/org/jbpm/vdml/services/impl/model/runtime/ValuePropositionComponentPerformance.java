@@ -22,7 +22,7 @@ public class ValuePropositionComponentPerformance implements ActivatableRuntimeE
     @ManyToOne
     private ValuePropositionComponent valuePropositionComponent;
     @OneToMany(mappedBy = "component", cascade = CascadeType.ALL)
-    private Set<ValuePropositionComponentMeasurement> measurements=new HashSet<ValuePropositionComponentMeasurement>();//Aggregated from related ValueAdds
+    private Set<ValuePropositionComponentPerformanceMeasurement> measurements=new HashSet<ValuePropositionComponentPerformanceMeasurement>();//Aggregated from related ValueAdds
 
     public ValuePropositionComponentPerformance() {
     }
@@ -43,7 +43,7 @@ public class ValuePropositionComponentPerformance implements ActivatableRuntimeE
     }
 
 
-    public Set<ValuePropositionComponentMeasurement> getMeasurements() {
+    public Set<ValuePropositionComponentPerformanceMeasurement> getMeasurements() {
         return this.measurements;
     }
 
@@ -67,8 +67,8 @@ public class ValuePropositionComponentPerformance implements ActivatableRuntimeE
         return getValuePropositionComponent();
     }
 
-    public ValuePropositionComponentMeasurement findMeasurement(Measure measure) {
-        ValuePropositionComponentMeasurement result = findMatchingRuntimeEntity(getMeasurements(), measure);
+    public ValuePropositionComponentPerformanceMeasurement findMeasurement(Measure measure) {
+        ValuePropositionComponentPerformanceMeasurement result = findMatchingRuntimeEntity(getMeasurements(), measure);
         return result;
     }
 }

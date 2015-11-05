@@ -13,7 +13,10 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
 import org.opengis.geometry.DirectPosition;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 public class RuntimeEntityUtil {
     public static <T extends RuntimeEntity> T findMatchingRuntimeEntity(Collection<? extends T > source, MetaEntity metaEntity){
@@ -26,6 +29,18 @@ public class RuntimeEntityUtil {
             }
         }
         throw new IllegalArgumentException("Not found: " + metaEntity.getName());
+    }
+    public static <T extends RuntimeEntity> Collection<T> findMatchingRuntimeEntities(Collection<? extends T > source, MetaEntity metaEntity){
+        if(metaEntity==null){
+            return Collections.emptySet();
+        }
+        Collection<T> result=new ArrayList<T>();
+        for (T t : source) {
+            if(t.getMetaEntity().getUri().equals(metaEntity.getUri())){
+                result.add(t);
+            }
+        }
+        return  result;
     }
     public static Geometry wktToGeometry(String wktPoint) {
         WKTReader fromText = new WKTReader();

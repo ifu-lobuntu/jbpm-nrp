@@ -22,7 +22,7 @@ public class PartitipantTest extends MetaEntityImportTest {
         ValueDeliveryModel vdm = buildModel();
         CapabilityDefinition capability=VDMLFactory.eINSTANCE.createCapabilityDefinition();
         capability.setName("MyCapability");
-        super.addCharacteristics(vdm,capability.getCharacteristicDefinition());
+        super.addTestCharacteristics(vdm, capability.getCharacteristicDefinition());
         vdm.getCapabilitylibrary().get(0).getCapability().add(capability);
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);
@@ -47,7 +47,7 @@ public class PartitipantTest extends MetaEntityImportTest {
         ValueDeliveryModel vdm = buildModel();
         StoreDefinition storeDef=VDMLFactory.eINSTANCE.createStoreDefinition();
         storeDef.setName("MyStore");
-        super.addCharacteristics(vdm, storeDef.getCharacteristicDefinition());
+        super.addTestCharacteristics(vdm, storeDef.getCharacteristicDefinition());
         vdm.getStoreLibrary().get(0).getStoreLibraryElement().add(storeDef);
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);
@@ -85,7 +85,7 @@ public class PartitipantTest extends MetaEntityImportTest {
         ValuePropositionComponent vpc=VDMLFactory.eINSTANCE.createValuePropositionComponent();
         vp.getComponent().add(vpc);
         vpc.setName("MyVPCToYou");
-        super.addMeasuredCharacteristics(vdm, vpc.getMeasuredCharacteristic());
+        super.addTestMeasuredCharacteristics(vdm, vpc.getMeasuredCharacteristic());
         new VdmlImporter(getEntityManager()).buildModel(DEFAULT_DEPLOYMENT_ID, vdm);
         ParticipantService participantService = new ParticipantService(getEntityManager());
         IndividualParticipant ekke = participantService.createIndividualParticipant("ekke");

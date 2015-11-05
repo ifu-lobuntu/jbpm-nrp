@@ -25,10 +25,16 @@ public class AbstractRuntimeService extends MetaBuilder {
     public AbstractRuntimeService() {
     }
 
-    protected <T extends RuntimeEntity> Collection<T> syncRuntimeEntities(Collection<? extends T> existingRuntimeEntities, Collection<? extends MetaEntity> equivalentMetaEntities, Class<? extends T> cls, Object parent) {
+    protected <T extends RuntimeEntity> Collection<T> syncRuntimeEntities(Collection<? extends T> existingRuntimeEntities, Collection<? extends MetaEntity> equivalentMetaEntities, Class<? extends T> cls, Object parent, MetaEntity ... additionalEntities) {
+        Set<MetaEntity> source= new HashSet<MetaEntity>(equivalentMetaEntities);
         Set<T> result = new HashSet<T>();
-        Set<MetaEntity> activeMeasures = addExistingRuntimeEntitiesTo(existingRuntimeEntities, equivalentMetaEntities, result);
-        for (MetaEntity metaEntity : equivalentMetaEntities) {
+        for (MetaEntity additionalEntity : additionalEntities) {
+            if(additionalEntity!=null){
+                source.add(additionalEntity);
+            }
+        }
+        Set<MetaEntity> activeMeasures = addExistingRuntimeEntitiesTo(existingRuntimeEntities, source, result);
+        for (MetaEntity metaEntity : source) {
             if (!activeMeasures.contains(metaEntity)) {
                 Constructor<?> c = null;
                 for (Constructor<?> constructor : cls.getConstructors()) {
@@ -86,7 +92,7 @@ public class AbstractRuntimeService extends MetaBuilder {
         for (ValuePropositionPerformance p : pvpp) {
             Collection<ValuePropositionComponentPerformance> cs = syncRuntimeEntities(p.getComponents(), p.getValueProposition().getComponents(), ValuePropositionComponentPerformance.class, p);
             for (ValuePropositionComponentPerformance cc : cs) {
-                syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ValuePropositionComponentMeasurement.class, cc);
+                syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ValuePropositionComponentPerformanceMeasurement.class, cc);
             }
         }
         return rp;

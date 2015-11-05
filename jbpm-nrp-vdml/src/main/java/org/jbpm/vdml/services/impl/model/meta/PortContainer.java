@@ -1,8 +1,14 @@
 package org.jbpm.vdml.services.impl.model.meta;
 
+import org.jbpm.vdml.services.impl.model.runtime.DeliverableFlowInstance;
+
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByType;
 
 @Entity()
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -12,9 +18,7 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
     private String name;
 
     @OneToMany(mappedBy = "portContainer",cascade = CascadeType.ALL)
-    private Set<InputPort> input= new HashSet<InputPort>();
-    @OneToMany(mappedBy = "portContainer",cascade = CascadeType.ALL)
-    private Set<OutputPort> output= new HashSet<OutputPort>();
+    private Set<Port> containedPorts = new HashSet<Port>();
 
     public PortContainer(String uri) {
         this.uri = uri;
@@ -24,12 +28,8 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
     protected PortContainer() {
     }
 
-    public Set<InputPort> getInput() {
-        return input;
-    }
-
-    public Set<OutputPort> getOutput() {
-        return output;
+    public Set<Port> getContainedPorts() {
+        return containedPorts;
     }
 
     @Override
@@ -51,11 +51,42 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
         }
         return result;
     }
-
+    public Set<InputPort> getInput(){
+        return findByType(getContainedPorts(), InputPort.class);
+    }
+    public Set<OutputPort> getOutput(){
+        return findByType(getContainedPorts(), OutputPort.class);
+    }
     @Override
     public void setName(String name) {
         this.name = name;
     }
 
 
+    public InputPort findInputPort(String inputName) {
+        return findByName(getInput(),inputName);
+    }
+
+    public OutputPort findOutputPort(String name) {
+        return findByName(getOutput(), name);
+    }
+
+    public Collection<DeliverableFlow> getOutputFlows() {
+        Set<DeliverableFlow> result=new HashSet<DeliverableFlow>();
+        for (Port port : containedPorts) {
+            if(port instanceof OutputPort && ((OutputPort) port).getOutput()!=null){
+                result.add(((OutputPort) port).getOutput());
+            }
+        }
+        return result;
+    }
+    public Collection<DeliverableFlow> getInputFlows() {
+        Set<DeliverableFlow> result=new HashSet<DeliverableFlow>();
+        for (Port port : containedPorts) {
+            if(port instanceof InputPort && ((InputPort) port).getInput()!=null){
+                result.add(((InputPort) port).getInput());
+            }
+        }
+        return result;
+    }
 }

@@ -4,57 +4,44 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByType;
+import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findOneByType;
+
 @Entity
 @DiscriminatorValue("OutputPort")
 
-public class OutputPort extends Port{
-    @ManyToOne
-    private PortContainer portContainer;
+public class OutputPort extends Port {
     @ManyToMany
 
-    @JoinTable(name="output_port_value_add")
-    private Set<Measure> valueAdds=new HashSet<Measure>();
-    public OutputPort(String uri,PortContainer portContainer) {
-        super(uri);
-        this.portContainer=portContainer;
-        this.portContainer.getOutput().add(this);
+    @JoinTable(name = "output_port_value_add")
+    private Set<ValueAdd> valueAdds = new HashSet<ValueAdd>();
+
+    public OutputPort(String uri, PortContainer portContainer) {
+        super(uri, portContainer);
     }
 
     public OutputPort() {
-        super();
-    }
 
-    @Override
-    public PortContainer getPortContainer() {
-        return portContainer;
     }
 
     public Set<OutputDelegation> getDelegatedOutputs() {
-        return getOutputDelegations(super.getInflows());
-    }
-    public DeliverableFlow getOutput(){
-        for (DirectedFlow directedFlow : getOutflows()) {
-            if(directedFlow instanceof DeliverableFlow){
-                return (DeliverableFlow) directedFlow;
-            }
-        }
-        return null;
-    }
-    protected Set<OutputDelegation> getOutputDelegations(Set<DirectedFlow> inflows) {
-        Set<OutputDelegation> delegatedOutputs=new HashSet<OutputDelegation>();
-        for (DirectedFlow inflow : inflows) {
-            if(inflow instanceof OutputDelegation){
-                delegatedOutputs.add((OutputDelegation) inflow);
-            }
-        }
-        return delegatedOutputs;
+        return findByType(getInflows(), OutputDelegation.class);
     }
 
-    public Set<Measure> getValueAdds() {
+    public DeliverableFlow getOutput() {
+        return findOneByType(getOutflows(), DeliverableFlow.class);
+    }
+
+    public Set<ValueAdd> getValueAdds() {
         return valueAdds;
     }
 
     public Set<OutputDelegation> getOutputDelegations() {
-        return getOutputDelegations(super.getOutflows());
+        return findByType(getOutflows(), OutputDelegation.class);
+    }
+
+    public ValueAdd findValueAdd(String s) {
+        return findByName(getValueAdds(), s);
     }
 }

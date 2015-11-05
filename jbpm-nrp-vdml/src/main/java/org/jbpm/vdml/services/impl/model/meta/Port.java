@@ -16,6 +16,8 @@ public abstract class Port implements MetaEntity,MeasurableElement{
     private String name;
     @ManyToOne
     private Measure batchSize;
+    @ManyToOne
+    private PortContainer portContainer;
     @ManyToMany
     @JoinTable(name="port_measure")
     private Collection<Measure> measures=new HashSet<Measure>();
@@ -24,11 +26,13 @@ public abstract class Port implements MetaEntity,MeasurableElement{
     @OneToMany(mappedBy = "target")
     private Set<DirectedFlow> inflows=new HashSet<DirectedFlow>();
 
-    public Port(String uri) {
-        this.uri = uri;
+    public Port() {
     }
 
-    protected  Port(){
+    protected  Port(String uri, PortContainer portContainer){
+        this.uri = uri;
+        this.portContainer=portContainer;
+        this.portContainer.getContainedPorts().add(this);
 
     }
     @Override
@@ -67,7 +71,9 @@ public abstract class Port implements MetaEntity,MeasurableElement{
         return inflows;
     }
 
-    public abstract PortContainer getPortContainer();
+    public  PortContainer getPortContainer(){
+        return portContainer;
+    }
 
 
 }

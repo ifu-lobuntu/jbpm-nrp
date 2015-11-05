@@ -37,9 +37,9 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         CollaborationInstance exchange = exchangeService.startExchangeForProduct(consumerParticipant.getId(), supplierParticipant.getOfferedStores().iterator().next().getId());
         //THEN
         assertEquals(3, exchange.getActivities().size());
-        assertNotNull(exchange.findActivity(collaboration.findActivity("Request")));
-        assertNotNull(exchange.findActivity(collaboration.findActivity("Receive")));
-        assertNotNull(exchange.findActivity(collaboration.findActivity("Provide")));
+        assertNotNull(exchange.findFirstActivity(collaboration.findActivity("Request")));
+        assertNotNull(exchange.findFirstActivity(collaboration.findActivity("Receive")));
+        assertNotNull(exchange.findFirstActivity(collaboration.findActivity("Provide")));
         assertEquals(2, exchange.getCollaborationRoles().size());
         assertNotNull(exchange.findRole(collaboration.findRole("Consumer")));
         assertNotNull(exchange.findRole(collaboration.findRole("Provider")));
@@ -53,9 +53,9 @@ public class StoreExchangeTest extends MetaEntityImportTest {
         assertEquals(consumerParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().getOwner().getId());
         assertEquals(supplierParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().getOwner().getId());
         assertEquals(supplierParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("ProductStore")).getStore().getOwner().getId());
-        assertEquals(consumerParticipant.getId(), exchange.findActivity(collaboration.findActivity("Request")).getCapabilityOffer().getParticipant().getId());
-        assertEquals(supplierParticipant.getId(), exchange.findActivity(collaboration.findActivity("Provide")).getCapabilityOffer().getParticipant().getId());
-        assertEquals(consumerParticipant.getId(), exchange.findActivity(collaboration.findActivity("Receive")).getCapabilityOffer().getParticipant().getId());
+        assertEquals(consumerParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("Request")).getCapabilityOffer().getParticipant().getId());
+        assertEquals(supplierParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("Provide")).getCapabilityOffer().getParticipant().getId());
+        assertEquals(consumerParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("Receive")).getCapabilityOffer().getParticipant().getId());
     }
     @Test
     public void testCommit() throws Exception{

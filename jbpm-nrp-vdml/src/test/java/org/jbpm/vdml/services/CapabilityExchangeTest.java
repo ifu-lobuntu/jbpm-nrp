@@ -37,8 +37,8 @@ public class CapabilityExchangeTest extends MetaEntityImportTest {
         CollaborationInstance exchange = exchangeService.startExchangeForService(consumerParticipant.getId(), supplierParticipant.getCapabilityOffers().iterator().next().getId());
         //THEN
         assertEquals(2, exchange.getActivities().size());
-        assertNotNull(exchange.findActivity(collaboration.findActivity("DefineWork")));
-        assertNotNull(exchange.findActivity(collaboration.findActivity("DoWork")));
+        assertNotNull(exchange.findFirstActivity(collaboration.findActivity("DefineWork")));
+        assertNotNull(exchange.findFirstActivity(collaboration.findActivity("DoWork")));
         assertEquals(2, exchange.getCollaborationRoles().size());
         assertNotNull(exchange.findRole(collaboration.findRole("Consumer")));
         assertNotNull(exchange.findRole(collaboration.findRole("Provider")));
@@ -49,8 +49,8 @@ public class CapabilityExchangeTest extends MetaEntityImportTest {
         assertEquals(supplierParticipant.getId(), exchange.findRole(collaboration.findRole("Provider")).getParticipant().getId());
         assertEquals(consumerParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("FromAccount")).getStore().getOwner().getId());
         assertEquals(supplierParticipant.getId(), exchange.findSupplyingStore(collaboration.findSupplyingStore("ToAccount")).getStore().getOwner().getId());
-        assertEquals(consumerParticipant.getId(), exchange.findActivity(collaboration.findActivity("DefineWork")).getCapabilityOffer().getParticipant().getId());
-        assertEquals(supplierParticipant.getId(), exchange.findActivity(collaboration.findActivity("DoWork")).getCapabilityOffer().getParticipant().getId());
+        assertEquals(consumerParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("DefineWork")).getCapabilityOffer().getParticipant().getId());
+        assertEquals(supplierParticipant.getId(), exchange.findFirstActivity(collaboration.findActivity("DoWork")).getCapabilityOffer().getParticipant().getId());
     }
 
     @Test

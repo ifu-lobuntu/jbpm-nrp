@@ -29,7 +29,9 @@ public abstract class Measurement implements ActivatableRuntimeEntity {
     public Measure getMeasure() {
         return measure;
     }
-
+    public boolean isResolved(){
+        return actualValue!=null || actualRating!=null;
+    }
     public Double getActualValue() {
         return actualValue;
     }

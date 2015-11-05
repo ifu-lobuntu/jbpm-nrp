@@ -21,9 +21,9 @@ public class ResourceUseInstance implements RuntimeEntity {
     @ManyToOne
     private ActivityInstance activity;
     @ManyToOne
-    private DeliverableFlowInstance input;
+    private InputPortInstance input;
     @ManyToOne
-    private DeliverableFlowInstance output;
+    private OutputPortInstance output;
     @ManyToOne
     private Address address;
 
@@ -147,11 +147,11 @@ public class ResourceUseInstance implements RuntimeEntity {
         this.quantity = quantity;
     }
 
-    public DeliverableFlowInstance getOutput() {
+    public OutputPortInstance getOutput() {
         return output;
     }
 
-    public void setOutput(DeliverableFlowInstance output) {
+    public void setOutput(OutputPortInstance output) {
         this.output = output;
     }
 
@@ -173,7 +173,7 @@ public class ResourceUseInstance implements RuntimeEntity {
         return activity;
     }
 
-    public DeliverableFlowInstance getInput() {
+    public InputPortInstance getInput() {
         return input;
     }
 
@@ -181,7 +181,7 @@ public class ResourceUseInstance implements RuntimeEntity {
         return measurements;
     }
 
-    public void setInput(DeliverableFlowInstance input) {
+    public void setInput(InputPortInstance input) {
         this.input = input;
     }
 

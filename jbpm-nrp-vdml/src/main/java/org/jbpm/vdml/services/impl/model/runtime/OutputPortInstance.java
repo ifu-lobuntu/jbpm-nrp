@@ -1,26 +1,50 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
-import org.jbpm.vdml.services.impl.model.meta.Port;
+import org.jbpm.vdml.services.impl.model.meta.OutputPort;
+import org.jbpm.vdml.services.impl.model.meta.ValueAdd;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.jbpm.vdml.services.impl.model.runtime.RuntimeEntityUtil.findMatchingRuntimeEntity;
 
 @Entity
 @DiscriminatorValue("OutputPortInstance")
 public class OutputPortInstance extends PortInstance {
-    @OneToMany
-    private Set<ValueAddMeasurement> valueAdds=new HashSet<ValueAddMeasurement>();
+    @OneToMany(mappedBy = "outputPort", cascade = CascadeType.ALL)
+    private Set<ValueAddInstance> valueAdds=new HashSet<ValueAddInstance>();
+    @ManyToOne
+    private ValuePropositionInstance valueProposition;
     public OutputPortInstance() {
     }
-
-    public OutputPortInstance(PortContainerInstance portContainer, Port port) {
-        super(portContainer, port);
+    public DeliverableFlowInstance getOutput(){
+        if(getOutflow().size()>1){
+            throw new IllegalStateException("Port '" + getPort().getName() +"' has more that one output DeliverableFlow");
+        }
+        return getOutflow().iterator().next();
     }
 
-    public Set<ValueAddMeasurement> getValueAdds() {
+    public ValuePropositionInstance getValueProposition() {
+        return valueProposition;
+    }
+
+    public void setValueProposition(ValuePropositionInstance valueProposition) {
+        this.valueProposition = valueProposition;
+    }
+
+    public OutputPort getPort(){
+        return (OutputPort) super.getPort();
+    }
+    public OutputPortInstance(OutputPort port, PortContainerInstance portContainer) {
+        super(port, portContainer);
+    }
+
+    public Set<ValueAddInstance> getValueAdds() {
         return valueAdds;
+    }
+
+    public ValueAddInstance findValueAdd(ValueAdd valueAdd) {
+        return findMatchingRuntimeEntity(getValueAdds(), valueAdd);
     }
 }

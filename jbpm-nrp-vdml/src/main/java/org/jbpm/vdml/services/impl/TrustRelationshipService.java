@@ -29,7 +29,7 @@ public class TrustRelationshipService extends AbstractRuntimeService {
 
     public List<ValuePropositionPerformance> findMatchingValueProposition(String valuePropositionRef, LocationCriterion location, Collection<MeasurementCriterion> criteria) {
         String s = CriteriaUtil.buildCriteriaString(criteria);
-        Query q = entityManager.createQuery("select distinct m.component.valueProposition from ValuePropositionComponentMeasurement  m " +
+        Query q = entityManager.createQuery("select distinct m.component.valueProposition from ValuePropositionComponentPerformanceMeasurement  m " +
                         "where m.component.valueProposition.valueProposition.uri = :valuePropositionUri and " +
                         " distance(m.component.valueProposition.provider.participant.address.location, :desiredLocation) < :maxDistance and  " +
                         s +
@@ -54,7 +54,7 @@ public class TrustRelationshipService extends AbstractRuntimeService {
     }
 
     public List<TrustRelationship> findMyPreferredSuppliers(String valuePropositionRef, Long participantId) {
-        Query q = entityManager.createQuery("select rp from RelationshipPerformance rp where rp.recipient.participant.id =:participantId and rp.valueProposition.uri=:valuePropositionUri");
+        Query q = entityManager.createQuery("select rp from TrustRelationship rp where rp.recipient.participant.id =:participantId and rp.valueProposition.uri=:valuePropositionUri");
         q.setParameter("participantId", participantId);
         q.setParameter("valuePropositionUri", valuePropositionRef);
         return q.getResultList();

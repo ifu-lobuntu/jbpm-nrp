@@ -55,7 +55,7 @@ public class ParticipantService extends AbstractRuntimeService {
             for (ValuePropositionPerformance p : pvpp) {
                 Collection<ValuePropositionComponentPerformance> cs = syncRuntimeEntities(p.getComponents(), p.getValueProposition().getComponents(), ValuePropositionComponentPerformance.class, p);
                 for (ValuePropositionComponentPerformance cc : cs) {
-                    syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ValuePropositionComponentMeasurement.class, cc);
+                    syncRuntimeEntities(cc.getMeasurements(), cc.getValuePropositionComponent().getMeasures(), ValuePropositionComponentPerformanceMeasurement.class, cc);
                 }
             }
         }

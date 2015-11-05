@@ -142,7 +142,7 @@ public class ExchangeService extends AbstractRuntimeService {
         RolePerformance requestorRolePerformance = findOrCreateRole(participant, collaboration1.getInitiatorRole());
         RolePerformance supplierRolePerformance = findOrCreateRole(cp.getOwner(), cp.getStoreDefinition().getExchangeConfiguration().getSupplierRole());
         CollaborationInstance observation = collaborationService.startCollaboration(collaboration1, Arrays.asList(requestorRolePerformance, supplierRolePerformance));
-        ActivityInstance ao = observation.findActivity(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking().getActivity());
+        ActivityInstance ao = observation.findFirstActivity(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking().getActivity());
         final ResourceUseInstance resourceUse = ao.findResourceUse(cp.getStoreDefinition().getExchangeConfiguration().getPoolBooking());
         //TODO check for availability AGAIN here.
         resourceUse.setPlannedFromDateTime(requiredAvailability.getFrom());
@@ -158,11 +158,11 @@ public class ExchangeService extends AbstractRuntimeService {
                 resourceUse.setAddress(collaboration1.getAddress());
                 break;
             case PROVIDING_STORE:
-                SupplyingStoreInstance sourcePortContainer = (SupplyingStoreInstance) resourceUse.getInput().getSourcePortContainer();
+                SupplyingStoreInstance sourcePortContainer = (SupplyingStoreInstance) resourceUse.getInput().getInput().getSourcePortContainer();
                 resourceUse.setAddress(sourcePortContainer.getStore().getAddress());
                 break;
             case RECEIVING_STORE:
-                SupplyingStoreInstance targetPortContainer = (SupplyingStoreInstance) resourceUse.getOutput().getTargetPortContainer();
+                SupplyingStoreInstance targetPortContainer = (SupplyingStoreInstance) resourceUse.getOutput().getOutput().getTargetPortContainer();
                 resourceUse.setAddress(targetPortContainer.getStore().getAddress());
                 break;
             case ROLE_PARTICIPANT:

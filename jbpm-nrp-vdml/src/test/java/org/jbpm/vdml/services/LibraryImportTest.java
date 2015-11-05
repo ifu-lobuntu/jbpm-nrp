@@ -23,19 +23,19 @@ public class LibraryImportTest extends MetaEntityImportTest {
         StoreDefinition sd = VDMLFactory.eINSTANCE.createStoreDefinition();
         sl.getStoreLibraryElement().add(sd);
         sd.setName("SupplyStuffDef");
-        addCharacteristics(vdm, sd.getCharacteristicDefinition());
+        addTestCharacteristics(vdm, sd.getCharacteristicDefinition());
 
         BusinessItemDefinition bd = VDMLFactory.eINSTANCE.createBusinessItemDefinition();
         vdm.getBusinessItemLibrary().get(0).getBusinessItemLibraryElement().add(bd);
         bd.setName("StuffDef");
-        addCharacteristics(vdm, bd.getCharacteristicDefinition());
+        addTestCharacteristics(vdm, bd.getCharacteristicDefinition());
 
         CapabilityLibrary cl =vdm.getCapabilitylibrary().get(0);
         vdm.getCapabilitylibrary().add(cl);
         CapabilityDefinition cd = VDMLFactory.eINSTANCE.createCapabilityDefinition();
         cl.getCapability().add(cd);
         cd.setName("DoStuffDef");
-        addCharacteristics(vdm, cd.getCharacteristicDefinition());
+        addTestCharacteristics(vdm, cd.getCharacteristicDefinition());
 
 
         vdm.eResource().save(new ByteArrayOutputStream(), null);
