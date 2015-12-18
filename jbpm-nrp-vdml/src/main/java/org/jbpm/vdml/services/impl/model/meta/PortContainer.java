@@ -19,6 +19,8 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
 
     @OneToMany(mappedBy = "portContainer",cascade = CascadeType.ALL)
     private Set<Port> containedPorts = new HashSet<Port>();
+    @OneToMany(mappedBy = "portContainer", cascade = CascadeType.ALL)
+    private Set<RoleResource> roleResources=new HashSet<RoleResource>();
 
     public PortContainer(String uri) {
         this.uri = uri;
@@ -88,5 +90,9 @@ public abstract class PortContainer implements MetaEntity, MeasurableElement {
             }
         }
         return result;
+    }
+
+    public Set<RoleResource> getRoleResources() {
+        return roleResources;
     }
 }

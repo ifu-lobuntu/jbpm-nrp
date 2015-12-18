@@ -8,7 +8,7 @@ import java.util.*;
 
 import static org.jbpm.vdml.services.impl.model.meta.MetaEntityUtil.findByName;
 
-@Entity
+@Entity(name="BusinessItemDefinition")
 public class BusinessItemDefinition implements MetaEntity{
     @Id
     private String uri;
@@ -17,6 +17,8 @@ public class BusinessItemDefinition implements MetaEntity{
     private BusinessItemDefinition extendedBusinessItemDefinition;
     @ManyToMany(mappedBy = "businessItemDefinitions")
     private Set<Collaboration> collaborations=new HashSet<Collaboration>();
+    @ManyToMany
+    private Set<Capability> supportedCapabilities=new HashSet<Capability>();
     @ManyToMany
     private Set<Measure> measures=new HashSet<Measure>();
     private boolean fungible;
@@ -33,6 +35,10 @@ public class BusinessItemDefinition implements MetaEntity{
     }
     public BusinessItemDefinition(String uri) {
         this.uri = uri;
+    }
+
+    public Set<Capability> getSupportedCapabilities() {
+        return supportedCapabilities;
     }
 
     public String getUri() {

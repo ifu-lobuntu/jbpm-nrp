@@ -62,13 +62,5 @@ public abstract class Measure implements  MetaEntity{
         this.uri = uri;
     }
 
-    public byte[] getInformation() {
-        return information;
-    }
-
-    public void setInformation(byte[] information) {
-        this.information = information;
-    }
-
     protected abstract void writeInformation(ObjectOutputStream oos) throws IOException;
 }

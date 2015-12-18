@@ -180,7 +180,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         ps.flush();
 
         Long projectId = project.getId();
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId,ObservationPhase.EXECUTION);
         CollaborationInstance collaborationInstanceFound = new ProjectService(getEntityManager()).findProject(projectId);
         BusinessItemObservation businessItemFound = collaborationInstanceFound.findFirstBusinessItem(project.getCollaboration().findBusinessItem("UserStory"));
         DeliverableFlowInstance moneyFlowObservation = collaborationInstanceFound.findFirstDeliverableFlow(collaborationInstanceFound.getCollaboration().findDeliverableFlow(incomeFlow.getName()));
@@ -208,7 +208,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         ps.flush();
 
         Long projectId = project.getId();
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId,ObservationPhase.EXECUTION);
         CollaborationInstance projecFound = new ProjectService(getEntityManager()).findProject(projectId);
         ActivityInstance codeUserStoryFound = projecFound.findFirstActivity(projecFound.getCollaboration().findActivity("CodeUserStory"));
         ActivityMeasurement totalCost = codeUserStoryFound.findMeasurement(codeUserStoryFound.getActivity().findMeasure("TotalCost"));
@@ -260,7 +260,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         }while(count<100);
         Long projectId = project.getId();
         //WHEN
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId,ObservationPhase.EXECUTION);
         //THEN
 
         CollaborationInstance projecFound = new ProjectService(getEntityManager()).findProject(projectId);
@@ -316,7 +316,7 @@ public class ObservationCalculationTest extends MetaEntityImportTest {
         ps.flush();
 
         Long projectId = project.getId();
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId);
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(projectId,ObservationPhase.EXECUTION);
         CollaborationInstance projectFound = new ProjectService(getEntityManager()).findProject(projectId);
         SupplyingStoreInstance backlog = projectFound.findFirstSupplyingStore(projectFound.getCollaboration().findSupplyingStore("ReleasePlan"));
         SupplyingStoreMeasurement latenessDifficultyRatio = backlog.findMeasurement(backlog.getSupplyingStore().findMeasure("LatenessDifficultyRatio"));

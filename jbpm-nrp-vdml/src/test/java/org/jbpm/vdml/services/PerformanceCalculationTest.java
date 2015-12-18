@@ -2,6 +2,7 @@ package org.jbpm.vdml.services;
 
 import org.jbpm.vdml.services.api.model.LinkedExternalObject;
 import org.jbpm.vdml.services.impl.*;
+import org.jbpm.vdml.services.impl.model.meta.*;
 import org.jbpm.vdml.services.impl.model.runtime.*;
 import org.jbpm.vdml.services.impl.model.runtime.CapabilityOffer;
 import org.joda.time.DateTime;
@@ -10,6 +11,13 @@ import org.omg.smm.Accumulator;
 import org.omg.smm.BinaryFunctor;
 import org.omg.smm.Characteristic;
 import org.omg.vdml.*;
+import org.omg.vdml.Activity;
+import org.omg.vdml.BusinessItemDefinition;
+import org.omg.vdml.CapabilityMethod;
+import org.omg.vdml.PoolDefinition;
+import org.omg.vdml.Role;
+import org.omg.vdml.StoreDefinition;
+import org.omg.vdml.SupplyingStore;
 import test.TestGradeMeasure;
 
 import java.io.ByteArrayOutputStream;
@@ -53,7 +61,7 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         completeProject(new DateTime(2015, 8, 8, 12, 0, 0, 0), new DateTime(2015, 8, 8, 12, 30, 0, 0), TestGradeMeasure.BAD);
         Long cpId = ekke.getCapabilityOffers().iterator().next().getId();
         PerformanceCalculationService service = new PerformanceCalculationService(getEntityManager());
-        service.calculateCapabilityPerformance(cpId);
+        service.calculateCapabilityPerformance(cpId,ObservationPhase.EXECUTION);
         CapabilityOffer capabilityOffer = service.findCapabilityPerformance(cpId);
         CapabilityMeasurement averageDurationMeasurement = capabilityOffer.findMeasurement(capabilityOffer.getCapability().findMeasure("AverageDuration"));
         assertEquals(60d, averageDurationMeasurement.getActualValue(),0.01);
@@ -73,7 +81,7 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         ao1.setActualStartDate(from);
         ao1.setActualDateOfCompletion(to);
         projectService.flush();
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId());
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId(),ObservationPhase.EXECUTION);
     }
     @Test
     public void testStorePerformance() throws Exception {
@@ -108,11 +116,11 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         participantService.setCapabilities(ekke.getId(), Collections.singleton(MetaBuilder.buildUri(orderFreshProduce)));
         participantService.setStores(farmerParticipant.getId(), Collections.singleton(MetaBuilder.buildUri(freshProduceStore)));
         Long spId = farmerParticipant.getOfferedStores().iterator().next().getId();
-        completeStoreProject(120, TestGradeMeasure.GOOD, spId);
-        completeStoreProject(30, TestGradeMeasure.GOOD, spId);
-        completeStoreProject(30, TestGradeMeasure.BAD, spId);
+        completeStoreProject(120, TestGradeMeasure.GOOD, farmerParticipant.getId());
+        completeStoreProject(30, TestGradeMeasure.GOOD, farmerParticipant.getId());
+        completeStoreProject(30, TestGradeMeasure.BAD, farmerParticipant.getId());
         PerformanceCalculationService service = new PerformanceCalculationService(getEntityManager());
-        service.calculateStorePerformance(spId);
+        service.calculateStorePerformance(spId,ObservationPhase.EXECUTION);
         StorePerformance storePerformance = service.findStorePerformance(spId);
         StoreMeasurement averageLatenessMeasurement = storePerformance.findMeasurement(storePerformance.getStoreDefinition().findMeasure("AverageLateness"));
         assertEquals(60d, averageLatenessMeasurement.getActualValue(), 0.01);
@@ -124,15 +132,16 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         assertEquals(3d, horriblyConvolutedMeasurement.getActualValue(),0.01);
     }
 
-    private void completeStoreProject(int lateness, TestGradeMeasure rating, Long storeId) {
+    private void completeStoreProject(int lateness, TestGradeMeasure rating, Long participantId) {
         ProjectService projectService=new ProjectService(getEntityManager());
         CollaborationInstance project = projectService.initiateProject(ekke.getId(), MetaBuilder.buildUri(cm));
-        projectService.assignStorePerformance(project.getId(), storeId);
+        org.jbpm.vdml.services.impl.model.meta.SupplyingStore supplyFreshProduce = project.getCollaboration().findSupplyingStore("SupplyFreshProduce");
+        projectService.assignParticipantToSupplyingstore(participantId, project.findFirstSupplyingStore(supplyFreshProduce).getId());
         SupplyingStoreInstance ao1 = project.getSupplyingStores().iterator().next();
         ao1.findMeasurement(ao1.getSupplyingStore().findMeasure("TestGradeMeasure")).setActualRating(rating);
         ao1.findMeasurement(ao1.getSupplyingStore().findMeasure("Lateness")).setActualValue((double) lateness);
         projectService.flush();
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId());
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId(),ObservationPhase.EXECUTION);
     }
 
     @Test
@@ -170,7 +179,7 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         completeBusinessItemProject(30, TestGradeMeasure.GOOD, bipId);
         completeBusinessItemProject(30, TestGradeMeasure.BAD, bipId);
         PerformanceCalculationService service = new PerformanceCalculationService(getEntityManager());
-        service.calculateReusableResourcePerformance(bipId);
+        service.calculateReusableResourcePerformance(bipId,ObservationPhase.EXECUTION);
         ReusableBusinessItemPerformance rbiPerformance = service.findReusableBusinessItemPerformance(bipId);
         ReusableBusinessItemMeasurement averageLatenessMeasurement = rbiPerformance.findMeasurement(rbiPerformance.getDefinition().findMeasure("AverageLateness"));
         assertEquals(60d, averageLatenessMeasurement.getActualValue(), 0.01);
@@ -190,7 +199,7 @@ public class PerformanceCalculationTest extends MetaEntityImportTest {
         ao1.findMeasurement(ao1.getDefinition().findMeasure("TestGradeMeasure")).setActualRating(rating);
         ao1.findMeasurement(ao1.getDefinition().findMeasure("Lateness")).setActualValue((double) lateness);
         projectService.flush();
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId());
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId(),ObservationPhase.EXECUTION);
     }
 
 }

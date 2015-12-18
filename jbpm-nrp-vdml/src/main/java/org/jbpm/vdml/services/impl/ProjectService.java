@@ -67,19 +67,18 @@ public class ProjectService extends AbstractRuntimeService{
         assignmentService.assignToRoles(project, Arrays.asList(rp));
         return rp;
     }
-    public RolePerformance assignParticipantToActivity(Long capabilityOfferId, Long activityId) {
-        ActivityInstance project = entityManager.find(ActivityInstance.class, activityId);
-        CapabilityOffer co = entityManager.find(CapabilityOffer.class,capabilityOfferId);
-        RolePerformance result = assignmentService.assignToActivities(project, co);
+    public RolePerformance assignParticipantToActivity(Long participantId, Long activityId) {
+        ActivityInstance ai = entityManager.find(ActivityInstance.class, activityId);
+        Participant p = entityManager.find(Participant.class,participantId);
+        RolePerformance result = assignmentService.assignActivityToParticipant(p, ai);
         entityManager.flush();
         return result;
     }
-    public StorePerformance assignStorePerformance(Long projectId, Long spId) {
-        CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);
-        StorePerformance storePerformance = entityManager.find(StorePerformance.class, spId);
-        assignmentService.assignToSupplyingStores(project.findFirstSupplyingStore(storePerformance.getStoreDefinition()),storePerformance);
+    public StorePerformance assignParticipantToSupplyingstore( Long participantId,Long supplyingStoreId) {
+        SupplyingStoreInstance ssi = entityManager.find(SupplyingStoreInstance.class, supplyingStoreId);
+        assignmentService.assignStoreToParticipant(entityManager.find(Participant.class, participantId), ssi);
         entityManager.flush();
-        return storePerformance;
+        return ssi.getStore();
     }
     public ReusableBusinessItemPerformance assignReusableBusinessItemPerformance(Long projectId, Long bipId) {
         CollaborationInstance project = entityManager.find(CollaborationInstance.class, projectId);

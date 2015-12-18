@@ -10,20 +10,20 @@ public class RoleResource implements MetaEntity{
     private String uri;
     private String name;
     @ManyToOne
-    private Activity activity;
+    private PortContainer portContainer;
     @ManyToOne
     private InputPort fromResource;
     @ManyToOne
     private RoleInCapabilityMethod toRole;
 
-    public RoleResource(String uri, Activity activity) {
+    public RoleResource(String uri, PortContainer portContainer) {
         this.uri = uri;
-        this.activity = activity;
-        this.activity.getRoleResources().add(this);
+        this.portContainer = portContainer;
+        this.portContainer.getRoleResources().add(this);
     }
 
-    public Activity getActivity() {
-        return activity;
+    public PortContainer getPortContainer() {
+        return portContainer;
     }
 
     public InputPort getFromResource() {

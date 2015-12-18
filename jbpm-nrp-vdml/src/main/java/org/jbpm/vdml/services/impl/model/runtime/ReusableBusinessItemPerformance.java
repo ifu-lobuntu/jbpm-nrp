@@ -30,7 +30,9 @@ public class ReusableBusinessItemPerformance implements ActivatableRuntimeEntity
 
     @ManyToOne
     @JoinColumn(nullable = true)
-    private Participant represents;
+    private IndividualParticipant represents;
+    @OneToMany(mappedBy = "capabilityResource")
+    private Set<CapabilityOffer> supportedCapabilityOffers = new HashSet<CapabilityOffer>();
     @ManyToOne(cascade = CascadeType.ALL)
     private Schedule schedule;
     @ManyToOne(cascade = CascadeType.ALL)
@@ -49,12 +51,21 @@ public class ReusableBusinessItemPerformance implements ActivatableRuntimeEntity
         this.definition = definition;
         this.instanceReference=instance;
     }
+    public ReusableBusinessItemPerformance(BusinessItemDefinition definition, IndividualParticipant participant) {
+        this.definition = definition;
+        this.represents=participant;
+        this.represents.getRepresentedActors().add(this);
+    }
 
-    public Participant getRepresents() {
+    public Set<CapabilityOffer> getSupportedCapabilityOffers() {
+        return supportedCapabilityOffers;
+    }
+
+    public IndividualParticipant getRepresents() {
         return represents;
     }
 
-    public void setRepresents(Participant represents) {
+    public void setRepresents(IndividualParticipant represents) {
         this.represents = represents;
     }
 

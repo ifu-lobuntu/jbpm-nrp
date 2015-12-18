@@ -22,6 +22,9 @@ public class CapabilityOffer implements ActivatableRuntimeEntity,DirectlyExchang
     private Participant participant;
     @ManyToOne
     private Capability capability;
+    @ManyToMany
+    @JoinTable(name="capability_resource")
+    private Set<ReusableBusinessItemPerformance> capabilityResource=new HashSet<ReusableBusinessItemPerformance>();
     @OneToMany()
     private Set<CapabilityMeasurement> measurements=new HashSet<CapabilityMeasurement>();//Aggregated from ActivityInstance.measurements
 

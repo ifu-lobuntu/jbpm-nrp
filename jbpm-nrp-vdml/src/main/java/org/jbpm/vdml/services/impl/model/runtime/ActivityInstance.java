@@ -1,10 +1,7 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 import org.hibernate.annotations.Type;
-import org.jbpm.vdml.services.impl.model.meta.Activity;
-import org.jbpm.vdml.services.impl.model.meta.Measure;
-import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
-import org.jbpm.vdml.services.impl.model.meta.ResourceUse;
+import org.jbpm.vdml.services.impl.model.meta.*;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -35,6 +32,16 @@ public class ActivityInstance extends PortContainerInstance {
     private Set<ActivityMeasurement> measurements = new HashSet<ActivityMeasurement>();
 
     public ActivityInstance() {
+    }
+
+    @Override
+    public PortContainer getPortContainer() {
+        return activity;
+    }
+
+    @Override
+    public RoleInCapabilityMethod getResponsibleRole() {
+        return getActivity().getPerformingRole();
     }
 
     public ActivityInstance(Activity activity, CollaborationInstance collaboration) {

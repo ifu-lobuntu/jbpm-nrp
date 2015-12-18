@@ -28,8 +28,6 @@ public class Activity extends PortContainer {
     private Set<Measure> measures=new HashSet<Measure>();
     @OneToMany(mappedBy = "delegatingActivity", cascade = CascadeType.ALL)
     private Set<RoleMapping> roleMappings=new HashSet<RoleMapping>();
-    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
-    private Set<RoleResource> roleResources=new HashSet<RoleResource>();
 
     public Activity(String uri, RoleInCapabilityMethod performingRole) {
         super(uri);
@@ -92,10 +90,6 @@ public class Activity extends PortContainer {
 
     public Set<RoleMapping> getRoleMappings() {
         return roleMappings;
-    }
-
-    public Set<RoleResource> getRoleResources() {
-        return roleResources;
     }
 
 }

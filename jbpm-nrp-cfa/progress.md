@@ -12,11 +12,13 @@ ConversationForAction workflow:
 - counterToOwner
 - renegotiate
 - renege
+- accept new terms
 - withdraw
+- Migrate ConversationAct to TaskImpl
+- implement validation for conversationForActionRole (Any, Initiator,Owner,etc.)
 
 #2. To implement
 
-- Migrate ConversationAct to TaskImpl
 - Subclass CaseTaskWorkItemHandler to create ConversationForAction
 
 ConversationForAction workflow:
@@ -24,10 +26,8 @@ ConversationForAction workflow:
 - add conversation (not direct request)
 - counterToRenegotiator
 - counterFromRenegotiator
-- accept new terms
 - allow inputs and outputs to be removed (currently only additive, maybe use null values but keep the keys)
 - null dates should not override previous agreed dates
-- implement validation for conversationForActionRole (Any, Initiator,Owner,etc.)
 
 Specify ContractService
 

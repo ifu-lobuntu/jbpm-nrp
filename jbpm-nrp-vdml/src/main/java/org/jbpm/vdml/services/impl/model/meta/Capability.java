@@ -20,6 +20,8 @@ public class Capability implements MetaEntity, MeasurableElement {
     private Capability extendedCapability;
     @ManyToMany
     private Set<Measure> measures = new HashSet<Measure>();
+    @ManyToMany
+    private Set<BusinessItemDefinition> capabilityResources= new HashSet<BusinessItemDefinition>();
 
     public Capability() {
 
@@ -34,6 +36,10 @@ public class Capability implements MetaEntity, MeasurableElement {
 
     public void setExchangeConfiguration(ExchangeConfiguration exchangeConfiguration) {
         this.exchangeConfiguration = exchangeConfiguration;
+    }
+
+    public Set<BusinessItemDefinition> getCapabilityResources() {
+        return capabilityResources;
     }
 
     public String getUri() {
@@ -70,5 +76,13 @@ public class Capability implements MetaEntity, MeasurableElement {
 
     public Measure findMeasure(String name) {
         return findByName(getMeasures(),name);
+    }
+
+    public void clearCapabilityResources() {
+        for (BusinessItemDefinition cr : new HashSet<BusinessItemDefinition>(capabilityResources)) {
+            capabilityResources.remove(cr);
+            cr.getSupportedCapabilities().remove(this);
+        }
+
     }
 }

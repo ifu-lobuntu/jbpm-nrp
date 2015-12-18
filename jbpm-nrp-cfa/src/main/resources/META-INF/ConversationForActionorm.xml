@@ -7,7 +7,7 @@
 		<query>
 			select distinct
 			new
-			org.pavanecce.cmmn.cfa.impl.ConversationForActionSummaryImpl(
+			org.jbpm.nrp.cfa.impl.ConversationForActionSummaryImpl(
 			t.id,
 			t.name,
 			t.subject,
@@ -37,72 +37,78 @@
 		</query>
 		<!-- hint name="org.hibernate.timeout" value="200"/ -->
 	</named-query>
-	<!--<named-query name="ConversationForActionGetOwnedCommitments">-->
-		<!--<query><![CDATA[-->
-			<!--select distinct-->
-			<!--new-->
-			<!--org.pavanecce.cmmn.cfa.impl.ConversationForActionSummaryImpl(-->
-			<!--t.id,-->
-			<!--t.name,-->
-			<!--t.description,-->
-			<!--t.taskData.status,-->
-			<!--t.priority,-->
-			<!--t.taskData.skipable,-->
-			<!--t.taskData.actualOwner.id,-->
-			<!--t.taskData.createdBy.id,-->
-			<!--t.taskData.createdOn,-->
-			<!--t.taskData.activationTime,-->
-			<!--t.taskData.expirationTime,-->
-			<!--t.taskData.processId,-->
-			<!--t.taskData.processInstanceId,-->
-			<!--t.taskData.parentId,-->
-			<!--t.taskData.deploymentId )-->
-			<!--from-->
-			<!--ConversationForActionImpl t-->
-			<!--where-->
-			<!--t.commitment.owner.id = :userId  and-->
-			<!--t.conversationState <> 'CONSUMMATED'-->
-			<!--order by t.id DESC-->
-			<!--]]>-->
-		<!--</query>-->
-		<!--&lt;!&ndash; hint name="org.hibernate.timeout" value="200"/ &ndash;&gt;-->
-	<!--</named-query>-->
-	<!--<named-query name="ConversationForActionGetInitiatedCommitments">-->
-		<!--<query><![CDATA[-->
-			<!--select distinct-->
-			<!--new-->
-			<!--org.pavanecce.cmmn.cfa.impl.ConversationForActionSummaryImpl(-->
-			<!--t.id,-->
-			<!--t.name,-->
-			<!--t.description,-->
-			<!--t.taskData.status,-->
-			<!--t.priority,-->
-			<!--t.taskData.skipable,-->
-			<!--t.taskData.actualOwner.id,-->
-			<!--t.taskData.createdBy.id,-->
-			<!--t.taskData.createdOn,-->
-			<!--t.taskData.activationTime,-->
-			<!--t.taskData.expirationTime,-->
-			<!--t.taskData.processId,-->
-			<!--t.taskData.processInstanceId,-->
-			<!--t.taskData.parentId,-->
-			<!--t.taskData.deploymentId )-->
-			<!--from-->
-			<!--ConversationForActionImpl t-->
-			<!--where-->
-			<!--t.commitment.isCommitted = true and-->
-			<!--t.peopleAssignments.taskInitiator.id = :userId and-->
-			<!--t.conversationState  <> 'CONSUMMATED'-->
-			<!--order by t.id DESC-->
-		<!--]]>-->
-		<!--</query>-->
-		<!--&lt;!&ndash; hint name="org.hibernate.timeout" value="200"/ &ndash;&gt;-->
-	<!--</named-query>-->
+	<named-query name="ConversationForActionGetOwnedCommitments">
+		<query><![CDATA[
+			select distinct
+			new
+			org.jbpm.nrp.cfa.impl.ConversationForActionSummaryImpl(
+			t.id,
+			t.name,
+			t.subject,
+			t.description,
+			t.taskData.status,
+			t.priority,
+			t.taskData.skipable,
+			t.taskData.actualOwner.id,
+			t.taskData.createdBy.id,
+			t.taskData.createdOn,
+			t.taskData.activationTime,
+			t.taskData.expirationTime,
+			t.taskData.processId,
+			t.taskData.processSessionId,
+			t.taskData.processInstanceId,
+			t.taskData.deploymentId,
+			t.subTaskStrategy,
+			t.taskData.parentId)
+			from
+			ConversationForActionImpl t
+			where
+			t.commitment.owner.id = :userId  and
+			t.conversationState <> 'CONSUMMATED'
+			order by t.id DESC
+			]]>
+		</query>
+		<!-- hint name="org.hibernate.timeout" value="200"/ -->
+	</named-query>
+	<named-query name="ConversationForActionGetInitiatedCommitments">
+		<query><![CDATA[
+			select distinct
+			new
+			org.jbpm.nrp.cfa.impl.ConversationForActionSummaryImpl(
+			t.id,
+			t.name,
+			t.subject,
+			t.description,
+			t.taskData.status,
+			t.priority,
+			t.taskData.skipable,
+			t.taskData.actualOwner.id,
+			t.taskData.createdBy.id,
+			t.taskData.createdOn,
+			t.taskData.activationTime,
+			t.taskData.expirationTime,
+			t.taskData.processId,
+			t.taskData.processSessionId,
+			t.taskData.processInstanceId,
+			t.taskData.deploymentId,
+			t.subTaskStrategy,
+			t.taskData.parentId)
+			from
+			ConversationForActionImpl t
+			where
+			t.commitment.isCommitted = true and
+			t.peopleAssignments.taskInitiator.id = :userId and
+			t.conversationState  <> 'CONSUMMATED'
+			order by t.id DESC
+		]]>
+		</query>
+		<!-- hint name="org.hibernate.timeout" value="200"/ -->
+	</named-query>
 	<named-query name="ConversationForActionGetPendingRequests">
 		<query>
 			select distinct
 			new
-			org.pavanecce.cmmn.cfa.impl.ConversationActSummaryImpl(
+			org.jbpm.nrp.cfa.impl.ConversationActSummaryImpl(
 			t.conversationForAction.id,
 			t.conversationForAction.name,
 			t.conversationForAction.description,
@@ -117,9 +123,9 @@
 			t.conversationForAction.taskData.processInstanceId,
 			t.conversationForAction.taskData.parentId,
 			t.conversationForAction.taskData.deploymentId,
-			t.inputContentId,
-			t.outputContentId,
-			t.faultContentId,
+			t.taskData.documentContentId,
+			t.taskData.outputContentId,
+			t.taskData.faultContentId,
 			t.kind,
 			t.resultingConversationState,
 			renegotiator,
@@ -141,7 +147,7 @@
 		<query>
 			select distinct
 			new
-			org.pavanecce.cmmn.cfa.impl.ConversationActSummaryImpl(
+			org.jbpm.nrp.cfa.impl.ConversationActSummaryImpl(
 			t.conversationForAction.id,
 			t.conversationForAction.name,
 			t.conversationForAction.description,
@@ -156,9 +162,9 @@
 			t.conversationForAction.taskData.processInstanceId,
 			t.conversationForAction.taskData.parentId,
 			t.conversationForAction.taskData.deploymentId,
-			t.inputContentId,
-			t.outputContentId,
-			t.faultContentId,
+			t.taskData.documentContentId,
+			t.taskData.outputContentId,
+			t.taskData.faultContentId,
 			t.kind,
 			t.resultingConversationState,
 			renegotiator,

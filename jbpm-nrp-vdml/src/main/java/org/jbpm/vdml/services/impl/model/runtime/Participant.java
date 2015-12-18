@@ -2,6 +2,7 @@ package org.jbpm.vdml.services.impl.model.runtime;
 
 
 import com.vividsolutions.jts.geom.Point;
+import org.jbpm.vdml.services.impl.model.meta.Capability;
 import org.jbpm.vdml.services.impl.model.scheduling.SchedulableObject;
 import org.jbpm.vdml.services.impl.model.scheduling.Schedule;
 
@@ -35,7 +36,13 @@ public abstract class Participant implements SchedulableObject {
     public Long getId() {
         return id;
     }
-
+    public Set<Capability> getOfferedCapabilities(){
+        Set<Capability> result= new HashSet<Capability>();
+        for (CapabilityOffer offer : capabilityOffers) {
+            result.add(offer.getCapability());
+        }
+        return result;
+    }
     public Set<StorePerformance> getOfferedStores() {
         return offeredStores;
     }

@@ -1,5 +1,6 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
+import org.jbpm.nrp.common.IntervalEnum;
 import org.jbpm.vdml.services.impl.model.meta.EnumeratedMeasure;
 import org.jbpm.vdml.services.impl.model.meta.Measure;
 import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
@@ -29,8 +30,11 @@ public abstract class Measurement implements ActivatableRuntimeEntity {
     public Measure getMeasure() {
         return measure;
     }
-    public boolean isResolved(){
+    public boolean isActualValueResolved(){
         return actualValue!=null || actualRating!=null;
+    }
+    public boolean isPlannedValueResolved(){
+        return plannedValue!=null || plannedRating!=null;
     }
     public Double getActualValue() {
         return actualValue;

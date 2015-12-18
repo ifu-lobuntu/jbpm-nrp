@@ -80,11 +80,5 @@ public abstract class Collaboration extends PortContainer {
         return ownedDirectedFlows;
     }
 
-    public Collection<ValueProposition> getValuePropositions() {
-        Set<ValueProposition> result = new HashSet<ValueProposition>();
-        for (Role role : getCollaborationRoles()) {
-            result.addAll(role.getProvidedValuePropositions());
-        }
-        return result;
-    }
+
 }

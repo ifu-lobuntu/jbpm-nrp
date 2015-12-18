@@ -17,8 +17,10 @@ public class BusinessItemObservation implements RuntimeEntity {
     private BusinessItemDefinition definition;
     @ManyToOne
     private CollaborationInstance collaboration;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "businessItem", cascade = CascadeType.ALL)
     private Set<BusinessItemMeasurement> measurements = new HashSet<BusinessItemMeasurement>();
+    @OneToMany(mappedBy="deliverable")
+    private Set<DeliverableFlowInstance> deliverableFlows = new HashSet<DeliverableFlowInstance>();
     @ManyToOne
     private ReusableBusinessItemPerformance sharedReference;
 
@@ -31,6 +33,10 @@ public class BusinessItemObservation implements RuntimeEntity {
         this.definition = definition;
         this.collaboration = collaboration;
         this.collaboration.getBusinessItems().add(this);
+    }
+
+    public Set<DeliverableFlowInstance> getDeliverableFlows() {
+        return deliverableFlows;
     }
 
     public Long getId() {

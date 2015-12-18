@@ -45,18 +45,4 @@ public class ValuePropositionComponent extends ValueElement {
         return valueProposition;
     }
 
-    public Map<PortContainer, Collection<ValueAdd>> findValueProducers() {
-        Map<PortContainer, Collection<ValueAdd>> valueProducers = new HashMap<PortContainer, Collection<ValueAdd>>();
-        for (ValueElement ve : getAggregatedFrom()) {
-            if (ve instanceof ValueAdd) {
-                ValueAdd va = (ValueAdd) ve;
-                Collection<ValueAdd> vas = valueProducers.get(va.getOutputPort().getPortContainer());
-                if (vas == null) {
-                    valueProducers.put(va.getOutputPort().getPortContainer(), vas = new HashSet<ValueAdd>());
-                }
-                vas.add(va);
-            }
-        }
-        return valueProducers;
-    }
 }

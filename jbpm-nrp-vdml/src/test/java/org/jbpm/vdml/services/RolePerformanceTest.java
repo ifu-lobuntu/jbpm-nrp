@@ -50,7 +50,8 @@ public class RolePerformanceTest extends MetaEntityImportTest {
 
         ValuePropositionPerformance valuePropositionPerformance = providingPerformance.getProvidedValuePropositions().iterator().next();
         PerformanceCalculationService service = new PerformanceCalculationService(getEntityManager());
-        service.calculateValueProposition(valuePropositionPerformance.getId());
+        service.calculateValueProposition(valuePropositionPerformance.getId(),ObservationPhase.EXECUTION);
+        //THEN
         ValuePropositionPerformance foundPerformance = service.findValuePropositionPerformance(valuePropositionPerformance.getId());
         ValuePropositionComponentPerformance numberOfBadPerformance = foundPerformance.findComponent(valuePropositionPerformance.getValueProposition().findComponent("TotalNumberOfBad"));
         assertEquals(3d, numberOfBadPerformance.findMeasurement(numberOfBadPerformance.getValuePropositionComponent().findMeasure("TotalNumberOfBad")).getActualValue(), 0.1);
@@ -131,7 +132,7 @@ public class RolePerformanceTest extends MetaEntityImportTest {
 
         TrustRelationship providedRelatiopnship = providingPerformance.getProvidedRelationships().iterator().next();
         PerformanceCalculationService service = new PerformanceCalculationService(getEntityManager());
-        service.calculateRelationshipPerformance(providedRelatiopnship.getId());
+        service.calculateRelationshipPerformance(providedRelatiopnship.getId(),ObservationPhase.EXECUTION);
         TrustRelationship foundPerformance = service.findRelationshipPerformance(providedRelatiopnship.getId());
         TrustRelationshipComponent numberOfBadPerformance = foundPerformance.findComponent(providedRelatiopnship.getValueProposition().findComponent("TotalNumberOfBad"));
         assertEquals(3d, numberOfBadPerformance.findMeasurement(numberOfBadPerformance.getValuePropositionComponent().findMeasure("TotalNumberOfBad")).getActualValue(), 0.1);
@@ -160,7 +161,7 @@ public class RolePerformanceTest extends MetaEntityImportTest {
         }
         projectService.assignParticipantToRole(consumerParticipant.getId(), project.getId(), MetaBuilder.buildUri(consumer));
         projectService.assignParticipantToRole(supplierParticipant.getId(), project.getId(), MetaBuilder.buildUri(supplier));
-        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId());
+        new ObservationCalculationService(getEntityManager()).resolveCollaborationMeasurements(project.getId(),ObservationPhase.EXECUTION);
         CollaborationInstance foundProject = new ProjectService(getEntityManager()).findProject(project.getId());
         assertEquals(1, foundProject.getValuePropositions().size());
         ValuePropositionInstance vpi = foundProject.getValuePropositions().iterator().next();

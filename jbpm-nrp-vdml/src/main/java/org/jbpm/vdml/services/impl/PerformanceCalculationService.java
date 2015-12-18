@@ -21,9 +21,9 @@ public class PerformanceCalculationService extends AbstractCalculationService {
         return entityManager.find(CapabilityOffer.class, cpId);
     }
 
-    public void calculateCapabilityPerformance(Long cpId) {
+    public void calculateCapabilityPerformance(Long cpId, ObservationPhase phase) {
         CapabilityOffer measurand = entityManager.find(CapabilityOffer.class, cpId);
-        ObservationContext context = new ObservationContext();
+        ObservationContext context = new ObservationContext(phase);
         context.putAll(measurand.getMeasurements());
         Set<Measurement> otherMeasurements = new MeasurementAggregator(entityManager).resolveAggregatedMEasurements(measurand, "ActivityMeasurement m where m.activity.capabilityOffer");
         resolveObservedMeasures(measurand.getCapability().getDeploymentId(), context, otherMeasurements);
@@ -31,9 +31,9 @@ public class PerformanceCalculationService extends AbstractCalculationService {
     }
 
 
-    public void calculateStorePerformance(Long spId) {
+    public void calculateStorePerformance(Long spId, ObservationPhase phase) {
         StorePerformance measurand = entityManager.find(StorePerformance.class, spId);
-        ObservationContext context = new ObservationContext();
+        ObservationContext context = new ObservationContext(phase);
         context.putAll(measurand.getMeasurements());
         Set<Measurement> otherMeasurements = new MeasurementAggregator(entityManager).resolveAggregatedMEasurements(measurand, "SupplyingStoreMeasurement m where m.store.store");
         resolveObservedMeasures(measurand.getStoreDefinition().getDeploymentId(), context, otherMeasurements);
@@ -44,9 +44,9 @@ public class PerformanceCalculationService extends AbstractCalculationService {
         return entityManager.find(StorePerformance.class, spId);
     }
 
-    public void calculateReusableResourcePerformance(Long bipId) {
+    public void calculateReusableResourcePerformance(Long bipId, ObservationPhase phase) {
         ReusableBusinessItemPerformance measurand = entityManager.find(ReusableBusinessItemPerformance.class, bipId);
-        ObservationContext context = new ObservationContext();
+        ObservationContext context = new ObservationContext(phase);
         context.putAll(measurand.getMeasurements());
         Set<Measurement> otherMeasurements = new MeasurementAggregator(entityManager).resolveAggregatedMEasurements(measurand, "BusinessItemMeasurement m where m.businessItem.sharedReference");
         resolveObservedMeasures(measurand.getDefinition().getDeploymentId(), context, otherMeasurements);
@@ -54,11 +54,11 @@ public class PerformanceCalculationService extends AbstractCalculationService {
     }
 
 
-    public void calculateValueProposition(Long pvppId) {
+    public void calculateValueProposition(Long pvppId, ObservationPhase phase) {
         ValuePropositionPerformance vpp = entityManager.find(ValuePropositionPerformance.class, pvppId);
         String deploymentId = vpp.getValueProposition().getCollaboration().getDeploymentId();
         for (final ValuePropositionComponentPerformance measurand : vpp.getComponents()) {
-            ObservationContext context = new ObservationContext();
+            ObservationContext context = new ObservationContext(phase);
             context.putAll(measurand.getMeasurements());
             Set<Measurement> otherMeasurements = new MeasurementAggregator<ValuePropositionComponentPerformance>(entityManager){
                 @Override
@@ -72,11 +72,11 @@ public class PerformanceCalculationService extends AbstractCalculationService {
     }
 
 
-    public void calculateRelationshipPerformance(Long rpId) {
+    public void calculateRelationshipPerformance(Long rpId, ObservationPhase phase) {
         TrustRelationship vpp = entityManager.find(TrustRelationship.class, rpId);
         String deploymentId = vpp.getValueProposition().getCollaboration().getDeploymentId();
         for (final TrustRelationshipComponent measurand : vpp.getComponents()) {
-            ObservationContext context = new ObservationContext();
+            ObservationContext context = new ObservationContext(phase);
             context.putAll(measurand.getMeasurements());
             Set<Measurement> otherMeasurements = new MeasurementAggregator<TrustRelationshipComponent>(entityManager){
                 @Override

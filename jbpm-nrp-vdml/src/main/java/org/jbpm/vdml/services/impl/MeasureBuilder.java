@@ -76,10 +76,23 @@ public class MeasureBuilder extends MetaBuilder {
             } else if (measure instanceof org.omg.smm.DirectMeasure) {
                 DirectMeasure directMeasure = new DirectMeasure();
                 result = directMeasure;
-            } else if (measure instanceof GradeMeasure || measure instanceof RankingMeasure) {
+            } else if (measure instanceof GradeMeasure) {
                 EnumeratedMeasure enumeratedMeasure = new EnumeratedMeasure();
                 Class cl = ClassResolver.resolveClass(Thread.currentThread().getContextClassLoader(), measure.eResource().getURI(), measure.getName());
                 enumeratedMeasure.setEnumClass(cl);
+                GradeMeasure gm = (GradeMeasure) measure;
+                if(gm.getGradeTo()!=null && gm.getGradeTo().getToDimensionalMeasure()!=null){
+                   enumeratedMeasure.setTargetMeasure(buildReference(gm.getGradeTo().getToDimensionalMeasure()));
+                }
+                result = enumeratedMeasure;
+            } else if (measure instanceof RankingMeasure) {
+                EnumeratedMeasure enumeratedMeasure = new EnumeratedMeasure();
+                Class cl = ClassResolver.resolveClass(Thread.currentThread().getContextClassLoader(), measure.eResource().getURI(), measure.getName());
+                enumeratedMeasure.setEnumClass(cl);
+                RankingMeasure gm = (RankingMeasure) measure;
+                if(gm.getRankingTo()!=null && gm.getRankingTo().getToDimensionalMeasure()!=null){
+                    enumeratedMeasure.setTargetMeasure(buildReference(gm.getRankingTo().getToDimensionalMeasure()));
+                }
                 result = enumeratedMeasure;
             } else if (measure instanceof org.omg.smm.BinaryMeasure) {
                 BinaryMeasure binaryMeasurement = new BinaryMeasure();

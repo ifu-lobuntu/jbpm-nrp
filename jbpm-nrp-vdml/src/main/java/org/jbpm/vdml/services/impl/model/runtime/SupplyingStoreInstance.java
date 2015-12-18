@@ -1,9 +1,7 @@
 package org.jbpm.vdml.services.impl.model.runtime;
 
 
-import org.jbpm.vdml.services.impl.model.meta.Measure;
-import org.jbpm.vdml.services.impl.model.meta.MetaEntity;
-import org.jbpm.vdml.services.impl.model.meta.SupplyingStore;
+import org.jbpm.vdml.services.impl.model.meta.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -28,6 +26,16 @@ public class SupplyingStoreInstance extends PortContainerInstance {
     private Set<SupplyingStoreMeasurement> measurements = new HashSet<SupplyingStoreMeasurement>();//Aggregated from BusinessItemObservation
 
     public SupplyingStoreInstance() {
+    }
+
+    @Override
+    public PortContainer getPortContainer() {
+        return supplyingStore;
+    }
+
+    @Override
+    public RoleInCapabilityMethod getResponsibleRole() {
+        return getSupplyingStore().getSupplyingRole();
     }
 
     public SupplyingStoreInstance(SupplyingStore supplyingStore, CollaborationInstance collaboration) {

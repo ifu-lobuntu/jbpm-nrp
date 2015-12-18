@@ -27,7 +27,7 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
 
     public PortContainerInstance() {
     }
-
+    public abstract PortContainer getPortContainer();
 
     @Override
     public Long getId() {
@@ -53,6 +53,7 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
         }
         return result;
     }
+    public abstract RoleInCapabilityMethod getResponsibleRole();
 
     public Set<DeliverableFlowInstance> getConcludedFlow() {
         return concludedFlow;
@@ -100,4 +101,18 @@ public abstract class PortContainerInstance implements RuntimeEntity, Measurand{
         }
         return result;
     }
+    public ReusableBusinessItemPerformance findProvidingRoleResource(){
+        for (RoleResource rr : getPortContainer().getRoleResources()) {
+            InputPortInstance inputPort = findInputPort(rr.getFromResource());
+            if(inputPort.getInflow().size()==1 && inputPort.getInput().getDeliverable().getSharedReference()!=null){
+                ReusableBusinessItemPerformance reference = inputPort.getInput().getDeliverable().getSharedReference();
+                if(reference.getRepresents()!=null){
+                    return reference;
+                }
+            }
+        }
+        return null;
+    }
+
+
 }

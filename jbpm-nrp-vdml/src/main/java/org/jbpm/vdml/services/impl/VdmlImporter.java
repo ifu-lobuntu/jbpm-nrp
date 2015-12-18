@@ -28,6 +28,9 @@ import org.jbpm.vdml.services.impl.model.meta.ValueProposition;
 import org.jbpm.vdml.services.impl.model.meta.ValuePropositionComponent;
 import org.jbpm.vdml.services.impl.model.meta.InputDelegation;
 import org.jbpm.vdml.services.impl.model.runtime.ExchangeConfiguration;
+import org.omg.vdml.CapabilityDefinition;
+import org.omg.vdml.CapabilityLibrary;
+import org.omg.vdml.ValueDeliveryModel;
 
 
 import javax.persistence.EntityManager;
@@ -59,7 +62,25 @@ public class VdmlImporter extends MetaBuilder {
             linkValueElements(c);
         }
         linkAssignments(vdm);
+        linkCapabilityResources(vdm);
         entityManager.flush();
+    }
+
+    private void linkCapabilityResources(org.omg.vdml.ValueDeliveryModel vdm) {
+        for (org.omg.vdml.CapabilityLibrary cl : vdm.getCapabilitylibrary()) {
+            for (org.omg.vdml.Capability capability : cl.getCapability()) {
+                if(capability instanceof org.omg.vdml.CapabilityDefinition){
+                    org.omg.vdml.CapabilityDefinition from= (org.omg.vdml.CapabilityDefinition)capability;
+                    Capability to=find(from,Capability.class);
+                    to.clearCapabilityResources();
+                    for (org.omg.vdml.BusinessItemDefinition fromBid : from.getCapabilityResourceDefinition()) {
+                        BusinessItemDefinition toBid=find(fromBid,BusinessItemDefinition.class);
+                        toBid.getSupportedCapabilities().add(to);
+                        to.getCapabilityResources().add(toBid);
+                    }
+                }
+            }
+        }
     }
 
     private void linkAssignments(org.omg.vdml.ValueDeliveryModel vdm) {
@@ -130,7 +151,7 @@ public class VdmlImporter extends MetaBuilder {
                 if (from instanceof org.omg.vdml.StoreDefinition) {
                     StoreDefinition to = findOrCreate(from, from instanceof org.omg.vdml.PoolDefinition ? PoolDefinition.class : StoreDefinition.class);
                     to.setDeploymentId(deploymentId);
-
+                    to.setResource(findOrCreate(from.getResource(),BusinessItemDefinition.class));
                     to.setName(from.getName());
                     measureBuilder.fromCharacteristics(to.getMeasures(), from.getCharacteristicDefinition());
                 }

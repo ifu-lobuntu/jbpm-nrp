@@ -6,6 +6,15 @@ import java.util.*;
 
 public class ObservationContext {
     private Map<String,ObservedMeasure> observedMeasures=new HashMap<String, ObservedMeasure>();
+    private ObservationPhase phase;
+
+    public ObservationContext(ObservationPhase phase) {
+        this.phase = phase;
+    }
+
+    public ObservationPhase getPhase() {
+        return phase;
+    }
 
     public ObservedMeasure getObservedMeasure(String key) {
         return observedMeasures.get(key);
@@ -25,7 +34,7 @@ public class ObservationContext {
         }
     }
     public ObservationContext subContext(){
-        ObservationContext result = new ObservationContext();
+        ObservationContext result = new ObservationContext(phase);
         result.observedMeasures.putAll(observedMeasures);
         return result;
     }
@@ -35,7 +44,7 @@ public class ObservationContext {
         for (ObservedMeasure om : observedMeasures.values()) {
             for (Measurement measurement : om.getMeasurements()) {
                 totalCount++;
-                if(measurement.isResolved()){
+                if(phase.isResolved(measurement)){
                     resolvedCount++;
                 }
             }

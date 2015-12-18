@@ -64,16 +64,5 @@ public abstract class Role implements MetaEntity {
         return performedActitivities;
     }
 
-    public void setPerformedActitivities(Set<Activity> performedActitivities) {
-        this.performedActitivities = performedActitivities;
-    }
 
-    public ValueProposition findValuePropositionTo(Role role) {
-        for (ValueProposition vp : providedValuePropositions) {
-            if(vp.getRecipient().equals(role)){
-                return vp;
-            }
-        }
-        return null;
-    }
 }

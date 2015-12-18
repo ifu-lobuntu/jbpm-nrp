@@ -46,10 +46,23 @@ public class ParticipantService extends AbstractRuntimeService {
         return (IndividualParticipant) q.getSingleResult();
     }
 
+    public void setRepresentedActors(Long participantId, Collection<String> businessItemDefinitionsIds) {
+        Collection<BusinessItemDefinition> businessItemDefinitions = entityManager.createQuery("select bid from BusinessItemDefinition bid where bid.uri in :businessItemDefinitionsIds").setParameter("businessItemDefinitionsIds", businessItemDefinitionsIds).getResultList();
+        IndividualParticipant participant = entityManager.find(IndividualParticipant.class, participantId);
+        syncRuntimeEntities(participant.getRepresentedActors(), businessItemDefinitions, ReusableBusinessItemPerformance.class, participant);
+        Set<Capability> capabilitiesToOffer = participant.getOfferedCapabilities();
+
+        for (ReusableBusinessItemPerformance actor : participant.getRepresentedActors()) {
+            capabilitiesToOffer.addAll(actor.getDefinition().getSupportedCapabilities());
+            syncRuntimeEntities(actor.getMeasurements(), actor.getDefinition().getMeasures(), ReusableBusinessItemMeasurement.class, actor);
+        }
+        syncRuntimeEntities(participant.getCapabilityOffers(), capabilitiesToOffer, CapabilityOffer.class, participant);
+    }
+
     public void setRoles(Long participantId, Collection<String> roleIds) {
-        Collection<RoleInNetwork> storeDefinitions = entityManager.createQuery("select c from RoleInNetwork c where c.uri in :roleIds").setParameter("roleIds", roleIds).getResultList();
+        Collection<RoleInNetwork> roles = entityManager.createQuery("select c from RoleInNetwork c where c.uri in :roleIds").setParameter("roleIds", roleIds).getResultList();
         Participant participant = entityManager.find(Participant.class, participantId);
-        syncRuntimeEntities(participant.getRolePerformances(), storeDefinitions, RolePerformance.class, participant);
+        syncRuntimeEntities(participant.getRolePerformances(), roles, RolePerformance.class, participant);
         for (RolePerformance cp : participant.getRolePerformances()) {
             Collection<ValuePropositionPerformance> pvpp = syncRuntimeEntities(cp.getProvidedValuePropositions(), cp.getRole().getProvidedValuePropositions(), ValuePropositionPerformance.class, cp);
             for (ValuePropositionPerformance p : pvpp) {
@@ -69,12 +82,12 @@ public class ParticipantService extends AbstractRuntimeService {
         for (MetaEntity metaEntity : storeDefinitions) {
             if (!activeStores.contains(metaEntity)) {
                 StorePerformance newInstance = null;
-                if(metaEntity instanceof PoolDefinition){
-                    newInstance=new PoolPerformance((PoolDefinition) metaEntity,participant);
-                }else{
-                    newInstance=new StorePerformance((StoreDefinition) metaEntity,participant);
+                if (metaEntity instanceof PoolDefinition) {
+                    newInstance = new PoolPerformance((PoolDefinition) metaEntity, participant);
+                } else {
+                    newInstance = new StorePerformance((StoreDefinition) metaEntity, participant);
                 }
-                result.add( newInstance);
+                result.add(newInstance);
                 entityManager.persist(newInstance);
                 entityManager.flush();
             }
@@ -110,8 +123,15 @@ public class ParticipantService extends AbstractRuntimeService {
         Collection<Capability> capabilities = entityManager.createQuery("select c from Capability c where c.uri in :capabilityIds").setParameter("capabilityIds", capabilityIds).getResultList();
         Participant participant = entityManager.find(Participant.class, participantId);
         syncRuntimeEntities(participant.getCapabilityOffers(), capabilities, CapabilityOffer.class, participant);
+        Set<BusinessItemDefinition> capabilityResources = new HashSet<BusinessItemDefinition>();
         for (CapabilityOffer cp : participant.getCapabilityOffers()) {
             syncRuntimeEntities(cp.getMeasurements(), cp.getCapability().getMeasures(), CapabilityMeasurement.class, cp);
+            capabilityResources.addAll(cp.getCapability().getCapabilityResources());
+        }
+        if(participant instanceof IndividualParticipant){
+            IndividualParticipant ip= (IndividualParticipant) participant;
+            capabilityResources.addAll(ip.getRepresentedActorDefinitions());
+            syncRuntimeEntities(ip.getRepresentedActors(), capabilityResources, ReusableBusinessItemPerformance.class, participant);
         }
     }
 
@@ -130,6 +150,7 @@ public class ParticipantService extends AbstractRuntimeService {
         resource.setSchedule(schedule);
         entityManager.flush();
     }
+
     //TODO figure out what to do here
     public void setPoolSchedule(Long id, Schedule schedule) {
         PoolPerformance pool = entityManager.find(PoolPerformance.class, id);

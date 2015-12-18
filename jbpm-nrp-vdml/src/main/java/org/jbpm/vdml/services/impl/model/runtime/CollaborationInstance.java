@@ -42,6 +42,16 @@ public class CollaborationInstance extends PortContainerInstance {
     public CollaborationInstance() {
     }
 
+    @Override
+    public PortContainer getPortContainer() {
+        return collaboration;
+    }
+
+    @Override
+    public RoleInCapabilityMethod getResponsibleRole() {
+        throw new IllegalStateException();
+    }
+
     public PortContainerInstance findPortContainer(PortContainer pc) {
         if (pc instanceof Activity) {
             return findFirstActivity((Activity) pc);

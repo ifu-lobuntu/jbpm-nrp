@@ -22,13 +22,13 @@ public class ObservationCalculationService extends AbstractCalculationService {
     }
 
 
-    public void resolveCollaborationMeasurements(Long collaborationObservationId) {
+    public void resolveCollaborationMeasurements(Long collaborationObservationId, ObservationPhase phase) {
         CollaborationInstance collaboration = entityManager.find(CollaborationInstance.class, collaborationObservationId);
         String deploymentId = collaboration.getCollaboration().getDeploymentId();
         //First business items
         for (BusinessItemObservation businessItem : collaboration.getBusinessItems()) {
             Set<? extends Measurement> measurements = businessItem.getMeasurements();
-            ObservationContext context = new ObservationContext();
+            ObservationContext context = new ObservationContext(phase);
             context.putAll(measurements);
             resolveObservedMeasures(deploymentId, context, measurements);
         }
@@ -37,25 +37,25 @@ public class ObservationCalculationService extends AbstractCalculationService {
         Set<PortContainer> processedNodes = new HashSet<PortContainer>();
         for (Activity ao : collaboration.getCollaboration().getActivities()) {
             if (ao.getInputFlows().isEmpty()) {
-                maybeProcessNode(deploymentId, processedFlows, processedNodes, ao, collaboration);
+                maybeProcessNode(deploymentId, processedFlows, processedNodes, ao, collaboration, phase);
             }
         }
         for (SupplyingStore ao : collaboration.getCollaboration().getSupplyingStores()) {
             if (ao.getInputFlows().isEmpty()) {
-                maybeProcessNode(deploymentId, processedFlows, processedNodes, ao, collaboration);
+                maybeProcessNode(deploymentId, processedFlows, processedNodes, ao, collaboration, phase);
             }
         }
         for (ValuePropositionInstance vpi : collaboration.getValuePropositions()) {
             if(vpi.isActive()){
-                calculateValuePropositionComponents(deploymentId, vpi);
+                calculateValuePropositionComponents(deploymentId, vpi,phase);
             }
         }
         entityManager.flush();
     }
 
-    protected void calculateValuePropositionComponents(String deploymentId, ValuePropositionInstance vpi) {
+    protected void calculateValuePropositionComponents(String deploymentId, ValuePropositionInstance vpi, ObservationPhase phase) {
         for (ValuePropositionComponentInstance c : vpi.getComponents()) {
-            ObservationContext oc = new ObservationContext();
+            ObservationContext oc = new ObservationContext(phase);
             for (ValueElementInstance vei : c.getAggregatedFrom()) {
                 oc.putAll(vei.getMeasurements());
             }
@@ -64,23 +64,23 @@ public class ObservationCalculationService extends AbstractCalculationService {
         }
     }
 
-    private void maybeProcessNode(String deploymentId, Set<DeliverableFlow> processedFlows, Set<PortContainer> processedNodes, PortContainer pc, CollaborationInstance ci) {
+    private void maybeProcessNode(String deploymentId, Set<DeliverableFlow> processedFlows, Set<PortContainer> processedNodes, PortContainer pc, CollaborationInstance ci, ObservationPhase phase) {
         if (processedFlows.containsAll(pc.getInputFlows()) && !processedNodes.contains(pc)) {
             processedFlows.addAll(pc.getOutputFlows());
             processedNodes.add(pc);
-            processAllNodeInstances(deploymentId, pc, ci);
+            processAllNodeInstances(deploymentId, pc, ci,phase);
             for (DeliverableFlow flow : pc.getOutputFlows()) {
                 if (flow.getTargetPortContainer() instanceof Activity || flow.getTargetPortContainer() instanceof SupplyingStore) {
-                    maybeProcessNode(deploymentId, processedFlows, processedNodes, flow.getTargetPortContainer(), ci);
+                    maybeProcessNode(deploymentId, processedFlows, processedNodes, flow.getTargetPortContainer(), ci, phase);
                 }
             }
         }
     }
 
-    private void processAllNodeInstances(String deploymentId, PortContainer pc, CollaborationInstance ci) {
+    private void processAllNodeInstances(String deploymentId, PortContainer pc, CollaborationInstance ci, ObservationPhase phase) {
         Collection<? extends PortContainerInstance> portContainers = ci.findPortContainers(pc);
         for (PortContainerInstance pci : portContainers) {
-            ObservationContext c = new ObservationContext();
+            ObservationContext c = new ObservationContext(phase);
             c.putAll(pci.getMeasurements());
             for (PortInstance portInstance : pci.getContainedPorts()) {
                 c.putAll(portInstance.getMeasurements());

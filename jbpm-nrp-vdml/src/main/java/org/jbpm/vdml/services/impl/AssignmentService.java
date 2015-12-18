@@ -21,63 +21,115 @@ public class AssignmentService extends AbstractRuntimeService {
         super(entityManager);
     }
 
+    public void applyResourceAssignments(CollaborationInstance ci) {
+        for (ActivityInstance ai : ci.getActivities()) {
+            assignRoleResource(ai);
+        }
+        for (SupplyingStoreInstance ssi : ci.getSupplyingStores()) {
+            assignRoleResource(ssi);
+        }
+    }
+
+    protected void assignRoleResource(PortContainerInstance pci) {
+        ReusableBusinessItemPerformance roleResource = pci.findProvidingRoleResource();
+        if (roleResource != null) {
+            IndividualParticipant participant = roleResource.getRepresents();
+            if (pci instanceof ActivityInstance) {
+                ActivityInstance ai = (ActivityInstance) pci;
+                assignActivityToParticipant(participant, ai);
+            } else {
+                SupplyingStoreInstance ssi = (SupplyingStoreInstance) pci;
+                assignStoreToParticipant(participant, ssi);
+            }
+        }
+    }
+
+    public RolePerformance assignActivityToParticipant(Participant participant, ActivityInstance ai) {
+        CapabilityOffer capabilityOffer = findOrCreateCapabilityOffer(participant, ai.getActivity().getCapabilityRequirement());
+        RolePerformance rolePerformance = findOrCreateRole(participant, ai.getResponsibleRole().getFulfillingNetworkRole());
+        return assignActivity(ai, capabilityOffer, rolePerformance);
+    }
+
+    private RolePerformance assignActivity(ActivityInstance ai, CapabilityOffer capabilityOffer, RolePerformance rolePerformance) {
+        ai.setCapabilityOffer(capabilityOffer);
+        ai.setPerformingRole(rolePerformance);
+        return ai.getPerformingRole();
+    }
+
+    public RolePerformance assignStoreToParticipant(Participant participant, SupplyingStoreInstance ssi) {
+        StorePerformance storePerformance = findOrCreateStorePerformance(participant, ssi.getSupplyingStore().getStoreRequirement());
+        RolePerformance rolePerformance = findOrCreateRole(participant, ssi.getResponsibleRole().getFulfillingNetworkRole());
+        return assignSupplyingStore(ssi, storePerformance, rolePerformance);
+    }
+
+    private RolePerformance assignSupplyingStore(SupplyingStoreInstance ssi, StorePerformance storePerformance, RolePerformance rolePerformance) {
+        ssi.setStore(storePerformance);
+        ssi.setSupplyingRole(rolePerformance);
+        return ssi.getSupplyingRole();
+    }
+
 
     public void assignToRoles(CollaborationInstance observation, Collection<RolePerformance> rolePerformances) {
         for (Role tmp : observation.getCollaboration().getCollaborationRoles()) {
             RoleInCapabilityMethod role = (RoleInCapabilityMethod) tmp;
-
             RolePerformance rp = findMatchingRolePerformance(rolePerformances, role.getFulfillingNetworkRole());
             if (rp != null) {
                 observation.getCollaborationRoles().add(rp);
+                Participant participant = rp.getParticipant();
                 for (Activity activity : role.getPerformedActitivities()) {
-                    Collection<ActivityInstance> activities = observation.findActivities(activity);
-                    for (ActivityInstance ao : activities) {
-                        Query q = entityManager.createQuery("select cp from CapabilityOffer cp where cp.participant= :participant and cp.capability=:capability");
-                        q.setParameter("participant", rp.getParticipant());
-                        q.setParameter("capability", activity.getCapabilityRequirement());
-                        List<CapabilityOffer> result = q.getResultList();
-                        CapabilityOffer cp;
-                        if (result.isEmpty()) {
-                            cp = new CapabilityOffer(activity.getCapabilityRequirement(), rp.getParticipant());
-                            entityManager.persist(cp);
-                        } else {
-                            cp = result.get(0);
-                        }
-                        cp.setActive(true);
-                        syncRuntimeEntities(cp.getMeasurements(), cp.getCapability().getMeasures(), CapabilityMeasurement.class, cp);
-                        ao.setCapabilityOffer(cp);
-                        ao.setPerformingRole(rp);
-                        //TODO signal event to commence ConversationForAction
+                    CapabilityOffer cp = findOrCreateCapabilityOffer(participant, activity.getCapabilityRequirement());
+                    for (ActivityInstance ao : observation.findActivities(activity)) {
+                        assignActivity(ao, cp, rp);
                     }
                 }
                 for (SupplyingStore ss : role.getSupplyingStores()) {
+                    StorePerformance sp = findOrCreateStorePerformance(participant, ss.getStoreRequirement());
                     for (SupplyingStoreInstance sso : observation.findSupplyingStores(ss)) {
-                        Query q = entityManager.createQuery("select sp from StorePerformance sp where sp.owner= :participant and sp.storeDefinition=:storeDefinition");
-                        q.setParameter("participant", rp.getParticipant());
-                        q.setParameter("storeDefinition", ss.getStoreRequirement());
-                        List<StorePerformance> result = q.getResultList();
-                        StorePerformance sp;
-                        if (result.isEmpty()) {
-                            if (ss.getStoreRequirement() instanceof PoolDefinition) {
-                                sp = new PoolPerformance((PoolDefinition) ss.getStoreRequirement(), rp.getParticipant());
-                            } else {
-                                sp = new StorePerformance(ss.getStoreRequirement(), rp.getParticipant());
-                            }
-                            entityManager.persist(sp);
-                        } else {
-                            sp = result.get(0);
-                        }
-                        sp.setActive(true);
-                        syncRuntimeEntities(sp.getMeasurements(), sp.getStoreDefinition().getMeasures(), StoreMeasurement.class, sp);
-                        sso.setStore(sp);
-                        sso.setSupplyingRole(rp);
-                        //TODO signal event to commence ConversationForAction
+                        assignSupplyingStore(sso, sp, rp);
                     }
                 }
             }
         }
         syncValuePropositions(observation);
         entityManager.flush();
+    }
+
+    private StorePerformance findOrCreateStorePerformance(Participant participant, StoreDefinition storeRequirement) {
+        Query q = entityManager.createQuery("select sp from StorePerformance sp where sp.owner= :participant and sp.storeDefinition=:storeDefinition");
+        q.setParameter("participant", participant);
+        q.setParameter("storeDefinition", storeRequirement);
+        List<StorePerformance> result = q.getResultList();
+        StorePerformance sp;
+        if (result.isEmpty()) {
+            if (storeRequirement instanceof PoolDefinition) {
+                sp = new PoolPerformance((PoolDefinition) storeRequirement, participant);
+            } else {
+                sp = new StorePerformance(storeRequirement, participant);
+            }
+            entityManager.persist(sp);
+        } else {
+            sp = result.get(0);
+        }
+        sp.setActive(true);
+        syncRuntimeEntities(sp.getMeasurements(), sp.getStoreDefinition().getMeasures(), StoreMeasurement.class, sp);
+        return sp;
+    }
+
+    private CapabilityOffer findOrCreateCapabilityOffer(Participant participant, Capability capabilityRequirement) {
+        Query q = entityManager.createQuery("select cp from CapabilityOffer cp where cp.participant= :participant and cp.capability=:capability");
+        q.setParameter("participant", participant);
+        q.setParameter("capability", capabilityRequirement);
+        List<CapabilityOffer> result = q.getResultList();
+        CapabilityOffer cp;
+        if (result.isEmpty()) {
+            cp = new CapabilityOffer(capabilityRequirement, participant);
+            entityManager.persist(cp);
+        } else {
+            cp = result.get(0);
+        }
+        cp.setActive(true);
+        syncRuntimeEntities(cp.getMeasurements(), cp.getCapability().getMeasures(), CapabilityMeasurement.class, cp);
+        return cp;
     }
 
     private RolePerformance findMatchingRolePerformance(Collection<RolePerformance> rolePerformances, RoleInNetwork fulfillingNetworkRole) {
@@ -96,7 +148,7 @@ public class AssignmentService extends AbstractRuntimeService {
         for (Role provider : c.getCollaboration().getCollaborationRoles()) {
             for (ValueProposition vp : provider.getProvidedValuePropositions()) {
                 for (RolePerformance recipient : c.findRolePerformances((RoleInCapabilityMethod) vp.getRecipient())) {
-                    RolePerformance providerPerformance=findMatchingRolePerformance(c.getCollaborationRoles(), ((RoleInCapabilityMethod) provider).getFulfillingNetworkRole());
+                    RolePerformance providerPerformance = findMatchingRolePerformance(c.getCollaborationRoles(), ((RoleInCapabilityMethod) provider).getFulfillingNetworkRole());
                     Collection<PortContainerInstance> responsibilitiesToRecipient = findResponsibilitiesTo(c, providerPerformance, recipient);
                     if (responsibilitiesToRecipient.size() > 0) {
                         ValuePropositionInstance vpi = c.findValuePropositionInstance(providerPerformance, recipient);
@@ -170,35 +222,12 @@ public class AssignmentService extends AbstractRuntimeService {
         return false;
     }
 
-    private void collectRecipients(ValueProposition vp, Set<RolePerformance> recipients, PortContainerInstance pci) {
-        for (OutputPortInstance opi : pci.getOutputPorts()) {
-            if (opi.getOutput() != null) {
-                if (opi.getOutput().getTargetPortContainer().getResponsibleRolePerformance() != null) {
-                    if (opi.getOutput().getTargetPortContainer().getResponsibleRolePerformance().getRole().equals(vp.getRecipient())) {
-                        recipients.add(opi.getOutput().getTargetPortContainer().getResponsibleRolePerformance());
-                    }
-                }
-                //TODO validate against circular flows
-                collectRecipients(vp, recipients, opi.getOutput().getTargetPortContainer());
+    public void assignToBusinessItem(BusinessItemObservation observation, ReusableBusinessItemPerformance rbip) {
+        observation.setSharedReference(rbip);
+        for (DeliverableFlowInstance dfi : observation.getDeliverableFlows()) {
+            if (rbip.equals(dfi.getTargetPortContainer().findProvidingRoleResource())) {
+                assignRoleResource(dfi.getTargetPortContainer());
             }
         }
-    }
-
-    public RolePerformance assignToActivities(ActivityInstance observation, CapabilityOffer capability) {
-        observation.setCapabilityOffer(capability);
-        observation.setPerformingRole(findOrCreateRole(capability.getParticipant(), observation.getActivity().getPerformingRole().getFulfillingNetworkRole()));
-        return observation.getResponsibleRolePerformance();
-        //TODO signal event to commence ConversationForAction
-    }
-
-    public void assignToSupplyingStores(SupplyingStoreInstance observation, StorePerformance capability) {
-        observation.setStore(capability);
-        observation.setSupplyingRole(findOrCreateRole(capability.getOwner(), observation.getSupplyingStore().getSupplyingRole().getFulfillingNetworkRole()));
-        //TODO signal event to commence ConversationForAction
-    }
-
-    public void assignToBusinessItem(BusinessItemObservation observation, ReusableBusinessItemPerformance storePerformance) {
-        observation.setSharedReference(storePerformance);
-        //uhm yeah well ok?!
     }
 }

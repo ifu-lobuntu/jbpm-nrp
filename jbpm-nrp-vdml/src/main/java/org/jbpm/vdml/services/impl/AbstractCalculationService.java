@@ -1,9 +1,9 @@
 package org.jbpm.vdml.services.impl;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.jbpm.nrp.common.IntervalEnum;
 import org.jbpm.vdml.services.impl.model.meta.*;
 import org.jbpm.vdml.services.impl.model.runtime.Measurement;
-import org.jbpm.vdml.services.impl.model.runtime.StoreMeasurement;
 
 import javax.persistence.EntityManager;
 import java.util.Collection;
@@ -23,11 +23,12 @@ public class AbstractCalculationService {
 
     protected void resolveObservedMeasures(String deploymentId, ObservationContext context, Collection<? extends Measurement> measurements) {
         for (Measurement measurement : measurements) {
-            if(!measurement.isResolved()) {
+            if (!context.getPhase().isResolved(measurement)) {
                 resolveMeasurement(deploymentId, context, measurement);
             }
         }
     }
+
     protected void resolveAllMeasurements(String deploymentId, ObservationContext c) {
         float oldResolutionRatio = 0;
         float newResolutionRatio = 0;
@@ -35,7 +36,7 @@ public class AbstractCalculationService {
             oldResolutionRatio = newResolutionRatio;
             resolveObservedMeasures(deploymentId, c, c.getAllMeasurements());
             newResolutionRatio = c.calculateResolutionRate();
-        } while (oldResolutionRatio < newResolutionRatio && newResolutionRatio!=1f);
+        } while (oldResolutionRatio < newResolutionRatio && newResolutionRatio != 1f);
     }
 
     private void resolveMeasurement(String deploymentId, ObservationContext context, Measurement measurement) {
@@ -44,13 +45,13 @@ public class AbstractCalculationService {
             Double measurementA = resolveMeasurement(deploymentId, context, bm.getMeasureA());
             Double measurementB = resolveMeasurement(deploymentId, context, bm.getMeasureB());
             if (measurementA != null && measurementB != null) {
-                measurement.setActualValue(bm.getFunctor().apply(measurementA, measurementB));
+                context.getPhase().setValue(measurement, bm.getFunctor().apply(measurementA, measurementB));
             }
         } else if (measurement.getMeasure() instanceof RescaledMeasure) {
             RescaledMeasure bm = (RescaledMeasure) measurement.getMeasure();
             Double measurementA = resolveMeasurement(deploymentId, context, bm.getRescaledMeasure());
             if (measurementA != null) {
-                measurement.setActualValue(bm.getMultiplier() * measurementA + bm.getOffset());
+                context.getPhase().setValue(measurement, bm.getMultiplier() * measurementA + bm.getOffset());
             }
 
         } else if (measurement.getMeasure() instanceof NamedMeasure) {
@@ -58,29 +59,60 @@ public class AbstractCalculationService {
             NamedMeasureStrategy strategy = NamedMeasureRegistry.get(deploymentId, bm.getName());
             if (strategy != null) {
                 Object o = strategy.applyMeasurement(measurement.getMeasurand());
-                if (o instanceof Double) {
-                    measurement.setActualValue((Double) o);
-                } else if (o instanceof Enum) {
-                    measurement.setActualRating((Enum) o);
+                context.getPhase().setValue(measurement, o);
+            }
+        } else if (measurement.getMeasure() instanceof EnumeratedMeasure) {
+            EnumeratedMeasure bm = (EnumeratedMeasure) measurement.getMeasure();
+            if (bm.getTargetMeasure() != null) {
+                Double targetMeasure = resolveMeasurement(deploymentId, context, bm.getTargetMeasure());
+                if (targetMeasure != null) {
+                    IntervalEnum value = findMatchingInterval(bm, targetMeasure);
+                    context.getPhase().setValue(measurement, value);
                 }
             }
         } else if (measurement.getMeasure() instanceof CollectiveMeasure) {
             CollectiveMeasure collectiveMeasure = (CollectiveMeasure) measurement.getMeasure();
-            Object values = resolveMeasurements(deploymentId, context, collectiveMeasure.getAggregatedMeasures(), false,true);
+            Object values = resolveMeasurements(deploymentId, context, collectiveMeasure.getAggregatedMeasures(), false, true);
             if (values != null) {
                 double value = calculateCollectiveMeasure(collectiveMeasure, (double[]) values);
-                measurement.setActualValue(value);
+                context.getPhase().setValue(measurement, value);
             }
         } else if (measurement.getMeasure() instanceof CountingMeasure) {
             CountingMeasure collectiveMeasure = (CountingMeasure) measurement.getMeasure();
             String exp = collectiveMeasure.getValuesToCount();
-            Object values = resolveMeasurements(deploymentId, context, Collections.singleton(collectiveMeasure.getMeasureToCount()), exp!=null && exp.contains("actualRating"),true);
+            Object values = resolveMeasurements(deploymentId, context, Collections.singleton(collectiveMeasure.getMeasureToCount()), exp != null && exp.contains("actualRating"), true);
             if (values != null) {
                 Counter c = new Counter(collectiveMeasure.getValuesToCount());
                 double value = values instanceof double[] ? c.getValue((double[]) values) : c.getValue((Enum<?>[]) values);
-                measurement.setActualValue(value);
+                context.getPhase().setValue(measurement, value);
             }
         }
+    }
+
+    private IntervalEnum findMatchingInterval(EnumeratedMeasure bm, Double targetMeasure) {
+        for (Enum<?> anEnum : bm.getEnumClass().getEnumConstants()) {
+            IntervalEnum ie = (IntervalEnum) anEnum;
+            boolean passesMaximumCheck = true;
+            if (ie.getMaximumEndpoint() != null) {
+                if (Boolean.TRUE.equals(ie.getMaximumOpen())) {
+                    passesMaximumCheck = targetMeasure < ie.getMaximumEndpoint();
+                } else {
+                    passesMaximumCheck = targetMeasure <= ie.getMaximumEndpoint();
+                }
+            }
+            boolean passesMinimumCheck = true;
+            if (ie.getMinimumEndpoint() != null) {
+                if (Boolean.TRUE.equals(ie.getMinimumOpen())) {
+                    passesMinimumCheck = targetMeasure > ie.getMinimumEndpoint();
+                } else {
+                    passesMinimumCheck = targetMeasure >= ie.getMinimumEndpoint();
+                }
+            }
+            if (passesMaximumCheck && passesMinimumCheck) {
+                return ie;
+            }
+        }
+        return null;
     }
 
 
@@ -118,12 +150,12 @@ public class AbstractCalculationService {
 
     private Object resolveMeasurements(String deploymentId, ObservationContext context, Set<EmfReference> measureA, boolean returnRatings, boolean interruptOnNullMeasurement) {
         Set<Measurement> all = new HashSet<Measurement>();
-        int unresolvedMeasurementCount=0;
-        int totalMeasurementCount=0;
+        int unresolvedMeasurementCount = 0;
+        int totalMeasurementCount = 0;
         for (EmfReference emfReference : measureA) {
             Collection<Measurement> measurements = resolveObservedMeasures(deploymentId, context, emfReference);
             if (measurements.isEmpty()) {
-                if(!interruptOnNullMeasurement) {
+                if (!interruptOnNullMeasurement) {
 //                    System.out.println("Measurement not in context");
                 }
                 return null;// context does not include all the measures yet
@@ -134,9 +166,9 @@ public class AbstractCalculationService {
                         if (returnRatings) {
                             return null;
                         } else if (measurement.getActualValue() == null) {
-                            if(interruptOnNullMeasurement) {
+                            if (interruptOnNullMeasurement) {
                                 return null;
-                            }else{
+                            } else {
                                 unresolvedMeasurementCount++;
                             }
 
@@ -146,7 +178,7 @@ public class AbstractCalculationService {
                 }
             }
         }
-        if(!interruptOnNullMeasurement){
+        if (!interruptOnNullMeasurement) {
 //            System.out.println(unresolvedMeasurementCount + " measurements from "+totalMeasurementCount+" not calculated yet");
             return null;
         }
@@ -183,7 +215,7 @@ public class AbstractCalculationService {
         if (observedMeasure != null) {
             measurements = observedMeasure.getMeasurements();
             for (Measurement measurement : measurements) {
-                if (!measurement.isResolved()) {
+                if (!context.getPhase().isResolved(measurement)) {
                     resolveMeasurement(deploymentId, context, measurement);
                 }
             }
