@@ -26,6 +26,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 public class RolePerformanceTest extends MetaEntityImportTest {
+
     private DeliverableFlow flow;
     private IndividualParticipant consumerParticipant;
     private IndividualParticipant supplierParticipant;
