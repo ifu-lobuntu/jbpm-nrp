@@ -2,6 +2,7 @@ package org.jbpm.vdml.services.impl.scheduling;
 
 import org.jbpm.vdml.services.impl.LocationUtil;
 import org.joda.time.Duration;
+import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.simple.SimpleScore;
 import org.optaplanner.core.impl.score.director.easy.EasyScoreCalculator;
 
@@ -9,12 +10,12 @@ public class BookingSolutionCalculator implements EasyScoreCalculator<BookingSol
     private final double millisPerMinute = 1000 * 60d;
 
     @Override
-    public SimpleScore calculateScore(BookingSolution bookingSolution) {
+    public SimpleScore calculateScore(BookingSolution bookingSolution, int i) {
         double totalScore = 1;
         for (Booking booking : bookingSolution.getBookings()) {
             if (booking.getStartScheduleSlot() == null ||
                     booking.getEndScheduleSlot() == null) {
-                return SimpleScore.valueOf(-1);
+                return SimpleScore.valueOfInitialized(-1);
 
             }
             ScheduleSlot currentSlot = booking.getStartScheduleSlot();
@@ -25,7 +26,7 @@ public class BookingSolutionCalculator implements EasyScoreCalculator<BookingSol
                 Duration interval = new Duration(currentSlot.getTo(), currentSlot.getNext().getFrom());
                 totalIdleMinutes += Math.round(interval.getMillis() / millisPerMinute);
                 if (totalIdleMinutes > 120) {
-                    return SimpleScore.valueOf(-1);
+                    return SimpleScore.valueOfInitialized(-1);
                 }
                 currentSlot = currentSlot.getNext();
                 remainder -= currentSlot.getDurationInMillis();
@@ -41,6 +42,7 @@ public class BookingSolutionCalculator implements EasyScoreCalculator<BookingSol
         }
         int finalScore = (int) Math.round(1000000000 / totalScore);
 //        System.out.println("Final Score:" + finalScore);
-        return SimpleScore.valueOf(finalScore);
+        return SimpleScore.valueOfInitialized(finalScore);
     }
+
 }

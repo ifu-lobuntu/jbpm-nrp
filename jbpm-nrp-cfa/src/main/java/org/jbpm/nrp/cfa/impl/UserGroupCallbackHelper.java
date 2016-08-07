@@ -6,6 +6,7 @@ import org.jbpm.services.task.commands.UserGroupCallbackTaskCommand;
 import org.kie.api.task.model.Attachment;
 import org.kie.api.task.model.Comment;
 import org.kie.api.task.model.OrganizationalEntity;
+import org.kie.api.task.model.User;
 import org.kie.internal.task.api.TaskContext;
 import org.kie.internal.task.api.model.Deadlines;
 import org.kie.internal.task.api.model.InternalPeopleAssignments;
@@ -34,8 +35,8 @@ public class UserGroupCallbackHelper extends UserGroupCallbackTaskCommand<Void> 
 	}
 
 	@Override
-	public  void addUserFromCallbackOperation(String userId, TaskContext context) {
-		super.addUserFromCallbackOperation(userId, context);
+	public User addUserFromCallbackOperation(String userId, TaskContext context) {
+		return super.addUserFromCallbackOperation(userId, context);
 	}
 
 	@Override

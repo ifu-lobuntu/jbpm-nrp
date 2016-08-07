@@ -28,7 +28,7 @@ public class MetaBuilder {
     }
 
 
-    protected <T> T findOrCreate(EObject eo, Class<T> t, Object... parent) {
+    protected <T> T findOrCreate(EObject eo, Class<? extends T> t, Object... parent) {
         if (eo == null) {
             return null;
         }

@@ -75,7 +75,7 @@ public class SchedulingUtilTest {
         solver.solve(booking);
         BookingSolution solvedCloudBalance = (BookingSolution) solver.getBestSolution();
         DateTime dateTime = solvedCloudBalance.getBookings().get(0).getStartScheduleSlot().getFrom();
-        System.out.println(new BookingSolutionCalculator().calculateScore(solvedCloudBalance));
+        System.out.println(new BookingSolutionCalculator().calculateScore(solvedCloudBalance,1000000));
         assertEquals(1, dateTime.getDayOfMonth());
         assertEquals(13, dateTime.getHourOfDay());
 
